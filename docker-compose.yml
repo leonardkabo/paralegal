@@ -1,0 +1,25 @@
+services:
+  paralegal-app:
+    build: .
+    container_name: paralegal-app
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - APP_URL=https://paralegal.votre-domaine.com
+    volumes:
+      # Persistance de la base de données et des fichiers envoyés
+      - ./paralegal.db:/app/paralegal.db
+      - ./uploads:/app/uploads
+    networks:
+      - traefik-network # Le nom de votre réseau Traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paralegal.rule=Host(`paralegal.votre-domaine.com`)"
+      - "traefik.http.routers.paralegal.entrypoints=websecure"
+      - "traefik.http.routers.paralegal.tls.certresolver=myresolver" # Votre resolver (LetsEncrypt)
+      - "traefik.http.services.paralegal.loadbalancer.server.port=3000"
+
+networks:
+  traefik-network:
+    external: true

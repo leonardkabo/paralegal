@@ -1,0 +1,5 @@
+{
+  "name": "Paralegal",
+  "description": "Application pédagogique pour la formation des parajuristes communautaires, accessible en français et en Fon.",
+  "requestFramePermissions": ["microphone"]
+}
