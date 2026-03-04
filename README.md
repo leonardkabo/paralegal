@@ -1,14 +1,14 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/leonardkabo/paralegal/blob/main/LOGO%20HAI%20ok.png" />
 </div>
 
-# Run and deploy your AI Studio app
+# Application entièrement développé par Léonard KABO
 
-This contains everything you need to run your app locally.
+Cette application est une plateforme de l'ONG HAI, entièrement développée par Léonard KABO, joignable via le +229 0165458778
 
-View your app in AI Studio: https://ai.studio/apps/75840e02-1015-4c49-900c-7694e33724bf
+Visitez le site web perso du développeur via : https://leonardkabo.cloud
 
-## Run Locally
+## Pour lancer l'app en local
 
 **Prerequisites:**  Node.js
 
