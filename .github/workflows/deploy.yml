@@ -13,14 +13,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          # On envoie tout le contenu du dossier actuel vers le dossier de l'app sur le VPS
+          source: "."
+          target: "~/paralegal"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          port: 22
           script: |
-            cd /path/to/your/app # Remplacer par le chemin réel sur votre VPS
-            git pull origin main
+            cd ~/paralegal
+            
+            # Création sécurisée des fichiers persistants s'ils n'existent pas
+            touch paralegal.db
+            mkdir -p uploads
+            
+            # Injection de la clé API Gemini dans le fichier .env
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+            echo "NODE_ENV=production" >> .env
+            
+            # Lancement/Reconstruction de l'application
             docker compose up -d --build
