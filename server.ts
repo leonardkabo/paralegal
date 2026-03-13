@@ -107,7 +107,7 @@ const settingsCount = db.prepare("SELECT COUNT(*) as count FROM settings").get()
 if (settingsCount.count === 0) {
   db.prepare("INSERT INTO settings (key, value) VALUES (?, ?)").run("logoUrl", "");
   db.prepare("INSERT INTO settings (key, value) VALUES (?, ?)").run("organizationName", "Health Access Initiative (HAI)");
-  db.prepare("INSERT INTO settings (key, value) VALUES (?, ?)").run("contactEmail", "contact@hai-benin.org");
+  db.prepare("INSERT INTO settings (key, value) VALUES (?, ?)").run("contactEmail", "info@healthaccess-initiative.org");
 }
 
 // Seed modules if empty or reset for 10 modules
@@ -115,70 +115,960 @@ const moduleCount = db.prepare("SELECT COUNT(*) as count FROM modules").get() as
 if (moduleCount.count < 10) {
   db.prepare("DELETE FROM modules").run();
   const initialModules = [
-    {
-      id: 1,
-      title: "Introduction aux parajuristes",
-      introduction: "Ce module présente le rôle essentiel des parajuristes dans le renforcement du pouvoir juridique des communautés.",
-      objectives: ["Définir le parajurisme", "Comprendre le Legal Empowerment", "Identifier les limites éthiques", "Connaître les missions sociales"],
-      keyNotions: ["Legal Empowerment", "Médiation", "Justice de proximité"],
-      content: "# Introduction aux parajuristes communautaires\n\nLe parajuriste est un acteur de changement social. Il n'est pas un avocat, mais un guide qui aide les citoyens à naviguer dans le système juridique.\n\n## Qu'est-ce qu'un parajuriste ?\nC'est une personne formée pour fournir une assistance juridique de base, sensibiliser les populations et faciliter la résolution de conflits.\n\n## Le Legal Empowerment\nC'est le processus par lequel les pauvres et les marginalisés utilisent le droit pour améliorer leur vie.",
-      quiz: [
-        { id: "q1_1", question: "Un parajuriste peut-il plaider au tribunal ?", options: ["Oui", "Non", "Seulement avec un juge"], correctAnswer: 1 },
-        { id: "q1_2", question: "Quel est l'objectif du Legal Empowerment ?", options: ["Remplacer les avocats", "Donner du pouvoir aux citoyens", "Changer la constitution"], correctAnswer: 1 },
-        { id: "q1_3", question: "Le parajuriste doit être issu de la communauté ?", options: ["Oui, c'est préférable", "Non, il doit venir de la capitale", "Peu importe"], correctAnswer: 0 },
-        { id: "q1_4", question: "La médiation fait-elle partie de son rôle ?", options: ["Oui", "Non", "Seulement pour les crimes"], correctAnswer: 0 },
-        { id: "q1_5", question: "Peut-il demander de l'argent pour ses services ?", options: ["Oui", "Non, c'est un service communautaire", "Seulement pour le transport"], correctAnswer: 1 }
-      ],
-      audioUrl: "", videoUrl: "", attachments: []
-    },
-    {
-      id: 2,
-      title: "Droit à la santé",
-      introduction: "Le droit à la santé est un droit fondamental protégé par la Constitution du Bénin.",
-      objectives: ["Connaître les textes légaux", "Identifier les violations", "Savoir orienter les victimes", "Comprendre l'éthique médicale"],
-      keyNotions: ["Accès universel", "Qualité des soins", "Non-discrimination"],
-      content: "# Le Droit à la Santé au Bénin\n\nL'État doit garantir l'accès aux soins pour tous. Cela inclut la disponibilité des médicaments et la qualité des infrastructures.\n\n## Les obligations de l'État\n1. Respecter l'accès aux soins.\n2. Protéger contre les abus.\n3. Réaliser les conditions de santé.",
-      quiz: [
-        { id: "q2_1", question: "Le droit à la santé est-il dans la Constitution ?", options: ["Oui", "Non", "Seulement pour les enfants"], correctAnswer: 0 },
-        { id: "q2_2", question: "Un hôpital peut-il refuser une urgence ?", options: ["Oui", "Non", "Si le patient n'a pas d'argent"], correctAnswer: 1 },
-        { id: "q2_3", question: "Que signifie 'Accessibilité économique' ?", options: ["Soins gratuits pour tous", "Coûts abordables", "Paiement après guérison"], correctAnswer: 1 },
-        { id: "q2_4", question: "L'eau potable fait-elle partie du droit à la santé ?", options: ["Oui", "Non", "Seulement en ville"], correctAnswer: 0 },
-        { id: "q2_5", question: "Le secret médical est-il obligatoire ?", options: ["Oui", "Non", "Sauf pour la famille"], correctAnswer: 0 }
-      ],
-      audioUrl: "", videoUrl: "", attachments: []
-    },
-    {
-      id: 3,
-      title: "Droit de la famille",
-      introduction: "Comprendre les règles du mariage, du divorce et des successions selon le Code des Personnes et de la Famille.",
-      objectives: ["Distinguer les types de mariage", "Comprendre les procédures de divorce", "Connaître les droits des héritiers", "Protéger les conjoints"],
-      keyNotions: ["Monogamie", "Succession", "Autorité parentale"],
-      content: "# Droit de la Famille\n\nLe Code des Personnes et de la Famille régit la vie privée au Bénin. Le mariage civil est le seul reconnu légalement pour la protection des biens.\n\n## Le Mariage\nIl doit être célébré devant l'officier d'état civil.\n\n## La Succession\nLes enfants, garçons et filles, ont les mêmes droits sur l'héritage de leurs parents.",
-      quiz: [
-        { id: "q3_1", question: "Quel mariage est reconnu par l'État ?", options: ["Religieux", "Coutumier", "Civil"], correctAnswer: 2 },
-        { id: "q3_2", question: "L'âge minimum légal du mariage est de :", options: ["15 ans", "18 ans", "21 ans"], correctAnswer: 1 },
-        { id: "q3_3", question: "Une fille peut-elle hériter de son père ?", options: ["Oui, autant qu'un garçon", "Non", "Moitié moins qu'un garçon"], correctAnswer: 0 },
-        { id: "q3_4", question: "Le divorce doit-il être prononcé par un juge ?", options: ["Oui", "Non, par le chef de village", "Par les parents"], correctAnswer: 0 },
-        { id: "q3_5", question: "Qui exerce l'autorité parentale ?", options: ["Le père seul", "La mère seule", "Les deux parents"], correctAnswer: 2 }
-      ],
-      audioUrl: "", videoUrl: "", attachments: []
-    },
-    {
-      id: 4,
-      title: "Droit foncier",
-      introduction: "Le foncier est une source majeure de conflits. Apprenez les bases du Code Foncier et Domanial.",
-      objectives: ["Comprendre le titre foncier", "Identifier les modes d'acquisition", "Gérer les litiges fonciers", "Connaître le rôle de l'ANDF"],
-      keyNotions: ["Titre Foncier", "Attestation de Détention Coutumière", "Expropriation"],
-      content: "# Droit Foncier et Domanial\n\nLa terre appartient à l'État ou aux particuliers. La sécurisation foncière passe par l'immatriculation.\n\n## Modes d'acquisition\n- Achat (acte notarié)\n- Succession\n- Donation",
-      quiz: [
-        { id: "q4_1", question: "Quel document garantit la propriété définitive ?", options: ["Le reçu d'achat", "Le Titre Foncier", "L'ADC"], correctAnswer: 1 },
-        { id: "q4_2", question: "Peut-on vendre une terre sans acte notarié ?", options: ["Oui", "Non, c'est obligatoire", "Seulement au village"], correctAnswer: 1 },
-        { id: "q4_3", question: "Que signifie l'expropriation ?", options: ["Vendre sa terre", "L'État reprend la terre pour utilité publique", "Donner sa terre"], correctAnswer: 1 },
-        { id: "q4_4", question: "L'ANDF s'occupe de quoi ?", options: ["De la santé", "De la gestion des terres", "De la police"], correctAnswer: 1 },
-        { id: "q4_5", question: "Un étranger peut-il posséder une terre au Bénin ?", options: ["Oui, sous conditions", "Non jamais", "Seulement à Cotonou"], correctAnswer: 0 }
-      ],
-      audioUrl: "", videoUrl: "", attachments: []
-    },
+      // MODULE 1: INTRODUCTION AU PARAJURISME ET EMPOWERMENT JURIDIQUE
+  {
+    id: 1,
+    title: "Module 1 : Fondements du Parajurisme et Legal Empowerment",
+    introduction: "Ce module établit les bases conceptuelles et éthiques du métier de parajuriste. Il explore la philosophie du Legal Empowerment, les principes déontologiques essentiels, et le rôle stratégique des parajuristes dans la chaîne d'accès à la justice au Bénin.",
+    objectives: [
+      "Définir le concept de parajurisme et distinguer les différents types de parajuristes",
+      "Comprendre la philosophie du Legal Empowerment et son application au Bénin",
+      "Maîtriser le code d'éthique et les limites de compétence du parajuriste",
+      "Identifier les partenaires institutionnels et les mécanismes de référencement",
+      "Appliquer les principes de confidentialité et de protection des données"
+    ],
+    keyNotions: [
+      "Legal Empowerment (Pouvoir Juridique)",
+      "Parajuriste communautaire vs institutionnel",
+      "Premiers secours juridiques",
+      "Déontologie et limites de compétence",
+      "Règle de la 'ligne rouge'",
+      "Confidentialité professionnelle"
+    ],
+    content: `# CHAPITRE 1 : QU'EST-CE QU'UN PARAJURISTE ?
+
+## 1.1 Définition et typologie
+
+Un **parajuriste** (paralegal) est une personne formée pour fournir une assistance juridique primaire, éduquer les communautés sur leurs droits, et faciliter l'accès à la justice, sans être titulaire d'un diplôme de droit complet [^7^].
+
+### Types de parajuristes au Bénin :
+- **Parajuristes communautaires** : Basés dans les villages/quartiers, proches des populations
+- **Parajuristes institutionnels** : Attachés à des ONG, cliniques juridiques ou structures étatiques
+- **Parajuristes spécialisés** : Focus sur des domaines spécifiques (VBG, foncier, santé)
+
+## 1.2 Le concept de Legal Empowerment
+
+Le **Legal Empowerment** est un processus par lequel les populations pauvres et marginalisées maîtrisent les outils juridiques pour améliorer leur vie quotidienne et défendre leurs intérêts [^6^].
+
+### Les quatre piliers du Legal Empowerment :
+1. **Accès à l'information juridique** : Connaître ses droits
+2. **Assistance juridique primaire** : Conseil de base et orientation
+3. **Médiation alternative** : Résolution pacifique des conflits
+4. **Plaidoyer systémique** : Agir pour changer les politiques
+
+## 1.3 Code d'éthique du parajuriste
+
+### Les principes fondamentaux :
+
+**a) Neutralité et impartialité**
+- Ne jamais prendre parti dans un conflit
+- Écouter toutes les parties avec la même attention
+- Ne pas laisser les relations personnelles influencer le jugement
+
+**b) Confidentialité absolue**
+- Tout ce qui est dit dans le cadre professionnel reste secret
+- Protection des données personnelles des clients
+- Pas de divulgation à la famille ou aux autorités sans consentement
+
+**c) Limites de compétence (La Ligne Rouge)**
+- **Ce qu'un parajuriste PEUT faire :**
+  - Informer sur les droits et procédures
+  - Aider à rédiger des documents simples
+  - Médier entre parties
+  - Orienter vers des avocats ou institutions compétentes
+  - Assister lors des démarches administratives
+
+- **Ce qu'un parajuriste NE DOIT PAS faire :**
+  - Représenter quelqu'un devant un tribunal (sauf exceptions légales spécifiques)
+  - Donner des avis juridiques complexes sur des matières spécialisées
+  - Accepter de l'argent pour des services (sauf remboursement de frais)
+  - Prendre des décisions à la place du client
+
+**d) Bénévolat et service communautaire**
+- Le parajuriste est un service gratuit pour la communauté
+- L'objectif est l'autonomisation, pas la dépendance
+- Le client doit toujours comprendre et approuver les démarches
+
+## 1.4 Réseau institutionnel au Bénin
+
+### Partenaires clés à connaître :
+
+**Secteur judiciaire :**
+- Tribunaux de première instance (civil, commercial, correctionnel)
+- Cours d'appel
+- Cour suprême
+- CRIET (Cour de Répression des Infractions Économiques et du Terrorisme)
+- Tribunaux de conciliation (pour les petits litiges)
+
+**Secteur administratif :**
+- Préfectures et mairies (état civil, foncier)
+- ANDF (Agence Nationale du Domaine et du Foncier)
+- Inspection du Travail
+- Direction de la Protection de l'Enfant
+
+**Secteur associatif et ONG :**
+- Barreau du Bénin (avocats)
+- Clinique juridique de l'Université d'Abomey-Calavi
+- Associations de défense des droits humains
+- Structures de médiation communautaire
+
+**Secteur santé (spécifique HAI) :**
+- Centres de santé et hôpitaux
+- Mécanismes de plaintes dans le système de santé
+- Comités de veille sanitaire
+
+---
+
+# CHAPITRE 2 : COMPÉTENCES FONDAMENTALES DU PARAJURISTE
+
+## 2.1 Compétences de communication
+
+### L'écoute active :
+- Écouter sans interrompre
+- Poser des questions ouvertes ("Comment c'est arrivé ?", "Que souhaitez-vous ?")
+- Reformuler pour vérifier la compréhension
+- Observer le langage non-verbal
+
+### La communication interculturelle :
+- Respecter les langues locales (Fon, Yoruba, etc.)
+- Adapter le discours au niveau d'éducation de l'interlocuteur
+- Utiliser des exemples concrets de la vie quotidienne
+- Mobiliser des allégories culturelles pertinentes
+
+## 2.2 Gestion des cas et documentation
+
+### Le dossier client :
+Chaque cas doit être documenté avec :
+- **Fiche d'identification** : Nom, contact, localisation, date
+- **Résumé du problème** : Description factuelle, parties en cause
+- **Documents collectés** : Copies des actes, correspondances
+- **Actions entreprises** : Conseils donnés, démarches facilitées
+- **Résolution** : Issue du cas, leçons apprises
+
+### Système de suivi :
+- Registre de consultation quotidien
+- Classement par type de problème (famille, foncier, travail, etc.)
+- Statistiques mensuelles pour les rapports d'activité
+
+## 2.3 Techniques de médiation de base
+
+### Les 5 étapes de la médiation communautaire :
+1. **Accueil et écoute** : Créer un climat de confiance
+2. **Analyse du conflit** : Identifier les intérêts réels (pas seulement les positions)
+3. **Génération d'options** : Proposer des solutions créatives
+4. **Négociation** : Aider les parties à trouver un terrain d'entente
+5. **Accord écrit** : Formaliser l'accord avec signatures et témoins
+
+### Principes de la médiation réussie :
+- **Volontariat** : Les parties doivent consentir librement
+- **Confidentialité** : Ce qui se dit en médiation reste secret
+- **Impartialité** : Le médiateur ne juge pas
+- **Flexibilité** : Adapter la procédure au contexte culturel
+
+---
+
+# CHAPITRE 3 : INTRODUCTION AU SYSTÈME JURIDIQUE BÉNINOIS
+
+## 3.1 Sources du droit au Bénin
+
+**Droit international :**
+- Constitution de 1990 (révisée)
+- Traités internationaux ratifiés (CEDAW, PIDCP, PIDESC, CRC)
+- Principes généraux du droit reconnu par la communauté internationale
+
+**Droit national :**
+- Lois votées par l'Assemblée Nationale
+- Décrets et arrêtés réglementaires
+- Coutumes non contraires à l'ordre public
+
+## 3.2 Hiérarchie des normes
+
+1. Constitution (suprême)
+2. Lois organiques et ordinaires
+3. Décrets présidentiels
+4. Arrêtés ministériels et interministériels
+5. Décisions locales (maires, préfets)
+
+## 3.3 Organigramme judiciaire simplifié
+
+\`\`\`
+COUR SUPRÊME (Cotonou)
+    │
+    ├── Cour Constitutionnelle
+    │
+    ├── Cour d'Appel (Cotonou, Parakou, Abomey, Bohicon)
+    │       │
+    │       ├── Tribunal de Première Instance (Civil/Commercial)
+    │       │       └── Tribunal de Conciliation (litiges < 100 000 FCFA)
+    │       │
+    │       └── Tribunal de Première Instance (Correctionnel)
+    │
+    └── CRIET (Crimes économiques et terrorisme)
+\`\`\`
+
+---
+
+# EXERCICE PRATIQUE : IDENTIFICATION DES RÔLES
+
+**Scénario :** Une femme vient vous consulter parce que son mari refuse de reconnaître leur enfant né hors mariage et ne donne pas les moyens de subsistance.
+
+**Questions à discuter :**
+1. Quelles sont les limites de votre intervention en tant que parajuriste ?
+2. Vers quelles institutions pouvez-vous l'orienter ?
+3. Quels documents devez-vous préparer avec elle ?
+4. Comment gérez-vous la confidentialité si elle demande que sa famille ne soit pas informée ?`,
+    quiz: [
+      { id: "q1_1", question: "Un parajuriste peut-il représenter un client devant le Tribunal de Première Instance ?", options: ["Oui, dans tous les cas", "Non, sauf exception légale spécifique", "Oui, si le client est pauvre"], correctAnswer: 1, explanation: "La représentation devant les tribunaux est généralement réservée aux avocats, sauf exceptions spécifiques prévues par la loi." },
+      { id: "q1_2", question: "Quelle est la première règle éthique du parajuriste ?", options: ["Gagner de l'argent", "Confidentialité et protection du client", "Plaire aux autorités"], correctAnswer: 1, explanation: "La confidentialité est fondamentale pour établir la confiance nécessaire à l'exercice du métier." },
+      { id: "q1_3", question: "Le Legal Empowerment vise principalement à :", options: ["Remplacer les avocats", "Donner aux pauvres les moyens d'utiliser le droit", "Créer de nouvelles lois"], correctAnswer: 1, explanation: "L'objectif est l'autonomisation des populations marginalisées par la maîtrise des outils juridiques." },
+      { id: "q1_4", question: "Dans une médiation, le parajuriste doit :", options: ["Prendre parti pour le plus faible", "Rester neutre et impartial", "Décider à la place des parties"], correctAnswer: 1, explanation: "La neutralité est essentielle pour que les parties acceptent le processus de médiation." },
+      { id: "q1_5", question: "Quel document garantit la propriété foncière au Bénin ?", options: ["Le Titre Foncier", "L'acte de vente sous seing privé", "La déclaration au chef de village"], correctAnswer: 0, explanation: "Seul le Titre Foncier délivré par l'ANDF garantit une propriété inattaquable." },
+      { id: "q1_6", question: "Un parajuriste peut-il accepter de l'argent pour ses services ?", options: ["Oui, c'est son droit", "Non, sauf remboursement des frais de déplacement", "Oui, si le client est riche"], correctAnswer: 1, explanation: "Le parajuriste bénévole ne doit pas facturer ses services, mais peut être remboursé de frais engagés." },
+      { id: "q1_7", question: "La CRIET est compétente pour :", options: ["Les divorces", "Les crimes économiques et le terrorisme", "Les litiges fonciers ruraux"], correctAnswer: 1, explanation: "La Cour de Répression des Infractions Économiques et du Terrorisme traite des crimes financiers complexes." },
+      { id: "q1_8", question: "Quelle est la durée idéale d'une formation initiale de parajuristes selon les standards internationaux ?", options: ["1 jour", "1 à 4 semaines", "1 an"], correctAnswer: 1, explanation: "Les programmes de formation de base varient généralement de 1 à 4 semaines selon le niveau de spécialisation [^2^]." }
+    ],
+    audioUrl: "", videoUrl: "", attachments: [], isReporting: 0, estimatedDuration: 240, difficultyLevel: "Débutant"
+  },
+
+  // MODULE 2 : DROIT À LA SANTÉ ET ÉTHIQUE MÉDICALE
+  {
+    id: 2,
+    title: "Module 2 : Droit à la Santé et Bioéthique",
+    introduction: "Ce module approfondit le droit à la santé comme droit fondamental, les obligations de l'État, la responsabilité médicale, et les mécanismes de défense des patients dans le contexte spécifique de la mission de HAI.",
+    objectives: [
+      "Maîtriser les textes constitutionnels et conventionnels sur le droit à la santé",
+      "Identifier les violations du droit à la santé et les recours disponibles",
+      "Comprendre la responsabilité médicale et le secret professionnel",
+      "Connaître les droits spécifiques des femmes et des enfants en santé reproductive",
+      "Maîtriser les procédures de plainte dans le système de santé béninois"
+    ],
+    keyNotions: [
+      "Droit à la santé (Constitution art. 29)",
+      "Accès universel et équité",
+      "Consentement éclairé",
+      "Secret médical et confidentialité",
+      "Responsabilité médicale",
+      "Santé reproductive et droits"
+    ],
+    content: `# CHAPITRE 1 : FONDEMENTS DU DROIT À LA SANTÉ
+
+## 1.1 Base constitutionnelle et internationale
+
+### Constitution du Bénin (1990) :
+**Article 29** : *"L'État reconnaît et garantit à tout individu le droit à la santé. Il a le devoir de veiller à la santé de la population et de prendre les mesures nécessaires pour assurer à tous la protection sanitaire."*
+
+### Instruments internationaux ratifiés par le Bénin :
+- **PIDESC** (Pacte International des Droits Économiques, Sociaux et Culturels) : Article 12
+- **CEDAW** : Article 12 (élimination de la discrimination dans le domaine des soins de santé)
+- **Convention des Droits de l'Enfant** : Article 24 (droit de l'enfant à la santé)
+- **Charte Africaine des Droits de l'Homme et des Peuples** : Article 16
+
+## 1.2 Les trois niveaux d'obligation de l'État
+
+**1. Respecter** : Ne pas entraver l'accès aux soins (pas de fermeture arbitraire de centres de santé)
+
+**2. Protéger** : Empêcher des tiers de nuire (régulation des pratiques médicales charlatanesques)
+
+**3. Réaliser** : Prendre des mesures positives pour garantir l'accès :
+- Construction d'infrastructures sanitaires
+- Formation du personnel médical
+- Subvention des médicaments essentiels
+- Couverture maladie universelle (AMU)
+
+---
+
+# CHAPITRE 2 : ACCÈS AUX SOINS ET ÉQUITÉ
+
+## 2.1 Les composantes de l'accès
+
+**Accessibilité physique** : Proximité géographique, transport, infrastructures adaptées aux personnes handicapées
+
+**Accessibilité financière** : Coûts abordables, gratuité pour les indigents, AMU
+
+**Accessibilité informationnelle** : Information compréhensible sur les services disponibles
+
+**Accessibilité culturelle** : Respect des langues, coutumes, et croyances
+
+## 2.2 La gratuité des soins au Bénin
+
+### Politique de gratuité :
+- **Soins obstétricaux et néonataux d'urgence (SONU)** : Gratuits depuis 2009
+- **Césarienne** : Gratuite
+- **Soins de paludisme** : Gratuits pour les U5 et les femmes enceintes
+- **VIH/SIDA** : ARV gratuits
+- **Vaccination** : Programme élargi de vaccination (PEV) gratuit
+
+### Défis persistants :
+- **Frais indirects** : Transport, nourriture pendant l'hospitalisation
+- **Pénuries de médicaments** : Obligation d'achat en pharmacie privée
+- **Corruption** : Paiements informels exigés par certains agents de santé
+
+---
+
+# CHAPITRE 3 : DROITS DU PATIENT ET ÉTHIQUE MÉDICALE
+
+## 3.1 Charte des droits du patient
+
+Tout patient a droit à :
+
+**a) L'information**
+- Connaître son état de santé
+- Comprendre les traitements proposés et leurs risques
+- Être informé des alternatives disponibles
+
+**b) Le consentement éclairé**
+- Aucun traitement sans consentement (sauf urgence vitale)
+- Droit de refuser un traitement
+- Droit de choisir son praticien
+
+**c) La dignité et le respect**
+- Accueil digne sans discrimination
+- Confidentialité absolue des informations médicales
+- Intimité préservée lors des examens
+
+**d) La qualité des soins**
+- Soins conformes aux normes professionnelles
+- Présence de personnel qualifié
+- Hygiène et sécurité garanties
+
+## 3.2 Le secret médical
+
+### Portée du secret :
+- **Absolu** : Ne peut être levé que par le patient lui-même ou une autorisation judiciaire
+- **Étendu** : Couvre tout le personnel soignant, pas seulement le médecin
+- **Perpétuel** : Survit au décès du patient et à la fin de la relation soignant-soigné
+
+### Exceptions légales :
+- Obligations de déclaration (maladies contagieuses, blessures par arme à feu)
+- Protection de l'intérêt supérieur de l'enfant
+- Défense du praticien en cas de procès
+
+## 3.3 Responsabilité médicale
+
+### Types de responsabilité :
+
+**Civile** : Réparation du préjudice subi (dommages-intérêts)
+- Exemple : Erreur de diagnostic entraînant un traitement inadapté
+
+**Pénale** : Sanctions pénales (prison, amende)
+- Exemple : Blessures involontaires, homicide involontaire, exercice illégal de la médecine
+
+**Disciplinaire** : Sanctions professionnelles (blâme, suspension, radiation)
+- Incompétence, faute contre l'honneur, manquement à la déontologie
+
+### La faute médicale :
+- **Définition** : Manquement à l'obligation de moyens (pas de résultat)
+- **Preuve** : Expertise médicale contradictoire
+- **Délai** : Action en responsabilité prescrite par 3 ans (10 ans en cas de dommage corporel)
+
+---
+
+# CHAPITRE 4 : SANTÉ REPRODUCTIVE ET DROITS DES FEMMES
+
+## 4.1 Planification familiale
+
+### Droit à la contraception :
+- Accès gratuit aux méthodes contraceptives modernes
+- Information sur les différentes méthodes
+- Confidentialité pour les mineurs (service adapté)
+
+### Interruption volontaire de grossesse (IVG) :
+- **Cadre légal** : Loi 2003-04 (IVG légale en cas de danger pour la vie de la mère ou grossesse résultant d'un viol)
+- **Conditions** : Avis de deux médecins, délai de réflexion
+- **Rôle du parajuriste** : Accompagnement pour l'accès à la procédure légale, pas d'encadrement d'IVG illégale
+
+## 4.2 Violences basées sur le genre (VBG) en milieu sanitaire
+
+### Obligations des établissements de santé :
+- Accueil sans jugement des victimes
+- Soins d'urgence gratuits (décret 2012-480)
+- Certification des blessures
+- Orientation vers les services psychosociaux et judiciaires
+
+### Protocole de prise en charge :
+1. **Accueil** : Espace privé, écoute empathique
+2. **Examens** : Documentation des blessures, collecte de preuves
+3. **Soins** : Prévention IST/VIH, contraception d'urgence si demandée
+4. **Certification** : Rédaction du constat médico-légal
+5. **Orientation** : Parajuriste, assistante sociale, justice
+
+---
+
+# CHAPITRE 5 : MÉCANISMES DE PLAINTE ET RECOURS
+
+## 5.1 Voies de recours administratives
+
+**Au niveau de l'établissement :**
+- Livre de plaintes disponible dans chaque centre de santé
+- Commission de recours des usagers (dans les hôpitaux)
+- Médecin-chef ou directeur de l'hôpital
+
+**Au niveau central :**
+- Direction de la Santé Publique (Ministère)
+- Inspection du Service de Santé
+- Mécanismes de la Couverture Maladie Universelle (AMU)
+
+## 5.2 Voies judiciaires
+
+**Action civile** : Demande de réparation devant le tribunal civil
+**Action pénale** : Plainte pour blessures involontaires ou homicide involontaire
+**Action disciplinaire** : Plainte au Conseil de l'Ordre des Médecins
+
+## 5.3 Rôle du parajuriste dans les litiges de santé
+
+### Accompagnement des patients :
+- Aider à comprendre les droits violés
+- Documenter les faits (dates, témoignages, documents médicaux)
+- Rédiger des lettres de réclamation
+- Orienter vers un avocat pour les actions complexes
+- Accompagner lors des audiences médicales
+
+### Précautions :
+- Ne pas donner d'avis médical (hors compétence)
+- Ne pas promettre de résultats financiers spécifiques
+- Respecter la décision finale du patient (même si on n'est pas d'accord)
+
+---
+
+# EXERCICE PRATIQUE : CAS CLINIQUE
+
+**Scénario :** Une jeune femme de 16 ans, mineure, vient vous voir. Elle est enceinte et son petit ami de 25 ans refuse de reconnaître la paternité. Ses parents veulent la marier de force au petit ami. Elle veut avorter mais a entendu dire que c'est interdit.
+
+**Questions d'analyse :**
+1. Quels sont les droits de cette jeune fille concernant sa grossesse ?
+2. Quelle est la procédure légale d'IVG au Bénin et s'applique-t-elle ici ?
+3. Comment gérez-vous la confidentialité vis-à-vis des parents ?
+4. Quelles sont les implications pénales pour le petit ami (relation avec une mineure) ?
+5. Quel accompagnement proposez-vous étape par étape ?`,
+    quiz: [
+      { id: "q2_1", question: "Quel article de la Constitution garantit le droit à la santé ?", options: ["Article 15", "Article 29", "Article 35"], correctAnswer: 1, explanation: "L'article 29 de la Constitution du Bénin consacre explicitement le droit à la santé." },
+      { id: "q2_2", question: "Un hôpital peut-il refuser une prise en charge d'urgence faute de paiement ?", options: ["Oui, c'est son droit", "Non, c'est une violation grave", "Seulement la nuit"], correctAnswer: 1, explanation: "Le refus de soins d'urgence est une violation du droit à la santé et peut entraîner des poursuites." },
+      { id: "q2_3", question: "Le secret médical peut être levé :", options: ["Jamais", "Par le patient ou une décision judiciaire", "Par la famille du patient"], correctAnswer: 1, explanation: "Le secret médical est absolu mais peut être levé par le patient lui-même ou une autorisation de justice." },
+      { id: "q2_4", question: "La SONU (Soins Obstétricaux et Néonataux d'Urgence) est :", options: ["Payante", "Gratuite pour toutes", "Gratuite seulement pour les pauvres"], correctAnswer: 1, explanation: "La gratuité de la SONU s'applique à toutes les femmes, sans condition de ressources." },
+      { id: "q2_5", question: "L'IVG est légale au Bénin en cas de :", options: ["Demande de la mère", "Danger pour la vie de la mère ou viol", "Jamais légale"], correctAnswer: 1, explanation: "Seuls ces deux cas permettent l'IVG légale selon la loi 2003-04." },
+      { id: "q2_6", question: "Un patient a-t-il le droit de refuser un traitement ?", options: ["Oui, c'est son droit au consentement éclairé", "Non, le médecin décide", "Seulement s'il est majeur"], correctAnswer: 0, explanation: "Le consentement éclairé implique le droit d'accepter ou de refuser." },
+      { id: "q2_7", question: "Quel délai pour agir en responsabilité médicale civile ?", options: ["1 an", "3 ans (10 ans pour dommage corporel)", "5 ans"], correctAnswer: 1, explanation: "La prescription est de 3 ans, portée à 10 ans pour les dommages corporels." },
+      { id: "q2_8", question: "La certification des blessures suite à une VBG doit être faite par :", options: ["Le parajuriste", "Un officier de police", "Un médecin (constat médico-légal)"], correctAnswer: 2, explanation: "Seul un médecin peut établir un constat médico-légal faisant foi." }
+    ],
+    audioUrl: "", videoUrl: "", attachments: [], isReporting: 0, estimatedDuration: 300, difficultyLevel: "Intermédiaire"
+  },
+
+  // MODULE 3 : DROIT DE LA FAMILLE APPROFONDI
+  {
+    id: 3,
+    title: "Module 3 : Droit de la Famille et des Personnes",
+    introduction: "Ce module couvre en profondeur le Code des Personnes et de la Famille du Bénin : mariage, divorce, filiation, autorité parentale, successions et régimes matrimoniaux. Il intègre les spécificités des droits coutumiers et leur harmonisation avec le droit positif.",
+    objectives: [
+      "Maîtriser les différents types de mariage et leurs effets juridiques",
+      "Connaître les procédures de divorce et leurs conséquences",
+      "Comprendre la filiation (légitime, naturelle, adoptive) et la reconnaissance d'enfant",
+      "Maîtriser les règles de succession et d'héritage (légal et testamentaire)",
+      "Connaître l'autorité parentale et ses limites"
+    ],
+    keyNotions: [
+      "Mariage civil vs coutumier vs religieux",
+      "Divorce pour faute vs divorce par consentement mutuel",
+      "Filiation et reconnaissance",
+      "Succession ab intestat vs testamentaire",
+      "Autorité parentale",
+      "Régime matrimonial (séparation de biens, communauté)"
+    ],
+    content: `# CHAPITRE 1 : LE MARIAGE AU BÉNIN
+
+## 1.1 Types de mariage et valeur juridique
+
+### Mariage civil (seul reconnu par l'État) :
+- **Condition de forme** : Célébration devant l'officier d'état civil
+- **Conditions de fond** :
+  - Consentement libre et éclairé des deux parties
+  - Âge minimum : 18 ans (16 ans avec dérogation pour cause grave)
+  - Absence d'empêchements (lien de parenté, bigamie)
+- **Effets** : Obligations alimentaires, devoir de secours, communauté de vie
+
+### Mariage coutumier :
+- **Valeur** : Reconnu socialement mais pas juridiquement pour l'état civil
+- **Risque** : Non protection des époux en cas de conflit (pas d'acte de mariage)
+- **Conseil du parajuriste** : Toujours conseiller la régularisation par le mariage civil
+
+### Mariage religieux :
+- **Valeur** : Purement spirituelle, aucune valeur juridique
+- **Pratique** : Souvent célébré après le mariage civil
+
+## 1.2 Régimes matrimoniaux
+
+**Communauté de biens réduite aux acquêts (régime légal) :**
+- Biens propres (avant mariage + donations/héritages) restent personnels
+- Biens acquis pendant le mariage sont communs (50/50 en cas de divorce)
+
+**Séparation de biens (régime conventionnel) :**
+- Chaque époux conserve la propriété de ses biens
+- Nécessite un contrat de mariage devant notaire
+
+**Participation aux acquêts :**
+- Biens gérés séparément pendant le mariage
+- Partage des acquêts à la dissolution
+
+---
+
+# CHAPITRE 2 : LE DIVORCE
+
+## 2.1 Causes de divorce
+
+### Divorce pour faute (article 229 et suivants du CPDF) :
+- Adultère
+- Condamnation pour crime/infamie
+- Violences graves ou injures graves
+- Abandon de domicile conjugal (>2 ans)
+- Non-respect des devoirs conjugaux
+
+### Divorce par consentement mutuel :
+- Accord des deux époux sur le principe et les conséquences
+- Procédure simplifiée devant le juge
+- Plan de parentalité pour les enfants
+
+### Divorce pour altération définitive du lien conjugal :
+- Séparation de fait depuis plus de 3 ans
+- Impossibilité de vivre ensemble
+
+## 2.2 Procédure de divorce
+
+**Étapes :**
+1. **Tentative de conciliation** : Obligatoire devant le juge (sauf divorce par consentement mutuel)
+2. **Assignation** : Le demandeur assigne l'autre époux devant le tribunal
+3. **Audience** : Débats, preuves des fautes alléguées
+4. **Jugement** : Divorce prononcé ou rejet de la demande
+5. **Appel** : Possible dans les 30 jours
+
+## 2.3 Effets du divorce
+
+**Sur les personnes :**
+- Cessation de la communauté de vie
+- Possibilité de reprendre le nom de jeune fille (pour la femme)
+- Déchéance des avantages matrimoniaux (si divorce pour faute)
+
+**Sur les biens :**
+- Liquidation du régime matrimonial
+- Partage des biens communs
+- Attribution du logement familial (souvent à la femme avec enfants)
+
+**Sur les enfants :**
+- **Garde** : Principe de l'intérêt supérieur de l'enfant
+- **Pension alimentaire** : Obligation du parent non gardien (fixée par le juge)
+- **Droit de visite et d'hébergement** : Organisé par le juge
+
+---
+
+# CHAPITRE 3 : LA FILIATION
+
+## 3.1 Filiation légitime (mariage)
+
+**Présomption de paternité :**
+- L'enfant né pendant le mariage est présumé être celui du mari
+- Possibilité de contestation par le mari (dans les 6 mois de la naissance ou découverte de la trahison)
+
+## 3.2 Filiation naturelle (hors mariage)
+
+**Reconnaissance volontaire :**
+- Acte de reconnaissance devant l'officier d'état civil
+- Possibilité de reconnaissance avant la naissance (acte sous seing privé)
+- Effets : Établissement de la filiation, droits successorels, obligations alimentaires
+
+**Recherche de paternité :**
+- Action en justice pour établir la filiation si le père refuse de reconnaître
+- Preuves : Présomption fondée sur des indices (cohabitation, correspondance, etc.)
+- Action impossible si la mère était mariée à un autre (présomption du mari)
+
+## 3.3 Filiation adoptive
+
+**Adoption plénière :**
+- Rupture de la filiation d'origine
+- L'adopté devient membre à part entière de la famille adoptive
+- Conditions : Consentement des parents biologiques (sauf abandon), différence d'âge (minimum 15 ans entre adoptant et adopté)
+
+**Adoption simple :**
+- Maintien de la filiation d'origine + ajout de la filiation adoptive
+- Plus souple que l'adoption plénière
+
+---
+
+# CHAPITRE 4 : L'AUTORITÉ PARENTALE
+
+## 4.1 Contenu et exercice
+
+**Droits des parents :**
+- Droit de garde et de surveillance
+- Droit d'éducation et de direction
+- Droit de représentation de l'enfant
+- Gestion des biens de l'enfant
+
+**Devoirs des parents :**
+- Entretien, éducation, sécurité de l'enfant
+- Respect de l'intégrité physique et morale
+- Obligation de scolarisation (âge 6-16 ans)
+
+## 4.2 Limites et abus
+
+**Châtiment corporel :**
+- **Interdit** : Loi 2015-08 du 16 juin 2015 interdit toute forme de violence éducative
+- **Sanctions** : Pénale (violences) et administrative (retrait de l'autorité parentale)
+
+**Mariage d'enfants :**
+- **Interdit** : Âge minimum 18 ans (16 avec dérogation exceptionnelle)
+- **Sanction** : Emprisonnement et amende pour les auteurs
+
+**Travail des enfants :**
+- Interdit avant 14 ans
+- Travail léger autorisé 14-16 ans (hors heures scolaires, non dangereux)
+
+## 4.3 Retrait de l'autorité parentale
+
+**Cas :**
+- Abandon de famille
+- Mauvais traitements
+- Incapacité manifeste
+- Atteinte aux mœurs sur l'enfant
+
+**Procédure :**
+- Action du procureur ou des proches
+- Jugement du tribunal de la famille
+- Placement de l'enfant ( famille d'accueil ou institution)
+
+---
+
+# CHAPITRE 5 : LES SUCCESSIONS
+
+## 5.1 Succession ab intestat (sans testament)
+
+**Ordre des héritiers (article 731 CPDF) :**
+1. **Descendants** (enfants, petits-enfants) + conjoint survivant
+2. **Ascendants** (parents, grands-parents) + conjoint survivant
+3. **Collatéraux** (frères, sœurs, oncles, tantes) + conjoint survivant
+4. **État** (déshérence)
+
+**Partage :**
+- **Principe d'égalité** : Garçons et filles héritent de parts égales (réforme de 2004)
+- **Réserve héréditaire** : 2/3 des biens réservés aux enfants (impossible de priver totalement un enfant)
+- **Quotité disponible** : 1/3 des biens que le défunt peut librement disposer
+
+## 5.2 Succession testamentaire
+
+**Formes de testament :**
+- **Testament olographe** : Écrit, daté, signé de la main du testateur
+- **Testament authentique** : Devant deux notaires ou un notaire et deux témoins
+- **Testament mystique** : Écrit par un tiers, scellé, remis à un notaire
+
+**Limites :**
+- Respect de la réserve héréditaire
+- Incessibilité des biens (on ne peut léguer ce qu'on n'a pas)
+
+## 5.3 Spécificités des successions en milieu rural
+
+**Conflits fréquents :**
+- Droit coutumier vs droit positif (exclusion des filles selon certaines coutumes)
+- Terres collectives vs terres individuelles
+- Conflits entre coépouses (polygamie)
+
+**Rôle du parajuriste :**
+- Expliquer la primauté du droit positif sur les coutumes contraires
+- Accompagner les femmes et filles dans la revendication de leurs droits
+- Médier entre les parties pour éviter les conflits prolongés
+- Orienter vers la justice en cas de spoliation
+
+---
+
+# EXERCICE PRATIQUE : CAS DE SUCCESSION COMPLEXE
+
+**Scénario :** M. Koffi décède sans testament. Il était polygame avec deux épouses (Awa et Fatou). Avec Awa, il a 3 enfants (2 garçons, 1 fille). Avec Fatou, il a 2 filles. Il possède une maison à Cotonou et des terres au village. Ses frères prétendent que selon la coutume, les filles n'héritent pas des terres et que la maison doit revenir aux garçons uniquement.
+
+**Questions :**
+1. Quelle est la répartition légale de la succession ?
+2. Comment gérez-vous la pression des frères et l'application du droit coutumier ?
+3. Quelle médiation proposez-vous ?
+4. Quels recours si les frères s'approprient les biens ?`,
+    quiz: [
+      { id: "q3_1", question: "Quel mariage est reconnu par l'État béninois ?", options: ["Le mariage religieux", "Le mariage coutumier", "Le mariage civil"], correctAnswer: 2, explanation: "Seul le mariage célébré devant l'officier d'état civil a une valeur juridique." },
+      { id: "q3_2", question: "L'âge minimum légal du mariage est de :", options: ["15 ans", "18 ans (16 avec dérogation)", "21 ans"], correctAnswer: 1, explanation: "18 ans est la règle, 16 ans possible avec autorisation du juge pour cause grave." },
+      { id: "q3_3", question: "Depuis la réforme de 2004, les filles héritent-elles autant que les garçons ?", options: ["Oui, parts égales", "Non, moitié seulement", "Seulement si elles sont célibataires"], correctAnswer: 0, explanation: "La réforme du CPDF a instauré l'égalité successorale entre hommes et femmes." },
+      { id: "q3_4", question: "Le divorce pour altération définitive du lien conjugal nécessite :", options: ["Une faute grave", "Un consentement mutuel", "Une séparation de fait de 3 ans"], correctAnswer: 2, explanation: "C'est le divorce 'sans faute' basé sur l'impossibilité de vivre ensemble." },
+      { id: "q3_5", question: "L'autorité parentale peut être retirée en cas de :", options: ["Mauvais résultats scolaires", "Abandon ou mauvais traitements", "Différence d'opinion avec l'enfant"], correctAnswer: 1, explanation: "L'intérêt supérieur de l'enfant justifie le retrait en cas de danger." },
+      { id: "q3_6", question: "La réserve héréditaire représente :", options: ["La totalité des biens", "Les 2/3 des biens réservés aux enfants", "Les 1/3 disponibles pour les legs"], correctAnswer: 1, explanation: "Les enfants sont protégés par la réserve de 2/3, seul 1/3 est libre." },
+      { id: "q3_7", question: "Un enfant né hors mariage peut-il être reconnu par son père ?", options: ["Oui, par acte de reconnaissance", "Non, jamais", "Seulement par décision judiciaire"], correctAnswer: 0, explanation: "La reconnaissance volontaire est possible devant l'officier d'état civil." },
+      { id: "q3_8", question: "Le châtiment corporel des enfants est :", options: ["Autorisé pour l'éducation", "Interdit par la loi 2015-08", "Laissé à l'appréciation des parents"], correctAnswer: 1, explanation: "Toute violence éducative, y compris le châtiment corporel, est interdite." }
+    ],
+    audioUrl: "", videoUrl: "", attachments: [], isReporting: 0, estimatedDuration: 360, difficultyLevel: "Avancé"
+  },
+
+  // MODULE 4 : DROIT FONCIER ET DOMANIAL
+  {
+    id: 4,
+    title: "Module 4 : Droit Foncier, Domanial et Environnemental",
+    introduction: "Ce module traite de la sécurisation foncière, des modes d'acquisition de la propriété, des conflits fonciers et de la protection environnementale. Il couvre le Code Foncier et Domanial du Bénin et les mécanismes de résolution des litiges fonciers.",
+    objectives: [
+      "Comprendre le Code Foncier et Domanial et la distinction domaine public/privé",
+      "Maîtriser les procédures d'immatriculation et d'obtention du Titre Foncier",
+      "Connaître les modes d'acquisition des terres (achat, héritage, prescription)",
+      "Identifier les conflits fonciers et les mécanismes de résolution",
+      "Comprendre les droits environnementaux et la protection foncière des femmes"
+    ],
+    keyNotions: [
+      "Domaine public vs domaine privé de l'État",
+      "Titre Foncier (TF) vs Attestation de Détention Coutumière (ADC)",
+      "Immatriculation foncière",
+      "Expropriation pour cause d'utilité publique",
+      "Prescription acquisitive",
+      "Gestion durable des ressources"
+    ],
+    content: `# CHAPITRE 1 : PRINCIPES GÉNÉRAUX DU DROIT FONCIER
+
+## 1.1 Régime foncier au Bénin
+
+### Dualisme foncier :
+Le Bénin connaît un système dual :
+- **Droit foncier moderne** : Titre Foncier, registres publics
+- **Droit foncier coutumier** : Terres relevant des chefferies traditionnelles
+
+### Domaine de l'État :
+
+**Domaine public :**
+- Inaliénable (ne peut être vendu)
+- Imprescriptible (ne peut être acquis par prescription)
+- Inclut : routes, cours d'eau, places publiques, forêts classées, sites archéologiques
+
+**Domaine privé de l'État :**
+- Biens appartenant à l'État mais alienables
+- Terres non immatriculées occupées par l'État
+- Peut faire l'objet de cession (vente, bail)
+
+## 1.2 Le Titre Foncier (TF)
+
+### Définition :
+Document juridique officiel attestant la propriété d'un terrain, délivré par l'ANDF (Agence Nationale du Domaine et du Foncier).
+
+### Procédure d'obtention :
+1. **Demande d'immatriculation** : Dépôt au service des Domaines
+2. **Instruction** : Enquête, bornage, publication d'avis (2 mois)
+3. **Décision** : Arrêté d'attribution du TF
+4. **Inscription** : Au livre foncier du tribunal
+
+### Valeur juridique :
+- **Sécurité juridique** : Propriété inattaquable (sauf erreur manifeste)
+- **Opposabilité** : Fait foi contre tiers et administration
+- **Transmissibilité** : Facilite les successions et ventes
+
+## 1.3 L'Attestation de Détention Coutumière (ADC)
+
+### Fonction :
+- Reconnaissance administrative d'une occupation coutumière
+- **Ne confère pas la propriété** mais atteste de la détention
+- Étape préalable vers l'immatriculation
+
+### Limites :
+- Ne protège pas contre l'expropriation sans indemnité
+- Ne permet pas de vendre librement (sauf dans la communauté)
+- Ne sécurise pas contre les conflits successoraux
+
+---
+
+# CHAPITRE 2 : MODES D'ACQUISITION DE LA PROPRIÉTÉ
+
+## 2.1 Acquisition par acte entre vifs (achat/vente)
+
+### Conditions de validité :
+- **Écriture obligatoire** : Acte notarié ou sous seing privé avec signature légalisée
+- **Consentement** : Pas de vice du consentement (erreur, dol, violence)
+- **Capacité** : Capacité juridique du vendeur (propriétaire, pas mineur sous tutelle)
+- **Objet licite** : Terrain non domanial public, non indisponible
+
+### Formalités :
+- **Enregistrement** : Dans les 3 mois au service des Domaines
+- **Paiement des droits** : Enregistrement (4%), TOM (1%), frais divers
+- **Mutation** : Changement de propriétaire au livre foncier (si TF existant)
+
+## 2.2 Acquisition par succession (décès)
+
+### Transmission :
+- **Délai** : Acceptation pure et simple ou sous bénéfice d'inventaire dans les 3 mois
+- **Partage** : Acte notarié ou judiciaire
+- **Mutation** : Inscription des héritiers au TF
+
+### Spécificités foncières :
+- Terres collectives : Impartageables sans consentement de la collectivité
+- Terres individuelles : Partageables selon règles successorales
+
+## 2.3 Prescription acquisitive (usucapion)
+
+### Définition :
+Acquisition de la propriété par possession prolongée et non interrompue.
+
+### Conditions :
+- **Possession** : 10 ans si bonne foi et juste titre, 20 ans sinon
+- **Continue** : Sans interruption (pas d'absence prolongée)
+- **Paisible** : Sans contestation ni procès
+- **Non interrompue** : Pas de reconnaissance de la propriété d'autrui
+
+### Procédure judiciaire :
+- Action en justice pour faire constater la prescription
+- Jugement substitué au titre (titre judiciaire)
+
+---
+
+# CHAPITRE 3 : CONFLITS FONCIERS ET RÉSOLUTION
+
+## 3.1 Types de conflits fonciers
+
+**Conflits de limite :**
+- Bornes déplacées
+- Empiètement sur voisin
+- Occupation de bande de terre contestée
+
+**Conflits de propriété :**
+- Vente à deux acheteurs différents
+- Spoliation par un tiers
+- Contestation successorale
+
+**Conflits avec l'administration :**
+- Expropriation sans indemnisation
+- Occupation domaniale contestée
+- Refus d'immatriculation
+
+**Conflits coutumiers :**
+- Terres collectives vs individuelles
+- Droits des femmes à la terre
+- Conflits inter-communautaires (autochtones/allogènes)
+
+## 3.2 Mécanismes de résolution
+
+### Voie amiable :
+- **Médiation traditionnelle** : Chef de village, notables
+- **Médiation moderne** : Centre de médiation, parajuristes
+- **Conciliation** : Tentative obligatoire avant procès (sauf urgence)
+
+### Voie judiciaire :
+- **Tribunal de Première Instance** : Compétent pour les litiges fonciers
+- **Juridictions coutumières** : Conciliation seulement (pas de décision exécutoire)
+- **Cour d'Appel** : Appel des décisions du TPI
+
+### Voie administrative :
+- **ANDF** : Contentieux d'immatriculation
+- **Préfecture** : Conflits liés au domaine public
+- **Cour administrative** : Recours contre décisions administratives
+
+## 3.3 Rôle du parajuriste dans les conflits fonciers
+
+### Conseil préventif :
+- Vérifier l'existence du TF avant tout achat
+- Exiger l'acte de propriété du vendeur
+- Vérifier l'identité du vendeur (pas usurpateur)
+- Conseiller l'acte notarié (pas vente verbale)
+
+### Accompagnement contentieux :
+- Rédaction des mémoires et conclusions simples
+- Assistance lors des audiences
+- Collecte des preuves (témoignages, documents)
+- Médiation entre parties
+
+### Limites :
+- Ne pas représenter en justice (sauf si habilité spécialement)
+- Ne pas donner d'avis sur la valeur des terres (expertise spécialisée)
+- Ne pas négocier à la place du client
+
+---
+
+# CHAPITRE 4 : EXPROPRIATION ET SERVITUDES
+
+## 4.1 Expropriation pour cause d'utilité publique
+
+### Conditions :
+- **Utilité publique** : Projet d'intérêt général (route, école, barrage)
+- **Juste et préalable indemnisation** : Prix du marché + préjudices annexes
+- **Procédure régulière** : Déclaration d'utilité publique, enquête publique
+
+### Indemnisation :
+- **Valeur vénale** : Prix réel du terrain
+- **Trouble de jouissance** : Préjudice subi pendant les travaux
+- **Dommages** : Pertes de récoltes, constructions détruites
+
+### Recours :
+- **Contentieux de l'expropriation** : Tribunal administratif
+- **Excès de pouvoir** : Recours contre DUP irrégulière
+- **Indemnisation insuffisante** : Expertise judiciaire
+
+## 4.2 Servitudes foncières
+
+### Définition :
+Charges imposées à un fonds (servant) pour l'avantage d'un autre fonds (dominant).
+
+### Types :
+- **Servitudes légales** : Distance des plantations, écoulement des eaux
+- **Servitudes conventionnelles** : Accord entre voisins (passage, vue)
+- **Servitudes apparentes** : Visibles (chemin, caniveau)
+
+### Constitution :
+- **Par acte** : Écrit devant notaire ou sous seing privé
+- **Par destination du père de famille** : Aménagements durables
+- **Par prescription** : 20 ans de jouissance non interrompue
+
+---
+
+# CHAPITRE 5 : DROITS FONCIERS DES FEMMES ET PROTECTION ENVIRONNEMENTALE
+
+## 5.1 Accès des femmes à la terre
+
+### Obstacles juridiques et coutumiers :
+- **Inégalité successorale coutumière** : Exclusion des filles selon certaines coutumes
+- **Désavantage matrimonial** : Perte des terres en cas de divorce ou veuvage
+- **Accès au crédit** : Difficulté d'obtenir des prêts fonciers
+
+### Protection légale :
+- **Constitution** : Égalité des sexes (art. 26)
+- **CPDF** : Égalité successorale (réforme 2004)
+- **Charte des droits des femmes** : Reconnaissance du droit foncier des femmes
+
+### Action du parajuriste :
+- Sensibilisation des communautés sur les droits des femmes
+- Accompagnement des femmes dans les démarches d'immatriculation
+- Défense des veuves et orphelines spoliées
+- Médiation dans les conflits successoraux
+
+## 5.2 Droit environnemental et terres
+
+### Protection des ressources naturelles :
+- **Forêts classées** : Interdiction de défrichement sans autorisation
+- **Zones humides** : Protection du littoral et mangroves
+- **Eau** : Ressource commune, gestion concertée
+
+### Responsabilité environnementale :
+- **Principe pollueur-payeur** : Réparation des dégradations
+- **Évaluation environnementale** : Obligatoire pour grands projets
+- **Accès à l'information** : Droit de connaître les risques environnementaux
+
+---
+
+# EXERCICE PRATIQUE : CAS FONCIER COMPLEXE
+
+**Scénario :** Une famille veut acheter un terrain à Abomey-Calavi pour construire une maison. Le vendeur propose deux options :
+- Terrain A : 15 millions FCFA avec Titre Foncier datant de 1995
+- Terrain B : 8 millions FCFA avec Attestation de Détention Coutumière seulement
+
+Le vendeur du terrain B insiste pour une vente rapide "car d'autres personnes sont intéressées" et demande un paiement en espèces sans acte notarié.
+
+**Questions :**
+1. Quelle est la différence juridique entre les deux terrains ?
+2. Quels risques court l'acheteur avec l'option B ?
+3. Quelles vérifications le parajuriste doit-il conseiller ?
+4. Quelle rédaction proposez-vous pour sécuriser l'achat du terrain A ?`,
+    quiz: [
+      { id: "q4_1", question: "Quel document garantit la propriété foncière définitive ?", options: ["L'Attestation de Détention Coutumière", "Le Titre Foncier", "Le reçu d'achat"], correctAnswer: 1, explanation: "Seul le Titre Foncier inscrit au livre foncier garantit la propriété." },
+      { id: "q4_2", question: "L'ANDF est l'agence chargée de :", options: ["La santé publique", "La gestion du domaine et du foncier", "L'éducation"], correctAnswer: 1, explanation: "ANDF = Agence Nationale du Domaine et du Foncier." },
+      { id: "q4_3", question: "Une terre du domaine public peut-elle être vendue ?", options: ["Oui", "Non, elle est inaliénable", "Seulement avec autorisation du Président"], correctAnswer: 1, explanation: "Le domaine public est inaliénable et imprescriptible." },
+      { id: "q4_4", question: "La prescription acquisitive nécessite :", options: ["5 ans de possession", "10 ou 20 ans selon les conditions", "1 an suffit"], correctAnswer: 1, explanation: "10 ans avec bonne foi et juste titre, 20 ans sinon." },
+      { id: "q4_5", question: "L'expropriation doit être :", options: ["Gratuite pour l'État", "Juste et préalablement indemnisée", "Sans formalité"], correctAnswer: 1, explanation: "La Constitution impose une juste et préalable indemnisation." },
+      { id: "q4_6", question: "Une vente de terrain doit être constatée par :", options: ["Acte notarié ou sous seing privé légalisé", "Verbal devant témoins", "SMS entre parties"], correctAnswer: 0, explanation: "L'écrit est obligatoire pour les biens immobiliers." },
+      { id: "q4_7", question: "Les femmes peuvent-elles hériter des terres au Bénin ?", options: ["Oui, égale aux hommes depuis 2004", "Non, selon la coutume", "Seulement si elles sont célibataires"], correctAnswer: 0, explanation: "La réforme de 2004 a instauré l'égalité successorale." },
+      { id: "q4_8", question: "Un parajuriste peut-il représenter un client dans un litige foncier ?", options: ["Oui, devant tous les tribunaux", "Non, sauf habilitation spéciale", "Oui, si le litige est inférieur à 1 million"], correctAnswer: 1, explanation: "La représentation en justice est réservée aux avocats." }
+    ],
+    audioUrl: "", videoUrl: "", attachments: [], isReporting: 0, estimatedDuration: 360, difficultyLevel: "Avancé"
+  },
     {
       id: 5,
       title: "Droits de l'enfant",

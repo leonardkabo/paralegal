@@ -417,7 +417,7 @@ const DocumentsScreen = ({ onBack, documents }: { onBack: () => void, documents:
 
 const AssistantScreen = ({ onBack }: { onBack: () => void }) => {
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string}[]>([
-    { role: 'assistant', text: "Bonjour ! Je suis votre tuteur juridique. Comment puis-je vous aider aujourd'hui ? Vous pouvez me poser des questions sur les cours ou sur une procédure juridique au Bénin." }
+    { role: 'assistant', text: "Bonjour ! Je suis KABO, votre tuteur juridique. Comment puis-je vous aider aujourd'hui ? Vous pouvez me poser des questions sur les cours ou sur une procédure juridique au Bénin." }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
