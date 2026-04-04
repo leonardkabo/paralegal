@@ -84,7 +84,9 @@ db.exec(`
     title TEXT,
     description TEXT,
     category TEXT,
-    content TEXT
+    content TEXT,
+    fileUrl TEXT,
+    fileName TEXT
   );
 
   CREATE TABLE IF NOT EXISTS case_studies (
@@ -92,7 +94,9 @@ db.exec(`
     title TEXT,
     description TEXT,
     scenario TEXT,
-    options TEXT -- JSON array
+    options TEXT, -- JSON array
+    fileUrl TEXT,
+    fileName TEXT
   );
 
   CREATE TABLE IF NOT EXISTS reports (
@@ -115,6 +119,10 @@ db.exec(`
 try { db.exec("ALTER TABLE progress ADD COLUMN completedCaseStudies TEXT DEFAULT '[]'"); } catch (e) {}
 try { db.exec("ALTER TABLE progress ADD COLUMN finalExamScore INTEGER"); } catch (e) {}
 try { db.exec("ALTER TABLE progress ADD COLUMN finalExamDate TEXT"); } catch (e) {}
+try { db.exec("ALTER TABLE legal_documents ADD COLUMN fileUrl TEXT"); } catch (e) {}
+try { db.exec("ALTER TABLE legal_documents ADD COLUMN fileName TEXT"); } catch (e) {}
+try { db.exec("ALTER TABLE case_studies ADD COLUMN fileUrl TEXT"); } catch (e) {}
+try { db.exec("ALTER TABLE case_studies ADD COLUMN fileName TEXT"); } catch (e) {}
 
 // Migration: Add missing columns to modules table if it already existed
 try { db.exec("ALTER TABLE modules ADD COLUMN estimatedDuration INTEGER"); } catch (e) {}
@@ -1855,10 +1863,10 @@ async function startServer() {
   app.post("/api/admin/legal-documents", (req, res) => {
     const doc = req.body;
     const insert = db.prepare(`
-      INSERT OR REPLACE INTO legal_documents (id, title, description, category, content)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO legal_documents (id, title, description, category, content, fileUrl, fileName)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    insert.run(doc.id, doc.title, doc.description, doc.category, doc.content);
+    insert.run(doc.id, doc.title, doc.description, doc.category, doc.content, doc.fileUrl || null, doc.fileName || null);
     res.json({ success: true });
   });
 
@@ -1872,10 +1880,10 @@ async function startServer() {
   app.post("/api/admin/case-studies", (req, res) => {
     const caseStudy = req.body;
     const insert = db.prepare(`
-      INSERT OR REPLACE INTO case_studies (id, title, description, scenario, options)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO case_studies (id, title, description, scenario, options, fileUrl, fileName)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    insert.run(caseStudy.id, caseStudy.title, caseStudy.description, caseStudy.scenario, JSON.stringify(caseStudy.options));
+    insert.run(caseStudy.id, caseStudy.title, caseStudy.description, caseStudy.scenario, JSON.stringify(caseStudy.options), caseStudy.fileUrl || null, caseStudy.fileName || null);
     res.json({ success: true });
   });
 

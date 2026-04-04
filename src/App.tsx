@@ -412,10 +412,25 @@ const DocumentsScreen = ({ onBack, documents }: { onBack: () => void, documents:
                 </Button>
                 <h2 className="font-bold truncate max-w-[200px]">{selectedDoc.title}</h2>
               </div>
-              <Button size="sm" className="gap-2">
-                <Download size={16} />
-                PDF
-              </Button>
+              <div className="flex gap-2">
+                {selectedDoc.fileUrl && (
+                  <a 
+                    href={selectedDoc.fileUrl} 
+                    download={selectedDoc.fileName}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button size="sm" variant="outline" className="gap-2 bg-emerald-50 text-emerald-600 border-emerald-100">
+                      <Download size={16} />
+                      Modèle
+                    </Button>
+                  </a>
+                )}
+                <Button size="sm" className="gap-2">
+                  <Download size={16} />
+                  PDF
+                </Button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto p-8 bg-slate-50">
               <div className="bg-white p-8 shadow-sm border border-slate-200 rounded-sm min-h-full font-serif text-sm whitespace-pre-wrap leading-relaxed">
@@ -603,7 +618,21 @@ const CaseStudiesScreen = ({
             
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
               <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Scénario</h4>
+                <div className="flex justify-between items-start mb-3">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Scénario</h4>
+                  {selectedCase.fileUrl && (
+                    <a 
+                      href={selectedCase.fileUrl} 
+                      download={selectedCase.fileName}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100 hover:bg-emerald-100 transition-colors"
+                    >
+                      <Download size={12} />
+                      Fichier Modèle
+                    </a>
+                  )}
+                </div>
                 <p className="text-sm leading-relaxed text-slate-700">{selectedCase.scenario}</p>
               </div>
 
@@ -1916,6 +1945,30 @@ const AdminDashboard = ({
     }
   };
 
+  const handleDocFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && editingDoc) {
+      try {
+        const { url, name } = await onUploadFile(file);
+        setEditingDoc({ ...editingDoc, fileUrl: url, fileName: name });
+      } catch (err) {
+        alert("Erreur lors de l'upload");
+      }
+    }
+  };
+
+  const handleCaseFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && editingCase) {
+      try {
+        const { url, name } = await onUploadFile(file);
+        setEditingCase({ ...editingCase, fileUrl: url, fileName: name });
+      } catch (err) {
+        alert("Erreur lors de l'upload");
+      }
+    }
+  };
+
   const handleDeleteAttachment = (id: string) => {
     if (!editingModule) return;
     const attToDelete = editingModule.attachments?.find(a => a.id === id);
@@ -2282,6 +2335,17 @@ const AdminDashboard = ({
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Contenu du modèle</label>
                 <textarea className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl min-h-[300px] text-sm font-serif" value={editingDoc.content} onChange={e => setEditingDoc({...editingDoc, content: e.target.value})} />
               </div>
+              <div className="space-y-2 pt-2 border-t border-slate-100">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Fichier Modèle (PDF/Autre)</label>
+                <input type="file" onChange={handleDocFileUpload} className="text-xs w-full" />
+                {editingDoc.fileUrl && (
+                  <div className="flex items-center gap-2 text-[10px] text-emerald-600 font-bold">
+                    <FileText size={12} />
+                    <span className="truncate">{editingDoc.fileName}</span>
+                    <button type="button" onClick={() => setEditingDoc({...editingDoc, fileUrl: undefined, fileName: undefined})} className="text-red-500 ml-2">Supprimer</button>
+                  </div>
+                )}
+              </div>
               <div className="flex gap-3 pt-4">
                 <Button type="submit" className="flex-1">Enregistrer</Button>
                 <Button type="button" variant="ghost" className="flex-1" onClick={() => setEditingDoc(null)}>Annuler</Button>
@@ -2299,6 +2363,17 @@ const AdminDashboard = ({
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Scénario complet</label>
                 <textarea className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl min-h-[120px] text-sm" value={editingCase.scenario} onChange={e => setEditingCase({...editingCase, scenario: e.target.value})} />
+              </div>
+              <div className="space-y-2 pt-2 border-t border-slate-100">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Fichier Complémentaire (PDF/Autre)</label>
+                <input type="file" onChange={handleCaseFileUpload} className="text-xs w-full" />
+                {editingCase.fileUrl && (
+                  <div className="flex items-center gap-2 text-[10px] text-emerald-600 font-bold">
+                    <FileText size={12} />
+                    <span className="truncate">{editingCase.fileName}</span>
+                    <button type="button" onClick={() => setEditingCase({...editingCase, fileUrl: undefined, fileName: undefined})} className="text-red-500 ml-2">Supprimer</button>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-4 pt-4 border-t border-slate-100">

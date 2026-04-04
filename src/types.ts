@@ -63,6 +63,8 @@ export interface LegalDocument {
   description: string;
   category: 'Contrat' | 'Procédure' | 'Lettre' | 'Formulaire';
   content: string;
+  fileUrl?: string;
+  fileName?: string;
 }
 
 export interface CaseStudy {
@@ -76,6 +78,8 @@ export interface CaseStudy {
     isCorrect: boolean;
     feedback: string;
   }[];
+  fileUrl?: string;
+  fileName?: string;
 }
 
 export interface UserProgress {
