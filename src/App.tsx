@@ -1418,6 +1418,19 @@ const ModuleDetail = ({
                   </ul>
                 </div>
 
+                {module.keyNotions && module.keyNotions.length > 0 && (
+                  <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                    <h3 className="text-blue-800 font-bold text-sm mb-2">Notions clés</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {module.keyNotions.map((notion, i) => (
+                        <span key={i} className="text-[10px] font-bold bg-white text-blue-600 px-2 py-1 rounded-lg border border-blue-100">
+                          {notion}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {module.videoUrl && (
                   <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-lg">
                     <video 
@@ -2380,7 +2393,71 @@ const AdminDashboard = ({
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Objectifs pédagogiques</h4>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setEditingModule({...editingModule, objectives: [...(editingModule.objectives || []), '']})}>
+                      <Plus size={14} className="mr-1" /> Ajouter
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {editingModule.objectives?.map((obj, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          className="flex-1 text-sm p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                          value={obj}
+                          onChange={e => {
+                            const newObjs = [...(editingModule.objectives || [])];
+                            newObjs[idx] = e.target.value;
+                            setEditingModule({...editingModule, objectives: newObjs});
+                          }}
+                          placeholder={`Objectif ${idx + 1}`}
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => setEditingModule({...editingModule, objectives: editingModule.objectives?.filter((_, i) => i !== idx)})}
+                          className="text-red-500 p-2"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Notions clés</h4>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setEditingModule({...editingModule, keyNotions: [...(editingModule.keyNotions || []), '']})}>
+                      <Plus size={14} className="mr-1" /> Ajouter
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {editingModule.keyNotions?.map((notion, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          className="flex-1 text-sm p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                          value={notion}
+                          onChange={e => {
+                            const newNotions = [...(editingModule.keyNotions || [])];
+                            newNotions[idx] = e.target.value;
+                            setEditingModule({...editingModule, keyNotions: newNotions});
+                          }}
+                          placeholder={`Notion ${idx + 1}`}
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => setEditingModule({...editingModule, keyNotions: editingModule.keyNotions?.filter((_, i) => i !== idx)})}
+                          className="text-red-500 p-2"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-4 border-t border-slate-100">
                   <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Contenu (Markdown)</label>
                   <textarea 
                     className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl min-h-[200px] text-sm font-mono"
