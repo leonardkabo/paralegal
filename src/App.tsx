@@ -42,6 +42,20 @@ import {
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+
+// Fix Leaflet marker icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+});
 
 import { GlossaryTerm, LegalDocument, CaseStudy, Language, Module, UserProgress, AppSettings, Attachment } from './types';
 import { 
@@ -417,7 +431,7 @@ const DocumentsScreen = ({ onBack, documents }: { onBack: () => void, documents:
 
 const AssistantScreen = ({ onBack }: { onBack: () => void }) => {
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string}[]>([
-    { role: 'assistant', text: "Bonjour ! Je suis KABO, votre tuteur juridique. Comment puis-je vous aider aujourd'hui ? Vous pouvez me poser des questions sur les cours ou sur une procédure juridique au Bénin." }
+    { role: 'assistant', text: "Bonjour ! Je suis votre tuteur juridique. Comment puis-je vous aider aujourd'hui ? Vous pouvez me poser des questions sur les cours ou sur une procédure juridique au Bénin." }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -1053,9 +1067,33 @@ const Dashboard = ({
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm leading-tight">{module.title}</h4>
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    {module.isReporting ? "Signalement" : user.preferredLanguage === 'fr' ? "Texte + Quiz" : "Audio"}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-[10px] text-slate-400">
+                      {module.isReporting ? "Signalement" : user.preferredLanguage === 'fr' ? "Texte + Quiz" : "Audio"}
+                    </p>
+                    {module.estimatedDuration && (
+                      <>
+                        <span className="text-[10px] text-slate-300">•</span>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                          <Clock size={10} />
+                          {module.estimatedDuration} min
+                        </div>
+                      </>
+                    )}
+                    {module.difficultyLevel && (
+                      <>
+                        <span className="text-[10px] text-slate-300">•</span>
+                        <span className={cn(
+                          "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                          module.difficultyLevel === 'Débutant' ? "bg-emerald-50 text-emerald-600" :
+                          module.difficultyLevel === 'Intermédiaire' ? "bg-blue-50 text-blue-600" :
+                          "bg-orange-50 text-orange-600"
+                        )}>
+                          {module.difficultyLevel}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <ChevronRight size={16} className="text-slate-300" />
               </Card>
@@ -1070,6 +1108,103 @@ const Dashboard = ({
             <p className="text-slate-400 text-xs mt-1">Essayez d'autres mots-clés</p>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+const LocationPicker = ({ onLocationSelect, initialLocation }: { onLocationSelect: (lat: number, lng: number) => void, initialLocation: [number, number] | null }) => {
+  const [position, setPosition] = useState<[number, number] | null>(initialLocation);
+
+  const MapEvents = () => {
+    useMapEvents({
+      click(e) {
+        setPosition([e.latlng.lat, e.latlng.lng]);
+        onLocationSelect(e.latlng.lat, e.latlng.lng);
+      },
+    });
+    return null;
+  };
+
+  return (
+    <div className="h-[200px] w-full rounded-xl overflow-hidden border border-slate-200">
+      <MapContainer center={position || [6.3654, 2.4333]} zoom={13} style={{ height: '100%', width: '100%' }}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <MapEvents />
+        {position && <Marker position={position} />}
+      </MapContainer>
+    </div>
+  );
+};
+
+const AudioRecorder = ({ onRecordingComplete }: { onRecordingComplete: (blob: Blob) => void }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        onRecordingComplete(blob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+    } catch (err) {
+      console.error("Failed to start recording", err);
+      alert("Impossible d'accéder au microphone.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+      <button 
+        onClick={isRecording ? stopRecording : startRecording}
+        className={cn(
+          "w-12 h-12 rounded-full flex items-center justify-center transition-all",
+          isRecording ? "bg-red-500 text-white animate-pulse" : "bg-emerald-500 text-white"
+        )}
+      >
+        {isRecording ? <Pause size={24} /> : <Mic size={24} />}
+      </button>
+      <div className="flex-1">
+        <p className="text-sm font-bold text-slate-700">
+          {isRecording ? "Enregistrement en cours..." : "Enregistrement audio"}
+        </p>
+        <p className="text-xs text-slate-500">
+          {isRecording ? formatTime(recordingTime) : "Cliquez pour commencer"}
+        </p>
       </div>
     </div>
   );
@@ -1095,13 +1230,76 @@ const ModuleDetail = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Reporting form state
-  const [reportData, setReportData] = useState({
+  const [reportData, setReportData] = useState<{
+    type: string;
+    description: string;
+    location: string;
+    date: string;
+    anonymous: boolean;
+    audioBlob: Blob | null;
+    attachments: File[];
+    coordinates: [number, number] | null;
+  }>({
     type: '',
     description: '',
     location: '',
     date: '',
-    anonymous: false
+    anonymous: false,
+    audioBlob: null,
+    attachments: [],
+    coordinates: null
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleReportSubmit = async () => {
+    if (!reportData.type || !reportData.description) {
+      alert("Veuillez remplir les champs obligatoires.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('id', Math.random().toString(36).substr(2, 9));
+      formData.append('userId', user.phone);
+      formData.append('moduleId', module.id.toString());
+      formData.append('type', reportData.type);
+      formData.append('description', reportData.description);
+      formData.append('location', JSON.stringify({
+        address: reportData.location,
+        latitude: reportData.coordinates?.[0],
+        longitude: reportData.coordinates?.[1]
+      }));
+      formData.append('date', reportData.date);
+      formData.append('anonymous', reportData.anonymous.toString());
+
+      if (reportData.audioBlob) {
+        formData.append('audio', reportData.audioBlob, 'report-audio.webm');
+      }
+
+      reportData.attachments.forEach(file => {
+        formData.append('attachments', file);
+      });
+
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        alert("Signalement envoyé avec succès !");
+        onComplete();
+      } else {
+        throw new Error("Failed to submit report");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de l'envoi du signalement.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     if (module.isReporting) setView('reporting');
@@ -1190,6 +1388,25 @@ const ModuleDetail = ({
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {user.preferredLanguage === 'fr' ? (
               <div className="space-y-6">
+                <div className="flex flex-wrap gap-2">
+                  {module.estimatedDuration && (
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                      <Clock size={12} />
+                      {module.estimatedDuration} minutes
+                    </div>
+                  )}
+                  {module.difficultyLevel && (
+                    <div className={cn(
+                      "text-[10px] font-bold px-3 py-1.5 rounded-full",
+                      module.difficultyLevel === 'Débutant' ? "bg-emerald-50 text-emerald-600" :
+                      module.difficultyLevel === 'Intermédiaire' ? "bg-blue-50 text-blue-600" :
+                      "bg-orange-50 text-orange-600"
+                    )}>
+                      Niveau {module.difficultyLevel}
+                    </div>
+                  )}
+                </div>
+
                 <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
                   <h3 className="text-emerald-800 font-bold text-sm mb-2">Objectifs pédagogiques</h3>
                   <ul className="space-y-1">
@@ -1229,7 +1446,7 @@ const ModuleDetail = ({
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm">
-                              <FileText size={20} />
+                              {att.type === 'audio' ? <Volume2 size={20} /> : att.type === 'video' ? <Video size={20} /> : <FileText size={20} />}
                             </div>
                             <span className="text-sm font-medium text-slate-700">{att.name}</span>
                           </div>
@@ -1352,39 +1569,103 @@ const ModuleDetail = ({
         {view === 'reporting' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             {user.preferredLanguage === 'fr' ? (
-              <div className="space-y-4">
-                <p className="text-sm text-slate-500">Remplissez ce formulaire pour signaler un cas communautaire.</p>
+              <div className="space-y-6">
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <p className="text-sm text-slate-600">Remplissez ce formulaire pour signaler un cas communautaire. Votre signalement sera traité par HAI.</p>
+                </div>
+
                 <Select 
                   label="Type de problème" 
                   options={[
                     { value: 'justice', label: 'Justice' },
                     { value: 'sante', label: 'Santé' },
+                    { value: 'foncier', label: 'Foncier' },
+                    { value: 'enfance', label: 'Enfance' },
+                    { value: 'vbg', label: 'VBG' },
                     { value: 'autre', label: 'Autre' }
                   ]}
                   value={reportData.type}
                   onChange={e => setReportData({...reportData, type: e.target.value})}
                 />
+
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Description du cas</label>
                   <textarea 
                     className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl min-h-[120px] focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                    placeholder="Décrivez la situation..."
+                    placeholder="Décrivez la situation en détail..."
                     value={reportData.description}
                     onChange={e => setReportData({...reportData, description: e.target.value})}
                   />
                 </div>
-                <Input 
-                  label="Localisation" 
-                  placeholder="Lieu de l'incident" 
-                  value={reportData.location}
-                  onChange={e => setReportData({...reportData, location: e.target.value})}
-                />
+
+                <div className="space-y-3">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Enregistrement audio (Optionnel)</label>
+                  <AudioRecorder onRecordingComplete={(blob) => setReportData({...reportData, audioBlob: blob})} />
+                  {reportData.audioBlob && (
+                    <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                      <CheckCircle2 size={12} /> Audio enregistré avec succès
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Localisation précise (Map)</label>
+                  <LocationPicker 
+                    initialLocation={reportData.coordinates} 
+                    onLocationSelect={(lat, lng) => setReportData({...reportData, coordinates: [lat, lng]})} 
+                  />
+                  <Input 
+                    label="Adresse ou repères" 
+                    placeholder="Quartier, ville, point de repère..." 
+                    value={reportData.location}
+                    onChange={e => setReportData({...reportData, location: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Pièces jointes (Images, PDF)</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="flex flex-col items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 hover:bg-emerald-50 transition-all">
+                      <Paperclip size={20} className="text-slate-400 mb-1" />
+                      <span className="text-[10px] font-bold text-slate-500">Ajouter des fichiers</span>
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*,.pdf" 
+                        className="hidden" 
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            setReportData({
+                              ...reportData, 
+                              attachments: [...reportData.attachments, ...Array.from(e.target.files)]
+                            });
+                          }
+                        }}
+                      />
+                    </label>
+                    <div className="space-y-1">
+                      {reportData.attachments.map((file, i) => (
+                        <div key={i} className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-lg text-[10px]">
+                          <span className="truncate max-w-[80px]">{file.name}</span>
+                          <button onClick={() => setReportData({
+                            ...reportData,
+                            attachments: reportData.attachments.filter((_, idx) => idx !== i)
+                          })}>
+                            <X size={12} className="text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 <Input 
                   label="Date de l'incident" 
                   type="date" 
                   value={reportData.date}
                   onChange={e => setReportData({...reportData, date: e.target.value})}
                 />
+
                 <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
                   <input 
                     type="checkbox" 
@@ -1395,30 +1676,84 @@ const ModuleDetail = ({
                   />
                   <label htmlFor="anon" className="text-sm font-medium text-slate-600">Soumettre anonymement</label>
                 </div>
-                <Button className="w-full" onClick={() => {
-                  alert("Signalement envoyé avec succès !");
-                  onComplete();
-                }}>
-                  Envoyer le signalement
+
+                <Button 
+                  className="w-full h-14 text-lg" 
+                  onClick={handleReportSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Envoi en cours..." : "Envoyer le signalement"}
                 </Button>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center space-y-8">
-                <div className="w-32 h-32 bg-red-50 rounded-full flex items-center justify-center relative">
-                  <Mic size={48} className="text-red-500" />
+              <div className="space-y-6">
+                <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+                  <p className="text-sm text-red-800 font-bold">Signalement vocal (Fon)</p>
+                  <p className="text-xs text-red-600">Enregistrez votre message pour signaler une situation.</p>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Enregistrement vocal</h3>
-                  <p className="text-slate-500 text-sm px-8">
-                    Enregistrez votre message (max 3 min) pour signaler une situation.
-                  </p>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Enregistrement audio</label>
+                  <AudioRecorder onRecordingComplete={(blob) => setReportData({...reportData, audioBlob: blob, type: 'audio_fon'})} />
+                  {reportData.audioBlob && (
+                    <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                      <CheckCircle2 size={12} /> Audio enregistré
+                    </p>
+                  )}
                 </div>
-                <Button className="w-full max-w-xs h-16 rounded-2xl bg-red-500 hover:bg-red-600">
-                  Démarrer l'enregistrement
+
+                <div className="space-y-3">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Localisation (Map)</label>
+                  <LocationPicker 
+                    initialLocation={reportData.coordinates} 
+                    onLocationSelect={(lat, lng) => setReportData({...reportData, coordinates: [lat, lng]})} 
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Photos (Optionnel)</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="flex flex-col items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer">
+                      <Camera size={20} className="text-slate-400 mb-1" />
+                      <span className="text-[10px] font-bold text-slate-500">Prendre une photo</span>
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            setReportData({
+                              ...reportData, 
+                              attachments: [...reportData.attachments, ...Array.from(e.target.files)]
+                            });
+                          }
+                        }}
+                      />
+                    </label>
+                    <div className="space-y-1">
+                      {reportData.attachments.map((file, i) => (
+                        <div key={i} className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-lg text-[10px]">
+                          <span className="truncate max-w-[80px]">{file.name}</span>
+                          <button onClick={() => setReportData({
+                            ...reportData,
+                            attachments: reportData.attachments.filter((_, idx) => idx !== i)
+                          })}>
+                            <X size={12} className="text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full h-16 text-xl bg-red-500 hover:bg-red-600" 
+                  onClick={handleReportSubmit}
+                  disabled={isSubmitting || !reportData.audioBlob}
+                >
+                  {isSubmitting ? "Envoi..." : "Envoyer le signalement"}
                 </Button>
-                <p className="text-[10px] text-slate-400 italic">
-                  En envoyant cet audio, vous consentez à sa transmission aux structures partenaires.
-                </p>
               </div>
             )}
           </motion.div>
@@ -1465,8 +1800,9 @@ const AdminDashboard = ({
   onSaveSettings: (s: AppSettings) => Promise<boolean>,
   onUploadFile: (file: File) => Promise<{ url: string, name: string }>
 }) => {
-  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings'>('users');
+  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports'>('users');
   const [users, setUsers] = useState<any[]>([]);
+  const [reports, setReports] = useState<any[]>([]);
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [editingTerm, setEditingTerm] = useState<GlossaryTerm | null>(null);
   const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
@@ -1476,6 +1812,9 @@ const AdminDashboard = ({
   useEffect(() => {
     if (view === 'users') {
       fetch('/api/admin/users').then(res => res.json()).then(setUsers);
+    }
+    if (view === 'reports') {
+      fetch('/api/reports').then(res => res.json()).then(setReports);
     }
   }, [view]);
 
@@ -1547,21 +1886,40 @@ const AdminDashboard = ({
     if (file && editingModule) {
       try {
         const { url, name } = await onUploadFile(file);
-        if (type === 'audio') {
-          setEditingModule({ ...editingModule, audioUrl: url });
-        } else if (type === 'video') {
-          setEditingModule({ ...editingModule, videoUrl: url });
-        } else {
-          const newAttachment = { id: Date.now().toString(), name, url, type: 'pdf' as const };
-          setEditingModule({ 
-            ...editingModule, 
-            attachments: [...(editingModule.attachments || []), newAttachment] 
-          });
-        }
+        const newAttachment: Attachment = { id: Date.now().toString(), name, url, type };
+        
+        const updatedModule = { 
+          ...editingModule, 
+          attachments: [...(editingModule.attachments || []), newAttachment] 
+        };
+
+        if (type === 'audio') updatedModule.audioUrl = url;
+        if (type === 'video') updatedModule.videoUrl = url;
+
+        setEditingModule(updatedModule);
       } catch (err) {
         alert("Erreur lors de l'upload");
       }
     }
+  };
+
+  const handleDeleteAttachment = (id: string) => {
+    if (!editingModule) return;
+    const attToDelete = editingModule.attachments?.find(a => a.id === id);
+    const newAttachments = editingModule.attachments?.filter(a => a.id !== id) || [];
+    
+    let newModule = { ...editingModule, attachments: newAttachments };
+    
+    if (attToDelete) {
+      if (attToDelete.type === 'audio' && editingModule.audioUrl === attToDelete.url) {
+        newModule.audioUrl = '';
+      }
+      if (attToDelete.type === 'video' && editingModule.videoUrl === attToDelete.url) {
+        newModule.videoUrl = '';
+      }
+    }
+    
+    setEditingModule(newModule);
   };
 
   return (
@@ -1612,6 +1970,12 @@ const AdminDashboard = ({
           Cas
         </button>
         <button 
+          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'reports' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+          onClick={() => setView('reports')}
+        >
+          Signalements
+        </button>
+        <button 
           className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'settings' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
           onClick={() => setView('settings')}
         >
@@ -1620,6 +1984,108 @@ const AdminDashboard = ({
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 pb-24">
+        {view === 'reports' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-slate-500 uppercase tracking-wider text-xs">Signalements reçus ({reports.length})</h3>
+            </div>
+            {reports.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-100">
+                <MessageSquare size={48} className="mx-auto text-slate-200 mb-4" />
+                <p className="text-slate-400 font-medium">Aucun signalement pour le moment</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {reports.map(report => (
+                  <Card key={report.id} className="p-6 space-y-4 overflow-hidden">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-10 h-10 rounded-xl flex items-center justify-center",
+                          report.type === 'justice' ? "bg-blue-100 text-blue-600" :
+                          report.type === 'sante' ? "bg-red-100 text-red-600" :
+                          "bg-emerald-100 text-emerald-600"
+                        )}>
+                          <HelpCircle size={20} />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-slate-900 capitalize">{report.type}</h4>
+                          <p className="text-[10px] text-slate-400">
+                            {new Date(report.createdAt).toLocaleString('fr-FR')} • {report.anonymous ? "Anonyme" : `Par ${report.userId}`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className={cn(
+                        "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                        report.status === 'pending' ? "bg-yellow-100 text-yellow-700" :
+                        report.status === 'resolved' ? "bg-emerald-100 text-emerald-700" :
+                        "bg-slate-100 text-slate-600"
+                      )}>
+                        {report.status}
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                      <p className="text-sm text-slate-700 leading-relaxed">{report.description}</p>
+                    </div>
+
+                    {report.audioUrl && (
+                      <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <Volume2 size={18} className="text-emerald-600" />
+                        <audio src={report.audioUrl} controls className="h-8 flex-1" />
+                      </div>
+                    )}
+
+                    {report.location && (report.location.latitude || report.location.address) && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                          <Globe size={14} /> Localisation
+                        </p>
+                        {report.location.address && (
+                          <p className="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            {report.location.address}
+                          </p>
+                        )}
+                        {report.location.latitude && report.location.longitude && (
+                          <div className="h-[150px] w-full rounded-xl overflow-hidden border border-slate-200">
+                            <MapContainer center={[report.location.latitude, report.location.longitude]} zoom={15} style={{ height: '100%', width: '100%' }}>
+                              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                              <Marker position={[report.location.latitude, report.location.longitude]} />
+                            </MapContainer>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {report.attachments && report.attachments.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                          <Paperclip size={14} /> Pièces jointes ({report.attachments.length})
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {report.attachments.map((att: any) => (
+                            <a 
+                              key={att.id} 
+                              href={att.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 p-2 bg-white border border-slate-100 rounded-lg hover:border-emerald-200 transition-all group"
+                            >
+                              {att.type === 'pdf' ? <FileText size={14} className="text-red-400" /> : <ImageIcon size={14} className="text-blue-400" />}
+                              <span className="text-[10px] font-medium truncate flex-1">{att.name}</span>
+                              <ExternalLink size={12} className="text-slate-300 group-hover:text-emerald-500" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {view === 'settings' && (
           <div className="space-y-6">
             <Card className="p-6 space-y-4">
@@ -1885,6 +2351,25 @@ const AdminDashboard = ({
                   value={editingModule.title} 
                   onChange={e => setEditingModule({...editingModule, title: e.target.value})} 
                 />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Input 
+                    label="Durée estimée (min)" 
+                    type="number"
+                    value={editingModule.estimatedDuration?.toString() || ''} 
+                    onChange={e => setEditingModule({...editingModule, estimatedDuration: parseInt(e.target.value) || 0})} 
+                  />
+                  <Select 
+                    label="Niveau de difficulté" 
+                    value={editingModule.difficultyLevel || 'Débutant'} 
+                    options={[
+                      { value: 'Débutant', label: 'Débutant' },
+                      { value: 'Intermédiaire', label: 'Intermédiaire' },
+                      { value: 'Avancé', label: 'Avancé' }
+                    ]} 
+                    onChange={e => setEditingModule({...editingModule, difficultyLevel: e.target.value as any})} 
+                  />
+                </div>
                 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Introduction</label>
@@ -1926,8 +2411,15 @@ const AdminDashboard = ({
                     <div className="flex flex-wrap gap-2 mt-2">
                       {editingModule.attachments?.map(att => (
                         <div key={att.id} className="flex items-center gap-2 bg-slate-100 px-2 py-1 rounded text-[10px]">
-                          <Paperclip size={10} /> {att.name}
-                          <button onClick={() => setEditingModule({...editingModule, attachments: editingModule.attachments?.filter(a => a.id !== att.id)})} className="text-red-500">×</button>
+                          {att.type === 'audio' ? <Volume2 size={10} /> : att.type === 'video' ? <Video size={10} /> : <FileText size={10} />}
+                          <span className="truncate max-w-[100px]">{att.name}</span>
+                          <button 
+                            type="button"
+                            onClick={() => handleDeleteAttachment(att.id)} 
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            ×
+                          </button>
                         </div>
                       ))}
                     </div>

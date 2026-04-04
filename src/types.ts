@@ -38,6 +38,8 @@ export interface Module {
   quiz?: QuizQuestion[];
   isReporting?: boolean;
   attachments?: Attachment[];
+  estimatedDuration?: number; // in minutes
+  difficultyLevel?: 'Débutant' | 'Intermédiaire' | 'Avancé';
 }
 
 export interface AppSettings {
@@ -83,4 +85,28 @@ export interface UserProgress {
   completedCaseStudies: string[]; // IDs of completed case studies
   finalExamScore?: number;
   finalExamDate?: string;
+}
+
+export interface Report {
+  id: string;
+  userId: string;
+  moduleId: number;
+  type: string;
+  description: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  date: string;
+  anonymous: boolean;
+  audioUrl?: string;
+  attachments?: {
+    id: string;
+    name: string;
+    url: string;
+    type: 'pdf' | 'image';
+  }[];
+  status: 'pending' | 'resolved' | 'dismissed';
+  createdAt: string;
 }

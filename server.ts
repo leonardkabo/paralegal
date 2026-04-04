@@ -60,7 +60,9 @@ db.exec(`
     videoUrl TEXT,
     quiz TEXT, -- JSON array
     attachments TEXT, -- JSON array
-    isReporting INTEGER DEFAULT 0
+    isReporting INTEGER DEFAULT 0,
+    estimatedDuration INTEGER,
+    difficultyLevel TEXT
   );
 
   CREATE TABLE IF NOT EXISTS settings (
@@ -92,12 +94,31 @@ db.exec(`
     scenario TEXT,
     options TEXT -- JSON array
   );
+
+  CREATE TABLE IF NOT EXISTS reports (
+    id TEXT PRIMARY KEY,
+    userId TEXT,
+    moduleId INTEGER,
+    type TEXT,
+    description TEXT,
+    location TEXT, -- JSON object
+    date TEXT,
+    anonymous INTEGER,
+    audioUrl TEXT,
+    attachments TEXT, -- JSON array
+    status TEXT DEFAULT 'pending',
+    createdAt TEXT
+  );
 `);
 
 // Migration: Add missing columns to progress table if it already existed
 try { db.exec("ALTER TABLE progress ADD COLUMN completedCaseStudies TEXT DEFAULT '[]'"); } catch (e) {}
 try { db.exec("ALTER TABLE progress ADD COLUMN finalExamScore INTEGER"); } catch (e) {}
 try { db.exec("ALTER TABLE progress ADD COLUMN finalExamDate TEXT"); } catch (e) {}
+
+// Migration: Add missing columns to modules table if it already existed
+try { db.exec("ALTER TABLE modules ADD COLUMN estimatedDuration INTEGER"); } catch (e) {}
+try { db.exec("ALTER TABLE modules ADD COLUMN difficultyLevel TEXT"); } catch (e) {}
 try { db.exec("ALTER TABLE users ADD COLUMN isAdmin INTEGER DEFAULT 0"); } catch (e) {}
 try { db.exec("ALTER TABLE modules ADD COLUMN videoUrl TEXT"); } catch (e) {}
 try { db.exec("ALTER TABLE modules ADD COLUMN attachments TEXT DEFAULT '[]'"); } catch (e) {}
@@ -1069,107 +1090,474 @@ Le vendeur du terrain B insiste pour une vente rapide "car d'autres personnes so
     ],
     audioUrl: "", videoUrl: "", attachments: [], isReporting: 0, estimatedDuration: 360, difficultyLevel: "Avancé"
   },
-    {
-      id: 5,
-      title: "Droits de l'enfant",
-      introduction: "Protéger les enfants contre les abus, le travail forcé et garantir leur éducation.",
-      objectives: ["Connaître le Code de l'Enfant", "Identifier les formes de maltraitance", "Savoir dénoncer les abus", "Promouvoir l'éducation"],
-      keyNotions: ["Intérêt supérieur de l'enfant", "Protection", "Éducation"],
-      content: "# Protection de l'Enfance\n\nL'enfant a droit à un nom, une nationalité et une protection contre toute forme de violence.\n\n## Le travail des enfants\nIl est interdit d'employer un enfant de moins de 14 ans pour des travaux pénibles.",
-      quiz: [
-        { id: "q5_1", question: "Quel est l'âge de la majorité au Bénin ?", options: ["16 ans", "18 ans", "21 ans"], correctAnswer: 1 },
-        { id: "q5_2", question: "L'école est-elle obligatoire ?", options: ["Oui", "Non", "Seulement pour les garçons"], correctAnswer: 0 },
-        { id: "q5_3", question: "Le châtiment corporel est-il autorisé ?", options: ["Oui, c'est l'éducation", "Non, c'est interdit", "Seulement à l'école"], correctAnswer: 1 },
-        { id: "q5_4", question: "Un enfant a-t-il droit à un acte de naissance ?", options: ["Oui, c'est un droit", "Non, c'est facultatif", "Seulement s'il va à l'école"], correctAnswer: 0 },
-        { id: "q5_5", question: "Le mariage des enfants est-il légal ?", options: ["Oui", "Non, c'est un crime", "Avec l'accord des parents"], correctAnswer: 1 }
+  {
+    id: 5,
+      title: "Module 5 : Protection de l'Enfance et Droits de l'Enfant",
+      introduction: "Ce module explore le cadre juridique de la protection de l'enfant au Bénin. Il détaille les droits fondamentaux, les formes de maltraitance, le travail des enfants, et les mécanismes de signalement et de prise en charge des mineurs en danger.",
+      objectives: [
+        "Maîtriser les dispositions du Code de l'Enfant au Bénin",
+        "Identifier les différentes formes de maltraitance et d'exploitation",
+        "Comprendre les règles sur le travail des enfants et l'âge minimum",
+        "Connaître les procédures de signalement et de placement",
+        "Promouvoir l'intérêt supérieur de l'enfant dans la communauté"
       ],
-      audioUrl: "", videoUrl: "", attachments: []
+      keyNotions: [
+        "Intérêt supérieur de l'enfant",
+        "Code de l'Enfant (Loi 2015-08)",
+        "Maltraitance physique et psychologique",
+        "Exploitation économique et sexuelle",
+        "Droit à l'éducation et à la santé",
+        "Mineur en conflit avec la loi"
+      ],
+      content: `# CHAPITRE 1 : LE CADRE JURIDIQUE DE PROTECTION
+      
+## 1.1 Définition de l'enfant
+Au Bénin, est considéré comme enfant tout être humain âgé de moins de 18 ans accomplis (Article 2 du Code de l'Enfant).
+
+## 1.2 L'intérêt supérieur de l'enfant
+C'est le principe cardinal : dans toute décision concernant un enfant, son intérêt doit être la considération primordiale. Cela inclut son bien-être physique, affectif et moral.
+
+## 1.3 Droits fondamentaux
+- **Droit à l'identité** : Nom, prénom et nationalité dès la naissance.
+- **Droit à la santé** : Accès aux soins et à la vaccination.
+- **Droit à l'éducation** : L'école est obligatoire et gratuite jusqu'à 16 ans.
+- **Droit à la protection** : Contre toute forme de violence, d'abus ou de négligence.
+
+---
+
+# CHAPITRE 2 : LES FORMES DE MALTRAITANCE ET D'EXPLOITATION
+
+## 2.1 Maltraitances physiques et psychologiques
+- **Châtiments corporels** : Interdits dans tous les milieux (famille, école, centres d'apprentissage).
+- **Négligence** : Privation de nourriture, de soins ou d'affection.
+- **Violences morales** : Insultes, humiliations, menaces.
+
+## 2.2 Exploitation économique (Travail des enfants)
+- **Âge minimum** : 14 ans pour les travaux légers, 16 ans pour le travail régulier.
+- **Pires formes de travail** : Esclavage, traite, prostitution, travaux dangereux (mines, carrières).
+- **Vidomégon** : Pratique de placement d'enfants détournée en exploitation domestique.
+
+## 2.3 Exploitation sexuelle et mariage forcé
+- **Mariage d'enfants** : Interdit avant 18 ans. Les auteurs et complices encourent des peines de prison.
+- **Pédocriminalité** : Tout acte sexuel sur un mineur est un crime sévèrement puni.
+
+---
+
+# CHAPITRE 3 : MÉCANISMES DE PROTECTION ET SIGNALEMENT
+
+## 3.1 Acteurs de la protection
+- **Direction de la Protection de l'Enfant (DPE)** : Coordination nationale.
+- **Centres de Promotion Sociale (CPS)** : Prise en charge de proximité.
+- **Brigade de Protection des Mineurs (BPM)** : Police spécialisée.
+- **Tribunal pour enfants** : Justice adaptée aux mineurs.
+
+## 3.2 Procédure de signalement
+Tout citoyen (et particulièrement le parajuriste) a l'obligation de signaler un enfant en danger.
+- **Où ?** CPS, Commissariat, Gendarmerie ou via le numéro vert (138).
+- **Confidentialité** : L'identité de l'informateur est protégée.
+
+## 3.3 Mesures de protection
+- **Placement d'urgence** : En famille d'accueil ou centre de transit.
+- **Assistance éducative** : Suivi de la famille par un travailleur social.
+- **Ordonnance de garde** : Décision du juge pour protéger l'enfant de ses agresseurs.
+
+---
+
+# RÔLE DU PARAJURISTE
+- Sensibiliser les parents sur l'importance de l'acte de naissance et de la scolarisation.
+- Détecter les signes de maltraitance dans la communauté.
+- Accompagner les familles vers les Centres de Promotion Sociale.
+- Dénoncer les mariages forcés et l'exploitation économique.`,
+      quiz: [
+        { id: "q5_1", question: "Quel est l'âge de la majorité légale au Bénin ?", options: ["16 ans", "18 ans", "21 ans"], correctAnswer: 1, explanation: "Le Code de l'Enfant fixe la majorité à 18 ans." },
+        { id: "q5_2", question: "L'école est obligatoire au Bénin jusqu'à quel âge ?", options: ["12 ans", "14 ans", "16 ans"], correctAnswer: 2, explanation: "La loi rend l'éducation obligatoire jusqu'à 16 ans." },
+        { id: "q5_3", question: "Le châtiment corporel est-il autorisé pour l'éducation ?", options: ["Oui, avec modération", "Non, c'est strictement interdit", "Seulement par les parents"], correctAnswer: 1, explanation: "La Loi 2015-08 interdit toute forme de violence éducative." },
+        { id: "q5_4", question: "Quel est l'âge minimum pour travailler au Bénin ?", options: ["12 ans", "14 ans", "18 ans"], correctAnswer: 1, explanation: "L'âge minimum légal est de 14 ans pour les travaux légers." },
+        { id: "q5_5", question: "Le mariage d'un enfant de 15 ans est-il possible avec l'accord des parents ?", options: ["Oui", "Non, c'est interdit avant 18 ans", "Seulement pour les filles"], correctAnswer: 1, explanation: "Le mariage est interdit avant 18 ans, même avec l'accord parental." },
+        { id: "q5_6", question: "Le numéro vert pour signaler un abus sur enfant est le :", options: ["117", "138", "160"], correctAnswer: 1, explanation: "Le 138 est la ligne dédiée à la protection de l'enfant." }
+      ],
+      audioUrl: "", videoUrl: "", attachments: [], isReporting: 0, estimatedDuration: 300, difficultyLevel: "Intermédiaire"
     },
     {
       id: 6,
-      title: "Violences Basées sur le Genre",
-      introduction: "Lutter contre les violences faites aux femmes et aux filles dans la société.",
-      objectives: ["Définir les VBG", "Connaître la loi sur les violences faites aux femmes", "Accompagner les victimes", "Sensibiliser la communauté"],
-      keyNotions: ["Violence physique", "Violence psychologique", "Harcèlement"],
-      content: "# Lutte contre les VBG\n\nLes violences basées sur le genre sont des actes nuisibles dirigés contre une personne en raison de son sexe.\n\n## La Loi 2011-26\nElle punit sévèrement les violences faites aux femmes au Bénin.",
-      quiz: [
-        { id: "q6_1", question: "La violence psychologique est-elle punie ?", options: ["Oui", "Non", "Seulement si elle est publique"], correctAnswer: 0 },
-        { id: "q6_2", question: "Le viol conjugal existe-t-il légalement ?", options: ["Oui", "Non", "Seulement en ville"], correctAnswer: 0 },
-        { id: "q6_3", question: "Où orienter une victime de VBG ?", options: ["À l'église", "Au commissariat ou centre social", "Chez le chef de village"], correctAnswer: 1 },
-        { id: "q6_4", question: "L'excision est-elle autorisée ?", options: ["Oui", "Non, c'est un crime", "Seulement par tradition"], correctAnswer: 1 },
-        { id: "q6_5", question: "Le harcèlement sexuel au travail est-il puni ?", options: ["Oui", "Non", "Si l'employeur est d'accord"], correctAnswer: 0 }
+      title: "Module 6 : Violences Basées sur le Genre (VBG)",
+      introduction: "Ce module traite des violences spécifiques liées au genre, principalement envers les femmes et les filles. Il analyse le cadre légal béninois, les types de violences, et les parcours de prise en charge des victimes.",
+      objectives: [
+        "Définir et identifier les différentes formes de VBG",
+        "Maîtriser la Loi 2011-26 sur les violences faites aux femmes",
+        "Comprendre le cycle de la violence et les obstacles au signalement",
+        "Connaître le circuit de prise en charge (médical, social, juridique)",
+        "Savoir mener une sensibilisation communautaire efficace"
       ],
-      audioUrl: "", videoUrl: "", attachments: []
+      keyNotions: [
+        "Violence physique, sexuelle, psychologique",
+        "Violence économique",
+        "Harcèlement sexuel",
+        "Mutilations Génitales Féminines (Excision)",
+        "Loi 2011-26",
+        "Prise en charge holistique"
+      ],
+      content: `# CHAPITRE 1 : COMPRENDRE LES VBG
+      
+## 1.1 Définition
+Les VBG sont des actes nuisibles dirigés contre une personne en raison de son sexe. Elles découlent de rapports de force inégaux entre hommes et femmes.
+
+## 1.2 Les types de violences
+- **Physiques** : Coups, blessures, séquestration.
+- **Sexuelles** : Viol, attouchements, harcèlement, mariage forcé.
+- **Psychologiques** : Menaces, insultes, isolement, contrôle excessif.
+- **Économiques** : Privation de ressources, interdiction de travailler, spoliation.
+- **Traditionnelles** : Excision, lévirat (mariage forcé avec le frère du défunt).
+
+---
+
+# CHAPITRE 2 : LE CADRE LÉGAL BÉNINOIS
+
+## 2.1 La Loi 2011-26
+Cette loi spécifique punit les violences faites aux femmes. Elle définit le viol, le harcèlement sexuel, et les violences domestiques comme des délits ou crimes graves.
+
+## 2.2 Les Mutilations Génitales Féminines (MGF)
+L'excision est un crime au Bénin. La loi punit non seulement l'auteur de l'acte, mais aussi les parents et complices.
+
+## 2.3 Le Harcèlement Sexuel
+La loi protège les femmes contre le harcèlement en milieu scolaire et professionnel. Le chantage sexuel pour obtenir une note ou un emploi est sévèrement puni.
+
+---
+
+# CHAPITRE 3 : PRISE EN CHARGE ET RÉFÉRENCEMENT
+
+## 3.1 Le parcours de la victime
+1. **Médical** : Soins d'urgence, prévention IST/VIH, certificat médical (gratuit dans certains cas).
+2. **Psychosocial** : Écoute, conseil, hébergement d'urgence (CPS).
+3. **Juridique** : Plainte, assistance judiciaire, procès.
+
+## 3.2 Rôle du parajuriste
+- **Accueil** : Créer un espace sécurisé et confidentiel.
+- **Écoute** : Ne jamais blâmer la victime ("Pourquoi es-tu sortie tard ?").
+- **Information** : Expliquer les droits et les options de recours.
+- **Accompagnement** : Orienter vers le CPS ou le commissariat.
+
+---
+
+# SENSIBILISATION COMMUNAUTAIRE
+Le parajuriste doit déconstruire les mythes :
+- "La femme appartient à son mari" -> Faux, elle a des droits propres.
+- "C'est une affaire de famille" -> Faux, la violence est un crime public.
+- "L'excision est nécessaire pour la pureté" -> Faux, c'est une mutilation dangereuse.`,
+      quiz: [
+        { id: "q6_1", question: "La violence psychologique est-elle punie par la loi au Bénin ?", options: ["Oui", "Non", "Seulement si elle laisse des traces"], correctAnswer: 0, explanation: "La Loi 2011-26 reconnaît et punit la violence morale et psychologique." },
+        { id: "q6_2", question: "Le viol entre époux est-il reconnu par la loi ?", options: ["Oui", "Non, le devoir conjugal l'emporte", "Seulement en cas de divorce"], correctAnswer: 0, explanation: "La loi punit tout acte sexuel imposé sans consentement, même dans le mariage." },
+        { id: "q6_3", question: "L'excision est considérée au Bénin comme :", options: ["Une tradition respectable", "Un crime puni de prison", "Un acte médical"], correctAnswer: 1, explanation: "Les MGF sont strictement interdites et pénalisées." },
+        { id: "q6_4", question: "Où orienter prioritairement une victime de viol ?", options: ["Chez le chef de village", "À l'hôpital ou centre de santé", "À l'église"], correctAnswer: 1, explanation: "L'urgence est médicale (prévention IST/VIH et constat)." },
+        { id: "q6_5", question: "Le harcèlement sexuel en milieu scolaire est puni par :", options: ["Le règlement intérieur", "Le Code Pénal et la Loi 2011-26", "Une simple amende"], correctAnswer: 1, explanation: "C'est une infraction pénale grave." }
+      ],
+      audioUrl: "", videoUrl: "", attachments: [], isReporting: 0, estimatedDuration: 300, difficultyLevel: "Intermédiaire"
     },
     {
       id: 7,
-      title: "Droit du travail",
-      introduction: "Connaître les droits et devoirs des travailleurs et des employeurs.",
-      objectives: ["Comprendre le contrat de travail", "Connaître le SMIG", "Gérer les licenciements", "Protection sociale (CNSS)"],
-      keyNotions: ["Contrat", "Salaire", "Sécurité sociale"],
-      content: "# Droit du Travail au Bénin\n\nLe Code du Travail régit les relations professionnelles. Tout travailleur a droit à un salaire juste et à une protection sociale.",
-      quiz: [
-        { id: "q7_1", question: "Le contrat de travail doit-il être écrit ?", options: ["Oui, c'est plus sûr", "Non, l'oral suffit parfois", "Seulement pour les cadres"], correctAnswer: 1 },
-        { id: "q7_2", question: "Que signifie le SMIG ?", options: ["Salaire Maximum", "Salaire Minimum Interprofessionnel Garanti", "Une taxe"], correctAnswer: 1 },
-        { id: "q7_3", question: "La CNSS sert à quoi ?", options: ["À payer les impôts", "À la retraite et aux allocations", "À la police"], correctAnswer: 1 },
-        { id: "q7_4", question: "Un travailleur a-t-il droit à des congés ?", options: ["Oui", "Non", "Seulement s'il est gentil"], correctAnswer: 0 },
-        { id: "q7_5", question: "Le licenciement abusif est-il puni ?", options: ["Oui", "Non", "Seulement dans le public"], correctAnswer: 0 }
+      title: "Module 7 : Droit du Travail et Protection Sociale",
+      introduction: "Ce module présente les bases du droit du travail au Bénin. Il couvre les types de contrats, les droits et obligations des parties, les conditions de travail, et le rôle de la CNSS dans la protection sociale des travailleurs.",
+      objectives: [
+        "Distinguer les différents types de contrats de travail (CDI, CDD)",
+        "Connaître les droits fondamentaux du travailleur (SMIG, congés, horaires)",
+        "Comprendre les procédures de rupture de contrat et de licenciement",
+        "Maîtriser le rôle de l'Inspection du Travail",
+        "Connaître les obligations sociales (CNSS)"
       ],
-      audioUrl: "", videoUrl: "", attachments: []
+      keyNotions: [
+        "Contrat de travail",
+        "SMIG (Salaire Minimum Interprofessionnel Garanti)",
+        "Licenciement vs Démission",
+        "CNSS",
+        "Inspection du Travail",
+        "Période d'essai"
+      ],
+      content: `# CHAPITRE 1 : LE CONTRAT DE TRAVAIL
+      
+## 1.1 Définition
+Le contrat de travail est une convention par laquelle une personne s'engage à mettre son activité professionnelle sous la direction d'une autre personne, moyennant rémunération.
+
+## 1.2 Types de contrats
+- **CDI (Contrat à Durée Indéterminée)** : La forme normale de travail, sans date de fin prévue.
+- **CDD (Contrat à Durée Déterminée)** : Pour une tâche précise et limitée dans le temps.
+- **Contrat d'apprentissage** : Pour la formation professionnelle des jeunes.
+
+## 1.3 La période d'essai
+Elle permet à l'employeur d'évaluer les compétences et au travailleur de vérifier si le poste lui convient. Sa durée est fixée par la loi selon la catégorie professionnelle.
+
+---
+
+# CHAPITRE 2 : CONDITIONS DE TRAVAIL ET RÉMUNÉRATION
+
+## 2.1 Le Salaire et le SMIG
+Le salaire est librement fixé mais ne peut être inférieur au **SMIG**. Le SMIG est le plancher légal pour protéger le pouvoir d'achat des travailleurs les plus modestes.
+
+## 2.2 Durée du travail et congés
+- **Durée légale** : 40 heures par semaine.
+- **Heures supplémentaires** : Donnent lieu à une majoration de salaire.
+- **Congés payés** : Tout travailleur a droit à des congés (généralement 2 jours par mois de travail effectif).
+
+## 2.3 Hygiène et Sécurité
+L'employeur a l'obligation de garantir un environnement de travail sain et sécurisé pour prévenir les accidents et maladies professionnelles.
+
+---
+
+# CHAPITRE 3 : RUPTURE DU CONTRAT ET PROTECTION SOCIALE
+
+## 3.1 Licenciement et Démission
+- **Licenciement** : Doit être fondé sur un motif réel et sérieux (faute, motif économique).
+- **Préavis** : Délai à respecter avant la fin effective du contrat.
+- **Indemnités** : Sommes versées au travailleur en cas de licenciement non fautif.
+
+## 3.2 La CNSS (Caisse Nationale de Sécurité Sociale)
+L'employeur doit obligatoirement déclarer ses employés à la CNSS.
+- **Prestations** : Allocations familiales, pensions de retraite, prise en charge des accidents de travail.
+
+## 3.3 L'Inspection du Travail
+C'est l'organe de contrôle et de médiation. En cas de conflit, le parajuriste doit orienter le travailleur vers l'inspecteur du travail pour une tentative de conciliation.`,
+      quiz: [
+        { id: "q7_1", question: "Le contrat de travail doit-il obligatoirement être écrit ?", options: ["Oui, toujours", "Non, l'oral est admis pour certains contrats", "Seulement pour les étrangers"], correctAnswer: 1, explanation: "Le Code du Travail admet le contrat verbal pour certains types d'emplois, bien que l'écrit soit recommandé." },
+        { id: "q7_2", question: "Que signifie l'acronyme SMIG ?", options: ["Salaire Maximum d'Intérêt Général", "Salaire Minimum Interprofessionnel Garanti", "Service Médical Inter-Garantie"], correctAnswer: 1, explanation: "C'est le salaire minimum légal en vigueur." },
+        { id: "q7_3", question: "Quelle est la durée légale hebdomadaire de travail au Bénin ?", options: ["35 heures", "40 heures", "48 heures"], correctAnswer: 1, explanation: "La durée légale est de 40 heures par semaine." },
+        { id: "q7_4", question: "L'inscription à la CNSS est-elle facultative pour l'employeur ?", options: ["Oui, si l'employé est d'accord", "Non, c'est une obligation légale", "Seulement pour les grandes entreprises"], correctAnswer: 1, explanation: "Tout employeur doit déclarer ses salariés dès l'embauche." },
+        { id: "q7_5", question: "En cas de conflit au travail, quelle institution assure la médiation ?", options: ["Le tribunal civil", "L'Inspection du Travail", "La Mairie"], correctAnswer: 1, explanation: "L'Inspection du Travail est l'étape de conciliation obligatoire." }
+      ],
+      audioUrl: "", videoUrl: "", attachments: [], estimatedDuration: 240, difficultyLevel: "Intermédiaire"
     },
     {
       id: 8,
-      title: "Médiation et Conflits",
-      introduction: "Apprendre les techniques de résolution pacifique des litiges communautaires.",
-      objectives: ["Maîtriser les étapes de la médiation", "Gérer les émotions", "Rédiger un procès-verbal", "Neutralité du médiateur"],
-      keyNotions: ["Impartialité", "Confidentialité", "Accord"],
-      content: "# Médiation Communautaire\n\nLa médiation est un processus volontaire où un tiers aide les parties à trouver une solution à leur conflit.",
-      quiz: [
-        { id: "q8_1", question: "Le médiateur doit-il prendre parti ?", options: ["Oui", "Non, il doit être neutre", "Pour le plus pauvre"], correctAnswer: 1 },
-        { id: "q8_2", question: "La médiation est-elle obligatoire ?", options: ["Oui", "Non, c'est volontaire", "Seulement pour le foncier"], correctAnswer: 1 },
-        { id: "q8_3", question: "Le contenu de la médiation est-il secret ?", options: ["Oui, c'est confidentiel", "Non", "Seulement pour le juge"], correctAnswer: 0 },
-        { id: "q8_4", question: "Peut-on médiatiser un crime grave (meurtre) ?", options: ["Oui", "Non, c'est pour la justice pénale", "Si les familles sont d'accord"], correctAnswer: 1 },
-        { id: "q8_5", question: "L'accord de médiation a-t-il une valeur ?", options: ["Oui, s'il est signé", "Non", "Seulement moralement"], correctAnswer: 0 }
+      title: "Module 8 : Techniques de Médiation et Résolution des Conflits",
+      introduction: "La médiation est un outil essentiel du parajuriste. Ce module enseigne les principes, les étapes et les techniques de communication nécessaires pour aider les parties à résoudre leurs litiges de manière pacifique et durable.",
+      objectives: [
+        "Comprendre les principes fondamentaux de la médiation (neutralité, volontariat)",
+        "Maîtriser les étapes d'un processus de médiation réussi",
+        "Développer des compétences d'écoute active et de reformulation",
+        "Savoir rédiger un procès-verbal d'accord de médiation",
+        "Identifier les limites de la médiation (cas non médiatisables)"
       ],
-      audioUrl: "", videoUrl: "", attachments: []
+      keyNotions: [
+        "Impartialité",
+        "Confidentialité",
+        "Écoute active",
+        "Accord à l'amiable",
+        "Neutralité",
+        "Gagnant-Gagnant"
+      ],
+      content: `# CHAPITRE 1 : LES FONDEMENTS DE LA MÉDIATION
+      
+## 1.1 Définition
+La médiation est un processus par lequel un tiers neutre (le médiateur/parajuriste) aide les parties en conflit à trouver elles-mêmes une solution mutuellement acceptable.
+
+## 1.2 Les principes d'or
+- **Volontariat** : On ne force personne à venir en médiation.
+- **Neutralité** : Le médiateur ne prend pas parti.
+- **Impartialité** : Le médiateur n'a pas d'intérêt personnel dans le conflit.
+- **Confidentialité** : Tout ce qui se dit reste dans la salle.
+
+---
+
+# CHAPITRE 2 : LES ÉTAPES DE LA MÉDIATION
+
+## 2.1 Préparation et Introduction
+- Installer les parties confortablement.
+- Expliquer les règles (pas d'insultes, temps de parole respecté).
+- Définir le rôle du médiateur.
+
+## 2.2 Exposé des faits
+- Chaque partie donne sa version sans être interrompue.
+- Le médiateur écoute et prend des notes.
+
+## 2.3 Identification des besoins
+- Le médiateur aide les parties à passer de leurs "positions" ("Je veux cet argent") à leurs "besoins" ("J'ai besoin de cet argent pour soigner mon enfant").
+
+## 2.4 Recherche de solutions
+- Brainstorming d'options.
+- Évaluation de la faisabilité des solutions proposées.
+
+## 2.5 Conclusion et Accord
+- Formalisation de la solution choisie.
+- Rédaction et signature du procès-verbal.
+
+---
+
+# CHAPITRE 3 : LES TECHNIQUES DE COMMUNICATION
+
+## 3.1 L'écoute active
+Montrer qu'on écoute par le regard, les hochements de tête et des petits encouragements verbaux.
+
+## 3.2 La reformulation
+"Si j'ai bien compris, ce qui vous blesse le plus c'est que..." Cela permet de valider les émotions et de clarifier les faits.
+
+## 3.3 La gestion des émotions
+Savoir faire une pause si la tension monte trop. Valider la colère ou la tristesse sans prendre parti.
+
+---
+
+# LIMITES DE LA MÉDIATION
+Le parajuriste ne doit JAMAIS médiatiser :
+- Les crimes graves (meurtre, viol).
+- Les cas de violences physiques graves en cours.
+- Les litiges où l'une des parties est sous l'emprise de la peur ou de la menace.`,
+      quiz: [
+        { id: "q8_1", question: "Un médiateur peut-il imposer une solution aux parties ?", options: ["Oui, s'il connaît bien la loi", "Non, les parties doivent trouver leur propre solution", "Seulement si les parties sont d'accord"], correctAnswer: 1, explanation: "Le médiateur facilite, il ne décide pas." },
+        { id: "q8_2", question: "La confidentialité en médiation signifie que :", options: ["On peut raconter au juge", "Rien de ce qui est dit ne doit être divulgué", "On peut en parler à sa famille"], correctAnswer: 1, explanation: "C'est un principe absolu pour garantir la liberté de parole." },
+        { id: "q8_3", question: "Quelle est la première étape d'une médiation ?", options: ["Signer l'accord", "L'exposé des faits par les parties", "L'introduction et la pose des règles"], correctAnswer: 2, explanation: "Il faut d'abord établir le cadre sécurisant." },
+        { id: "q8_4", question: "Peut-on médiatiser un cas de viol ?", options: ["Oui, pour éviter le scandale", "Non, c'est un crime qui doit aller en justice", "Si les familles sont d'accord"], correctAnswer: 1, explanation: "Les crimes graves sont exclus du champ de la médiation." },
+        { id: "q8_5", question: "La reformulation sert à :", options: ["Répéter bêtement", "Vérifier la compréhension et calmer les esprits", "Gagner du temps"], correctAnswer: 1, explanation: "C'est un outil puissant de clarification et d'empathie." }
+      ],
+      audioUrl: "", videoUrl: "", attachments: [], estimatedDuration: 180, difficultyLevel: "Débutant"
     },
     {
       id: 9,
-      title: "Institutions Judiciaires",
-      introduction: "Connaître l'organisation de la justice au Bénin pour mieux orienter.",
-      objectives: ["Distinguer les tribunaux", "Connaître le rôle du procureur", "Accès à l'assistance juridique", "Rôle des huissiers et notaires"],
-      keyNotions: ["Tribunal de première instance", "Cour d'Appel", "CRIET"],
-      content: "# Organisation Judiciaire au Bénin\n\nLa justice est rendue au nom du peuple béninois. Elle comprend des tribunaux de base et des cours spécialisées.",
-      quiz: [
-        { id: "q9_1", question: "Où porte-t-on plainte en premier ?", options: ["À la Cour Suprême", "Au commissariat ou Tribunal de 1ère instance", "À la mairie"], correctAnswer: 1 },
-        { id: "q9_2", question: "La CRIET s'occupe de quoi ?", options: ["Des divorces", "Des crimes économiques et terrorisme", "Du foncier"], correctAnswer: 1 },
-        { id: "q9_3", question: "L'assistance juridique gratuite existe-t-elle ?", options: ["Oui, pour les indigents", "Non", "Seulement pour les mineurs"], correctAnswer: 0 },
-        { id: "q9_4", question: "Le procureur représente qui ?", options: ["Le prévenu", "La société (l'État)", "Le juge"], correctAnswer: 1 },
-        { id: "q9_5", question: "Un huissier sert à quoi ?", options: ["À juger", "À constater et exécuter les décisions", "À défendre"], correctAnswer: 1 }
+      title: "Module 9 : Organisation Judiciaire et Accès à la Justice",
+      introduction: "Ce module détaille l'organisation des tribunaux au Bénin. Il explique le rôle de chaque acteur de la justice et comment orienter efficacement un citoyen vers la bonne juridiction.",
+      objectives: [
+        "Connaître la hiérarchie des tribunaux au Bénin",
+        "Distinguer le rôle du juge, du procureur, de l'avocat et de l'huissier",
+        "Comprendre la différence entre le civil et le pénal",
+        "Connaître les procédures d'assistance juridique pour les démunis",
+        "Identifier les juridictions spécialisées (CRIET, Cour Constitutionnelle)"
       ],
-      audioUrl: "", videoUrl: "", attachments: []
+      keyNotions: [
+        "Tribunal de Première Instance",
+        "Cour d'Appel",
+        "Procureur de la République",
+        "Huissier de Justice",
+        "Notaire",
+        "Assistance Juridique"
+      ],
+      content: `# CHAPITRE 1 : LES TRIBUNAUX AU BÉNIN
+      
+## 1.1 Les Tribunaux de Première Instance (TPI)
+C'est la porte d'entrée de la justice. Ils traitent la majorité des affaires quotidiennes (divorce, foncier, petits délits).
+
+## 1.2 Les Cours d'Appel
+Si une personne n'est pas d'accord avec le jugement du TPI, elle peut faire "appel" devant cette cour pour un second examen de l'affaire.
+
+## 1.3 La Cour Suprême
+C'est la plus haute juridiction en matière administrative et judiciaire. Elle vérifie que la loi a été correctement appliquée.
+
+## 1.4 Les juridictions spécialisées
+- **CRIET** : Pour les crimes économiques et le terrorisme.
+- **Cour Constitutionnelle** : Pour la conformité des lois à la Constitution et les droits de l'homme.
+
+---
+
+# CHAPITRE 2 : LES ACTEURS DE LA JUSTICE
+
+## 2.1 Les Magistrats
+- **Magistrats du siège (Juges)** : Ils tranchent les litiges et rendent les décisions.
+- **Magistrats du parquet (Procureurs)** : Ils représentent la société, dirigent les enquêtes de police et poursuivent les auteurs d'infractions.
+
+## 2.2 Les Auxiliaires de Justice
+- **L'Avocat** : Conseille et défend ses clients devant les tribunaux.
+- **L'Huissier** : Signifie les actes (convocations) et fait exécuter les décisions de justice (saisies, expulsions).
+- **Le Notaire** : Rédige les actes officiels (ventes de terrains, contrats de mariage).
+- **Le Greffier** : Assiste le juge et conserve les dossiers.
+
+---
+
+# CHAPITRE 3 : ACCÈS À LA JUSTICE
+
+## 3.1 Civil vs Pénal
+- **Civil** : Conflit entre deux personnes (ex: loyer impayé). L'objectif est la réparation.
+- **Pénal** : Infraction à la loi (ex: vol, coups et blessures). L'objectif est la sanction.
+
+## 3.2 L'Assistance Juridique
+L'État béninois prévoit des mécanismes pour aider les personnes démunies à se défendre (avocat commis d'office, exonération de frais).
+
+## 3.3 Rôle d'orientation du parajuriste
+Le parajuriste doit savoir :
+- Si l'affaire est civile ou pénale.
+- Quel tribunal est compétent (lieu de l'affaire ou domicile).
+- Quels documents sont nécessaires pour constituer le dossier.`,
+      quiz: [
+        { id: "q9_1", question: "Qui dirige l'enquête de police et décide des poursuites ?", options: ["Le Juge", "Le Procureur", "L'Avocat"], correctAnswer: 1, explanation: "Le Procureur est le chef de l'action publique." },
+        { id: "q9_2", question: "Un huissier de justice sert à :", options: ["Défendre le prévenu", "Signifier les actes et exécuter les jugements", "Rédiger les lois"], correctAnswer: 1, explanation: "C'est un auxiliaire d'exécution indispensable." },
+        { id: "q9_3", question: "Où va-t-on si on n'est pas d'accord avec un premier jugement ?", options: ["À la Mairie", "En Cour d'Appel", "Au Commissariat"], correctAnswer: 1, explanation: "L'appel permet un second degré de juridiction." },
+        { id: "q9_4", question: "La CRIET est compétente pour :", options: ["Les divorces", "Le terrorisme et les crimes économiques", "Le vol de poules"], correctAnswer: 1, explanation: "C'est une cour spéciale pour les infractions graves et complexes." },
+        { id: "q9_5", question: "L'assistance juridique est réservée :", options: ["Aux riches", "Aux personnes démunies (indigents)", "Aux avocats"], correctAnswer: 1, explanation: "C'est un mécanisme d'équité sociale." }
+      ],
+      audioUrl: "", videoUrl: "", attachments: [], estimatedDuration: 240, difficultyLevel: "Intermédiaire"
     },
     {
       id: 10,
-      title: "Signalement et Veille",
-      introduction: "Utilisez vos connaissances pour protéger votre communauté.",
-      objectives: ["Identifier les alertes", "Remplir un rapport de signalement", "Collaborer avec HAI", "Veille juridique"],
-      keyNotions: ["Alerte", "Rapport", "Suivi"],
-      content: "# Veille Juridique et Signalement\n\nEn tant que parajuriste, vous êtes les yeux et les oreilles de la justice dans votre communauté. Votre rôle est de détecter les abus et de les signaler.",
-      quiz: [
-        { id: "q10_1", question: "Que faire face à une violation grave ?", options: ["Ignorer", "Signaler via l'application", "Attendre"], correctAnswer: 1 },
-        { id: "q10_2", question: "Le signalement doit-il être précis ?", options: ["Oui", "Non", "Peu importe"], correctAnswer: 0 },
-        { id: "q10_3", question: "La veille juridique c'est quoi ?", options: ["Dormir au tribunal", "Suivre l'évolution des lois et des cas", "Surveiller les voisins"], correctAnswer: 1 },
-        { id: "q10_4", question: "Peut-on signaler anonymement ?", options: ["Oui", "Non", "Seulement pour le foncier"], correctAnswer: 0 },
-        { id: "q10_5", question: "Le parajuriste doit-il faire un suivi ?", options: ["Oui", "Non", "Seulement si on le paie"], correctAnswer: 0 }
+      title: "Module 10 : Signalement, Veille et Éthique du Parajuriste",
+      introduction: "Ce dernier module synthétise le rôle pratique du parajuriste. Il traite des techniques de veille juridique, des procédures de signalement via l'application, et rappelle les principes éthiques fondamentaux.",
+      objectives: [
+        "Maîtriser l'outil de signalement de l'application",
+        "Savoir rédiger un rapport d'alerte précis et factuel",
+        "Comprendre l'importance de la veille juridique communautaire",
+        "Réaffirmer les principes de confidentialité et de non-substitution",
+        "Collaborer efficacement avec HAI et les autorités"
       ],
-      audioUrl: "", videoUrl: "", attachments: [], isReporting: 1
+      keyNotions: [
+        "Alerte",
+        "Rapport factuel",
+        "Veille communautaire",
+        "Déontologie",
+        "Référencement",
+        "Protection des sources"
+      ],
+      content: `# CHAPITRE 1 : LA VEILLE JURIDIQUE COMMUNAUTAIRE
+      
+## 1.1 Qu'est-ce que la veille ?
+C'est une attitude d'observation active. Le parajuriste reste attentif aux rumeurs, aux changements de comportement et aux situations d'injustice dans son quartier ou village.
+
+## 1.2 Domaines de vigilance
+- **Foncier** : Tentatives de spoliation de veuves, ventes multiples.
+- **Enfance** : Enfants non scolarisés, signes de maltraitance.
+- **Santé** : Refus de soins, corruption dans les centres de santé.
+- **VBG** : Femmes battues, mariages forcés précoces.
+
+---
+
+# CHAPITRE 2 : L'ART DU SIGNALEMENT
+
+## 2.1 Utilisation de l'application
+L'application Paralegal permet d'envoyer des alertes en temps réel.
+- **Précision** : Qui ? Quoi ? Où ? Quand ?
+- **Preuves** : Si possible, joindre des photos ou témoignages (avec consentement).
+
+## 2.2 Rédaction d'un rapport factuel
+Évitez les jugements de valeur ("Il est méchant"). Préférez les faits ("Il a frappé son épouse avec un bâton le 12 mars à 10h").
+
+## 2.3 L'urgence et la priorité
+Savoir distinguer ce qui nécessite une intervention immédiate (danger de mort, viol récent) de ce qui peut attendre une médiation programmée.
+
+---
+
+# CHAPITRE 3 : ÉTHIQUE ET SÉCURITÉ DU PARAJURISTE
+
+## 3.1 La règle de non-substitution
+Le parajuriste n'est ni avocat, ni juge, ni policier. Il aide, oriente et facilite, mais ne remplace jamais les institutions.
+
+## 3.2 Sécurité personnelle
+- Ne jamais se mettre en danger.
+- Travailler en réseau avec les autorités locales.
+- Savoir quand passer le relais à des professionnels (HAI, Police).
+
+## 3.3 Confidentialité et Confiance
+La réputation du parajuriste repose sur sa capacité à garder les secrets. Une seule fuite peut détruire la confiance de toute une communauté.
+
+---
+
+# CONCLUSION DE LA FORMATION
+Félicitations ! Vous êtes désormais armés pour être des agents de changement. Votre rôle est noble : apporter la lumière du droit là où règne l'obscurité de l'ignorance.`,
+      quiz: [
+        { id: "q10_1", question: "Que signifie être factuel dans un rapport ?", options: ["Donner son opinion", "Rapporter uniquement les faits observables", "Raconter ce qu'on a entendu dire"], correctAnswer: 1, explanation: "La crédibilité dépend de l'objectivité des faits." },
+        { id: "q10_2", question: "Le parajuriste doit-il intervenir physiquement pour arrêter une bagarre ?", options: ["Oui, il est la loi", "Non, il doit appeler les autorités et assurer sa sécurité", "Seulement s'il est plus fort"], correctAnswer: 1, explanation: "La sécurité du parajuriste est prioritaire." },
+        { id: "q10_3", question: "La veille juridique sert à :", options: ["Surveiller la vie privée des gens", "Anticiper et prévenir les violations de droits", "Devenir chef de village"], correctAnswer: 1, explanation: "C'est un outil de prévention communautaire." },
+        { id: "q10_4", question: "Peut-on partager les informations d'un cas sur les réseaux sociaux ?", options: ["Oui, pour dénoncer", "Non, c'est une violation grave de la confidentialité", "Seulement si on cache le nom"], correctAnswer: 1, explanation: "Le secret professionnel est absolu." },
+        { id: "q10_5", question: "Quelle est la mission finale du parajuriste ?", options: ["Gagner des procès", "L'autonomisation juridique (Legal Empowerment) des citoyens", "Devenir avocat"], correctAnswer: 1, explanation: "L'objectif est que les citoyens sachent utiliser le droit eux-mêmes." }
+      ],
+      audioUrl: "", videoUrl: "", attachments: [], isReporting: 1, estimatedDuration: 120, difficultyLevel: "Débutant"
     }
   ];
 
   const insert = db.prepare(`
-    INSERT INTO modules (id, title, introduction, objectives, keyNotions, content, audioUrl, videoUrl, quiz, attachments, isReporting)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO modules (id, title, introduction, objectives, keyNotions, content, audioUrl, videoUrl, quiz, attachments, isReporting, estimatedDuration, difficultyLevel)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   
   for (const m of initialModules) {
@@ -1184,7 +1572,9 @@ Le vendeur du terrain B insiste pour une vente rapide "car d'autres personnes so
       m.videoUrl,
       JSON.stringify(m.quiz),
       JSON.stringify(m.attachments),
-      m.isReporting
+      m.isReporting,
+      m.estimatedDuration || null,
+      m.difficultyLevel || null
     );
   }
 }
@@ -1417,8 +1807,8 @@ async function startServer() {
   app.post("/api/admin/modules", (req, res) => {
     const module = req.body;
     const insert = db.prepare(`
-      INSERT OR REPLACE INTO modules (id, title, introduction, objectives, keyNotions, content, audioUrl, videoUrl, quiz, attachments, isReporting)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO modules (id, title, introduction, objectives, keyNotions, content, audioUrl, videoUrl, quiz, attachments, isReporting, estimatedDuration, difficultyLevel)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     insert.run(
       module.id,
@@ -1431,7 +1821,9 @@ async function startServer() {
       module.videoUrl,
       JSON.stringify(module.quiz),
       JSON.stringify(module.attachments),
-      module.isReporting ? 1 : 0
+      module.isReporting ? 1 : 0,
+      module.estimatedDuration || null,
+      module.difficultyLevel || null
     );
     res.json({ success: true });
   });
@@ -1540,7 +1932,56 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  app.post("/api/reports", upload.fields([
+  { name: 'audio', maxCount: 1 },
+  { name: 'attachments', maxCount: 5 }
+]), (req, res) => {
+  const { id, userId, moduleId, type, description, location, date, anonymous } = req.body;
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+  
+  let audioUrl = '';
+  if (files['audio'] && files['audio'][0]) {
+    audioUrl = `/uploads/${files['audio'][0].filename}`;
+  }
+
+  const attachments = (files['attachments'] || []).map(file => ({
+    id: Math.random().toString(36).substr(2, 9),
+    name: file.originalname,
+    url: `/uploads/${file.filename}`,
+    type: file.mimetype.includes('pdf') ? 'pdf' : 'image'
+  }));
+
+  db.prepare(`
+    INSERT INTO reports (id, userId, moduleId, type, description, location, date, anonymous, audioUrl, attachments, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    id,
+    userId,
+    parseInt(moduleId),
+    type,
+    description,
+    location, // already stringified from client
+    date,
+    anonymous === 'true' ? 1 : 0,
+    audioUrl,
+    JSON.stringify(attachments),
+    new Date().toISOString()
+  );
+
+  res.json({ success: true });
+});
+
+app.get("/api/reports", (req, res) => {
+  const reports = db.prepare("SELECT * FROM reports ORDER BY createdAt DESC").all();
+  res.json(reports.map((r: any) => ({
+    ...r,
+    location: JSON.parse(r.location || '{}'),
+    attachments: JSON.parse(r.attachments || '[]'),
+    anonymous: r.anonymous === 1
+  })));
+});
+
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
