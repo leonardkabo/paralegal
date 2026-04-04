@@ -1960,6 +1960,21 @@ async function startServer() {
     res.json({ success: true });
   });
 
+  app.post("/api/reset-password", (req, res) => {
+    const { phone, birthDate, newPassword } = req.body;
+    try {
+      const user = db.prepare("SELECT * FROM users WHERE phone = ? AND birthDate = ?").get(phone, birthDate) as any;
+      if (user) {
+        db.prepare("UPDATE users SET password = ? WHERE phone = ?").run(newPassword, phone);
+        res.json({ success: true });
+      } else {
+        res.status(400).json({ error: "Informations de vérification incorrectes (Téléphone ou Date de naissance)" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post("/api/sync", (req, res) => {
     const { phone, progress } = req.body;
     try {

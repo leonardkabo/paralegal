@@ -153,6 +153,30 @@ export function useAppState() {
     }
   };
 
+  const resetPassword = async (phone: string, birthDate: string, newPassword: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, birthDate, newPassword })
+      });
+      const data = await res.json();
+      if (data.success) {
+        return true;
+      } else {
+        setError(data.error || "Erreur lors de la réinitialisation");
+        return false;
+      }
+    } catch (err) {
+      setError("Erreur réseau");
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const setLanguage = async (lang: Language) => {
     if (user) {
       setUser({ ...user, preferredLanguage: lang });
@@ -351,6 +375,7 @@ export function useAppState() {
     error,
     registerUser,
     login,
+    resetPassword,
     setLanguage,
     completeModule,
     markAudioListened,
