@@ -432,10 +432,63 @@ const DocumentsScreen = ({ onBack, documents }: { onBack: () => void, documents:
                 </Button>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-8 bg-slate-50">
-              <div className="bg-white p-8 shadow-sm border border-slate-200 rounded-sm min-h-full font-serif text-sm whitespace-pre-wrap leading-relaxed">
-                {selectedDoc.content}
-              </div>
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 flex flex-col">
+              {selectedDoc.fileUrl ? (
+                <div className="flex-1 flex flex-col gap-4">
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center">
+                        <FileText size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 truncate max-w-[200px] md:max-w-md">{selectedDoc.fileName}</p>
+                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Document Modèle</p>
+                      </div>
+                    </div>
+                    <a 
+                      href={selectedDoc.fileUrl} 
+                      download={selectedDoc.fileName}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button size="sm" className="gap-2">
+                        <Download size={16} />
+                        Télécharger
+                      </Button>
+                    </a>
+                  </div>
+                  
+                  {selectedDoc.fileUrl.toLowerCase().endsWith('.pdf') ? (
+                    <div className="flex-1 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-inner">
+                      <iframe 
+                        src={`${selectedDoc.fileUrl}#toolbar=0`} 
+                        className="w-full h-full border-none"
+                        title={selectedDoc.title}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex-1 bg-white rounded-xl border border-slate-200 flex flex-col items-center justify-center p-12 text-center space-y-4">
+                      <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-300">
+                        <FileText size={48} />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-slate-900">Aperçu non disponible</h4>
+                        <p className="text-xs text-slate-500 max-w-xs mx-auto">Ce type de fichier ne peut pas être prévisualisé directement. Veuillez le télécharger pour le consulter.</p>
+                      </div>
+                      <a href={selectedDoc.fileUrl} download={selectedDoc.fileName} target="_blank" rel="noopener noreferrer">
+                        <Button variant="outline" className="gap-2">
+                          <Download size={16} />
+                          Télécharger le document
+                        </Button>
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white p-8 shadow-sm border border-slate-200 rounded-sm min-h-full font-serif text-sm whitespace-pre-wrap leading-relaxed">
+                  {selectedDoc.content || "Aucun contenu disponible pour ce modèle."}
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -629,11 +682,47 @@ const CaseStudiesScreen = ({
                       className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100 hover:bg-emerald-100 transition-colors"
                     >
                       <Download size={12} />
-                      Fichier Modèle
+                      Télécharger
                     </a>
                   )}
                 </div>
-                <p className="text-sm leading-relaxed text-slate-700">{selectedCase.scenario}</p>
+                
+                {selectedCase.fileUrl ? (
+                  <div className="space-y-4">
+                    {selectedCase.fileUrl.toLowerCase().endsWith('.pdf') ? (
+                      <div className="aspect-[3/4] w-full bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                        <iframe 
+                          src={`${selectedCase.fileUrl}#toolbar=0`} 
+                          className="w-full h-full border-none"
+                          title={selectedCase.title}
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center space-y-3">
+                        <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300">
+                          <FileText size={24} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900">{selectedCase.fileName}</p>
+                          <p className="text-[10px] text-slate-500">Document d'étude de cas</p>
+                        </div>
+                        <a href={selectedCase.fileUrl} download={selectedCase.fileName} target="_blank" rel="noopener noreferrer">
+                          <Button size="sm" variant="outline" className="gap-2">
+                            <Download size={14} />
+                            Ouvrir le fichier
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                    {selectedCase.scenario && (
+                      <div className="pt-4 border-t border-slate-200">
+                        <p className="text-xs text-slate-500 italic">Note: Le scénario complet est détaillé dans le document ci-dessus.</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm leading-relaxed text-slate-700">{selectedCase.scenario || "Aucun scénario disponible."}</p>
+                )}
               </div>
 
               <div className="space-y-3">
