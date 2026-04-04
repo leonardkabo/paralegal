@@ -1674,32 +1674,44 @@ async function startServer() {
   });
 
   app.get("/api/admin/files", (req, res) => {
-    const fs = require('fs');
-    const path = require('path');
-    const files = fs.readdirSync(uploadDir);
-    const fileDetails = files.map(filename => {
-      const stats = fs.statSync(path.join(uploadDir, filename));
-      return {
-        name: filename,
-        size: stats.size,
-        createdAt: stats.birthtime,
-        url: `/uploads/${filename}`
-      };
-    });
-    res.json(fileDetails);
+    try {
+      console.log("Listing files in:", uploadDir);
+      if (!fs.existsSync(uploadDir)) {
+        console.log("Upload directory does not exist!");
+        return res.json([]);
+      }
+      const files = fs.readdirSync(uploadDir);
+      console.log("Files found:", files);
+      const fileDetails = files.map(filename => {
+        const stats = fs.statSync(path.join(uploadDir, filename));
+        return {
+          name: filename,
+          size: stats.size,
+          createdAt: stats.birthtime,
+          url: `/uploads/${filename}`
+        };
+      });
+      res.json(fileDetails);
+    } catch (err) {
+      console.error("Error listing files:", err);
+      res.status(500).json({ error: "Failed to list files" });
+    }
   });
 
   app.delete("/api/admin/files/:filename", (req, res) => {
-    const fs = require('fs');
-    const path = require('path');
     const { filename } = req.params;
     const filePath = path.join(uploadDir, filename);
     
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ error: "File not found" });
+    try {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "File not found" });
+      }
+    } catch (err) {
+      console.error("Error deleting file:", err);
+      res.status(500).json({ error: "Failed to delete file" });
     }
   });
 
