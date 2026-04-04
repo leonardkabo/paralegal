@@ -3,61 +3,54 @@ import { Module } from '../types';
 export const MODULES: Module[] = [
   {
     id: 1,
-    title: "Introduction aux parajuristes",
-    introduction: "Ce module présente le rôle essentiel des parajuristes dans le renforcement du pouvoir juridique des communautés.",
+    title: "Introduction au parajuridisme communautaire",
+    introduction: "Ce module pose les fondations du métier de parajuriste, ses frontières légales et son importance cruciale dans le contexte ouest-africain et béninois.",
     objectives: [
-      "Comprendre la définition d'un parajuriste communautaire",
-      "Identifier les missions principales",
-      "Connaître les limites de l'intervention",
-      "Comprendre l'approche du Legal Empowerment"
+      "Maîtriser l'approche du Legal Empowerment (Renforcement du pouvoir juridique)",
+      "Identifier avec précision les limites légales de l'intervention pour éviter l'exercice illégal de la profession d'avocat",
+      "Intégrer les principes déontologiques stricts : gratuité, confidentialité, impartialité",
+      "Cartographier les acteurs de la chaîne judiciaire au Bénin"
     ],
-    keyNotions: ["Legal Empowerment", "Médiation", "Orientation juridique", "Justice sociale"],
+    keyNotions: ["Legal Empowerment", "Médiation para-légale", "Déontologie", "Exercice illégal du droit"],
     content: `
-# Introduction aux parajuristes communautaires
+# Module 1 : Fondements et Déontologie du Parajuriste
 
-Le parajuriste n'est pas un avocat, mais un pont entre la communauté et le système judiciaire. Il joue un rôle crucial dans l'accès à la justice pour les populations les plus vulnérables.
+## 1. Contexte et nécessité au Bénin
+Au Bénin, l'accès à la justice formelle se heurte à plusieurs obstacles : la barrière linguistique (la justice est rendue en français), l'éloignement géographique des tribunaux, la complexité des procédures et surtout le coût des services d'un avocat. C'est ici qu'intervient le parajuriste communautaire. Il n'est pas un substitut à l'avocat, mais le **premier maillon de la chaîne d'accès au droit**.
 
-## Qu'est-ce qu'un parajuriste ?
-Un parajuriste communautaire est une personne issue de la communauté, formée pour fournir une assistance juridique de base. Il n'a pas besoin d'être un juriste de formation, mais doit avoir une bonne connaissance des réalités locales et des droits fondamentaux.
+Le concept central est le **Legal Empowerment** : il ne s'agit pas d'assister passivement les populations, mais de leur transférer les connaissances nécessaires pour qu'elles puissent revendiquer et défendre leurs droits elles-mêmes face aux administrations et aux juridictions.
 
-## L'approche du Legal Empowerment
-Le "Legal Empowerment" ou renforcement du pouvoir juridique consiste à donner aux citoyens les moyens de connaître, d'utiliser et de façonner le droit. Au lieu de simplement résoudre des problèmes pour les gens, le parajuriste les aide à devenir autonomes.
+## 2. Le mandat du parajuriste : Ce qu'il fait et ne fait pas
+Pour protéger l'usager et se protéger lui-même, le parajuriste doit connaître ses limites. Le Bénin réprime l'exercice illégal de la profession d'avocat.
 
-## Rôles principaux :
-1. **Éducation juridique** : Organiser des séances de sensibilisation pour informer les citoyens sur leurs droits et devoirs.
-2. **Médiation** : Faciliter la résolution pacifique des conflits au sein de la communauté (conflits fonciers, familiaux, etc.).
-3. **Orientation** : Guider les personnes vers les institutions compétentes (police, tribunaux, services sociaux) lorsque le cas dépasse ses compétences.
-4. **Accompagnement** : Aider les citoyens dans leurs démarches administratives et judiciaires.
+**Ce que le parajuriste DOIT faire :**
+* **Vulgarisation juridique** : Traduire les lois (Code Pénal, Code des Personnes et de la Famille) en langues locales (Fon, Bariba, Dendi, Yoruba, etc.) lors de séances communautaires ou universitaires.
+* **Orientation (Référencement)** : Diriger les victimes vers les structures compétentes (Centres de Promotion Sociale - CPS, Commissariats, Cliniques juridiques).
+* **Médiation de base** : Aider à la résolution de petits litiges civils (conflits de voisinage, petits conflits fonciers) par le dialogue, avant que cela ne devienne une affaire judiciaire.
+* **Accompagnement administratif** : Aider à remplir un formulaire, rédiger une simple demande manuscrite.
 
-## Limites de l'intervention
-Le parajuriste ne peut pas :
-- Représenter un client devant un tribunal comme un avocat.
-- Rendre des jugements comme un juge.
-- Utiliser la force ou la contrainte.
+**Ce que le parajuriste NE PEUT PAS faire :**
+* Représenter un client ou plaider devant un juge au Tribunal de Première Instance ou à la Cour d'Appel.
+* Rédiger des actes juridiques complexes (contrats de vente de domaine, testaments).
+* Percevoir des honoraires. Son action est fondamentalement bénévole ou prise en charge par une ONG/structure d'appui.
+
+## 3. Les piliers déontologiques
+Le parajuriste est un confident de la communauté. Il est tenu par :
+1.  **Le secret professionnel** : Tout ce qui est dit lors d'un entretien ne doit jamais être divulgué, même aux chefs de quartier, sauf en cas de danger de mort imminent ou d'abus sur mineur (obligation de signalement).
+2.  **L'impartialité** : Dans une médiation, il n'est ni juge ni arbitre. Il ne prend pas parti, même si l'une des parties est un proche.
+3.  **La probité** : Le refus absolu de toute corruption ou trafic d'influence auprès des agents de police ou de mairie.
     `,
     quiz: [
       {
         id: "q1_1",
-        question: "Un parajuriste est-il un avocat ?",
-        options: ["Oui", "Non", "Seulement au tribunal"],
+        question: "Selon la loi, un parajuriste peut-il défendre un accusé à la barre du tribunal ?",
+        options: ["Oui, s'il a suivi cette formation", "Non, c'est l'exercice exclusif de la profession d'avocat", "Seulement devant le chef de village"],
         correctAnswer: 1
       },
       {
         id: "q1_2",
-        question: "Quel est l'un des rôles principaux du parajuriste ?",
-        options: ["Rendre des jugements", "Arrêter les criminels", "Éduquer la communauté sur ses droits"],
-        correctAnswer: 2
-      },
-      {
-        id: "q1_3",
-        question: "Que signifie le concept de 'Legal Empowerment' ?",
-        options: ["Donner le pouvoir aux avocats", "Renforcer le pouvoir juridique des citoyens", "Changer toutes les lois"],
-        correctAnswer: 1
-      },
-      {
-        id: "q1_4",
-        question: "Le parajuriste peut-il représenter quelqu'un devant un juge ?",
-        options: ["Oui, toujours", "Non, c'est le rôle de l'avocat", "Seulement pour les petits vols"],
+        question: "Face à un conflit foncier complexe, quelle est la meilleure attitude du parajuriste ?",
+        options: ["Trancher le litige et déclarer un gagnant", "Orienter les parties vers un avocat, un notaire ou les autorités domaniales", "Rédiger un acte de vente définitif"],
         correctAnswer: 1
       }
     ],
@@ -65,62 +58,43 @@ Le parajuriste ne peut pas :
   },
   {
     id: 2,
-    title: "Droit à la santé",
-    introduction: "Le droit à la santé est un droit fondamental garanti par la constitution et les traités internationaux.",
+    title: "Le Droit à la Santé : Cadre légal et déterminants",
+    introduction: "Analyse approfondie du droit à la santé au Bénin, incluant la responsabilité médicale et les facteurs environnementaux.",
     objectives: [
-      "Connaître les textes protégeant le droit à la santé",
-      "Identifier les obligations de l'État",
-      "Savoir orienter en cas de violation",
-      "Comprendre les principes de disponibilité et d'accessibilité"
+      "Maîtriser la Loi n° 2020-37 portant protection de la santé au Bénin",
+      "Comprendre les obligations des formations sanitaires (publiques et privées)",
+      "Identifier les voies de recours en cas de négligence médicale",
+      "Intégrer l'impact de l'environnement (gestion des déchets, hygiène) sur la santé publique"
     ],
-    keyNotions: ["Accès universel", "Qualité des soins", "Non-discrimination", "Éthique médicale"],
+    keyNotions: ["Loi 2020-37", "Responsabilité médicale", "Non-assistance à personne en danger", "Déterminants environnementaux"],
     content: `
-# Le Droit à la Santé
+# Module 2 : Le Droit à la Santé et ses dimensions
 
-Chaque citoyen a le droit de jouir du meilleur état de santé physique et mentale possible. Ce droit ne signifie pas le "droit d'être en bonne santé", mais le droit à un système de protection de la santé.
+## 1. Le cadre normatif au Bénin
+Le droit à la santé est garanti par la Constitution béninoise. Récemment, la **Loi n° 2020-37 portant protection de la santé en République du Bénin** est venue renforcer les obligations de l'État et des prestataires de soins. 
+Le droit à la santé ne signifie pas que l'État garantit une santé parfaite, mais qu'il met en place un système de prévention, de traitement et de contrôle accessible à tous (le standard "AAAQ" de l'OMS : Accessibilité, Acceptabilité, Disponibilité, Qualité).
 
-## Les piliers du droit à la santé (Principes de l'OMS) :
-- **Disponibilité** : L'État doit garantir un nombre suffisant d'établissements, de services et de programmes de santé publique.
-- **Accessibilité** : Les services de santé doivent être accessibles à tous, sans discrimination. Cela inclut l'accessibilité physique (proximité) et économique (coût abordable).
-- **Acceptabilité** : Les services doivent respecter l'éthique médicale et être adaptés à la culture des populations.
-- **Qualité** : Les soins doivent être scientifiquement et médicalement appropriés.
+## 2. Les Droits du Patient et les Obligations Médicales
+Dans les centres de santé ou CHUD (Centres Hospitaliers Universitaires Départementaux), le patient possède des droits inaliénables :
+* **Le droit à l'information et au consentement** : Le médecin doit expliquer le traitement en termes simples. Aucun soin (sauf urgence vitale) ne peut être imposé sans consentement.
+* **Le droit aux soins d'urgence** : Le refus de prise en charge pour une urgence vitale sous prétexte de manque de moyens financiers (défaut de paiement de la caution) expose le personnel médical à des poursuites pénales pour **non-assistance à personne en danger** (Article 325 du Code Pénal).
+* **La séquestration illégale** : Il est strictement illégal pour un hôpital de retenir un patient (ou un nouveau-né et sa mère) contre son gré parce qu'il n'a pas payé sa facture. C'est une infraction pénale (atteinte à la liberté d'aller et venir) que le parajuriste doit savoir signaler au Procureur.
 
-## Obligations de l'État
-L'État a l'obligation de :
-1. **Respecter** : Ne pas entraver l'accès aux soins.
-2. **Protéger** : Empêcher les tiers de nuire à la santé des citoyens.
-3. **Réaliser** : Adopter des mesures pour assurer la pleine réalisation du droit à la santé.
-
-## Facteurs déterminants de la santé
-Le droit à la santé inclut aussi l'accès à :
-- L'eau potable et l'assainissement.
-- Une alimentation saine.
-- Un logement adéquat.
-- Des conditions de travail sûres.
+## 3. Santé Environnementale et Responsabilité Communautaire
+Le droit à la santé s'étend aux conditions de vie. Les maladies hydriques, le paludisme, ou les infections respiratoires sont souvent liés à la mauvaise gestion des déchets, à l'absence de tri et au manque d'assainissement.
+L'État et les communes ont l'obligation d'assurer la salubrité publique. Le parajuriste peut utiliser les lois sur l'hygiène publique pour interpeller les élus locaux (maires, chefs d'arrondissement) sur l'insalubrité, soutenant ainsi des initiatives locales d'économie circulaire et de gestion des déchets.
     `,
     quiz: [
       {
         id: "q2_1",
-        question: "Le droit à la santé inclut-il l'accès à l'eau potable ?",
-        options: ["Oui", "Non", "Seulement en ville"],
-        correctAnswer: 0
+        question: "Un centre de santé peut-il retenir une femme qui vient d'accoucher parce qu'elle n'a pas payé sa facture ?",
+        options: ["Oui, c'est la procédure normale de recouvrement", "Non, c'est une privation illégale de liberté (séquestration)", "Seulement avec l'accord du chef de village"],
+        correctAnswer: 1
       },
       {
         id: "q2_2",
-        question: "Que signifie le principe de 'Disponibilité' ?",
-        options: ["Avoir des médicaments gratuits", "Avoir un nombre suffisant de centres de santé", "Avoir des médecins qui parlent toutes les langues"],
-        correctAnswer: 1
-      },
-      {
-        id: "q2_3",
-        question: "L'accessibilité économique signifie que :",
-        options: ["Les soins sont toujours gratuits", "Les soins doivent être abordables pour tous", "Les riches paient pour les pauvres"],
-        correctAnswer: 1
-      },
-      {
-        id: "q2_4",
-        question: "L'État a-t-il l'obligation de protéger les citoyens contre les faux médicaments ?",
-        options: ["Oui, c'est son rôle de protection", "Non, c'est la responsabilité des pharmacies", "Seulement si le citoyen porte plainte"],
+        question: "L'accès à l'eau potable et la gestion correcte des déchets font-ils partie du droit à la santé ?",
+        options: ["Oui, ce sont des déterminants essentiels de la santé", "Non, cela relève uniquement du ministère de l'environnement"],
         correctAnswer: 0
       }
     ],
@@ -128,66 +102,45 @@ Le droit à la santé inclut aussi l'accès à :
   },
   {
     id: 3,
-    title: "Violences basées sur le genre (VBG)",
-    introduction: "Comprendre et lutter contre les VBG pour protéger l'intégrité de tous les membres de la communauté.",
+    title: "VBG et Protection de la Femme et de l'Enfant",
+    introduction: "Les infractions, les peines et le circuit de référencement pour la protection des victimes de Violences Basées sur le Genre.",
     objectives: [
-      "Définir les VBG",
-      "Identifier les différents types de violences",
-      "Connaître le circuit de prise en charge des victimes",
-      "Comprendre les causes profondes des VBG"
+      "Appliquer les dispositions de la Loi n° 2011-26 et du Code Pénal de 2018",
+      "Maîtriser les procédures de saisine de l'Institut National de la Femme (INF)",
+      "Connaître le circuit de prise en charge : médical, psychosocial et judiciaire",
+      "Appréhender la notion de harcèlement en milieu universitaire et professionnel"
     ],
-    keyNotions: ["Violence physique", "Violence psychologique", "Violence économique", "Consentement"],
+    keyNotions: ["Loi 2011-26", "Institut National de la Femme (INF)", "Viol", "Harcèlement", "Centres de Promotion Sociale (CPS)"],
     content: `
-# Violences Basées sur le Genre (VBG)
+# Module 3 : Lutte contre les VBG (Violences Basées sur le Genre)
 
-Les VBG sont des actes nuisibles perpétrés contre la volonté d'une personne et qui sont fondés sur les différences établies par la société entre les hommes et les femmes.
+## 1. L'arsenal juridique : Loi 2011-26 et Code Pénal
+Le Bénin s'est doté de lois extrêmement sévères contre les VBG. La **Loi n° 2011-26 du 09 janvier 2012** portant prévention et répression des violences faites aux femmes, couplée au **Code Pénal (Loi n° 2018-16)**, criminalise de nombreuses pratiques :
+* **Le Viol** : C'est un crime (et non un simple délit), passible de la réclusion criminelle (jusqu'à 20 ans, voire la perpétuité si la victime est mineure). La loi ne reconnaît *aucune justification* (ni tenue vestimentaire, ni mariage). Le viol conjugal est reconnu et puni.
+* **Le Harcèlement sexuel** : Notamment en milieu scolaire, universitaire (abus d'autorité d'un professeur sur une étudiante) ou professionnel.
+* **Mutilations Génitales Féminines (MGF) et Mariage Forcé** : Pratiques sévèrement réprimées. Quiconque facilite ou participe à ces actes est complice.
+* **Violences économiques et psychologiques** : Priver son épouse de ressources essentielles, confisquer ses documents ou la soumettre à des violences verbales répétées sont des délits pénaux.
 
-## Les différents types de violences :
-1. **Violence Physique** : Coups, blessures, mutilations.
-2. **Violence Sexuelle** : Viol, harcèlement sexuel, mariage forcé.
-3. **Violence Psychologique** : Insultes, menaces, humiliation, isolement.
-4. **Violence Économique** : Privation de ressources, contrôle total des revenus, interdiction de travailler.
+## 2. L'Institut National de la Femme (INF)
+Une révolution récente au Bénin est la création de l'INF. Cet institut, en plus de sensibiliser, dispose de la **capacité d'ester en justice**. L'INF peut se constituer partie civile et poursuivre les auteurs de VBG même si la victime (sous pression familiale) décide de retirer sa plainte. Le parajuriste doit avoir les contacts des démembrements de l'INF dans sa région (ex: Borgou).
 
-## Le cycle de la violence
-La violence domestique suit souvent un cycle :
-- Tension (accumulation de stress).
-- Explosion (passage à l'acte).
-- Lune de miel (regrets, promesses de changement).
-Il est important de briser ce cycle.
-
-## Prise en charge des victimes
-Une victime de VBG a besoin d'une prise en charge holistique :
-- **Médicale** : Soins urgents, kit de prophylaxie (en cas de viol).
-- **Psychosociale** : Écoute, conseil, soutien émotionnel.
-- **Juridique** : Plainte, protection légale.
-- **Sécuritaire** : Hébergement d'urgence si nécessaire.
-
-## Rôle du parajuriste
-Le parajuriste doit écouter sans juger, assurer la confidentialité et orienter rapidement la victime vers les services spécialisés.
+## 3. Le Parcours de la Victime et le Rôle du Parajuriste
+Le temps est le plus grand ennemi dans les cas de violences (surtout sexuelles).
+1.  **L'Urgence Médicale (Les 72h critiques)** : Orientations immédiates vers un centre de santé pour les soins (Prévention VIH/IST, contraception d'urgence) et l'établissement du **certificat médical**. Sans certificat, la procédure judiciaire est très difficile.
+2.  **Le Signalement** : Utilisation du numéro vert national (le **132** au Bénin) ou saisine immédiate de la Police Républicaine.
+3.  **L'Accompagnement Psychosocial** : Orienter vers les Centres de Promotion Sociale (CPS) ou des ONG spécialisées pour un soutien psychologique et un hébergement d'urgence si la victime est en danger chez elle.
     `,
     quiz: [
       {
         id: "q3_1",
-        question: "La violence psychologique est-elle une VBG ?",
-        options: ["Oui", "Non"],
-        correctAnswer: 0
-      },
-      {
-        id: "q3_2",
-        question: "Empêcher une femme de disposer de son propre argent est une violence :",
-        options: ["Physique", "Économique", "Sociale"],
-        correctAnswer: 1
-      },
-      {
-        id: "q3_3",
-        question: "Quelle est la première chose à faire pour une victime de viol ?",
-        options: ["Se laver", "Aller à la police", "Aller au centre de santé pour les soins d'urgence"],
+        question: "Une étudiante est harcelée par un professeur qui exige des faveurs sexuelles contre des notes. Que doit faire le parajuriste ?",
+        options: ["Lui conseiller de céder pour avoir son diplôme", "Organiser une médiation secrète avec le professeur", "L'orienter vers l'Institut National de la Femme (INF) et la police pour un dépôt de plainte"],
         correctAnswer: 2
       },
       {
-        id: "q3_4",
-        question: "Le parajuriste doit-il forcer une victime à porter plainte ?",
-        options: ["Oui, c'est la loi", "Non, il doit respecter le choix de la victime tout en l'informant", "Seulement si la violence est grave"],
+        id: "q3_2",
+        question: "Si une victime de viol souhaite retirer sa plainte sous la pression de sa famille, l'INF peut-il poursuivre la procédure ?",
+        options: ["Non, la volonté de la victime prime toujours", "Oui, l'INF a le pouvoir de se constituer partie civile et de poursuivre l'auteur"],
         correctAnswer: 1
       }
     ],
@@ -195,123 +148,90 @@ Le parajuriste doit écouter sans juger, assurer la confidentialité et orienter
   },
   {
     id: 4,
-    title: "Enregistrement des naissances",
-    introduction: "L'acte de naissance est la clé de l'identité juridique et de la citoyenneté.",
+    title: "État civil, ANIP et Identité Juridique",
+    introduction: "Maitriser les nouvelles procédures d'identification au Bénin et les solutions aux cas de non-déclaration.",
     objectives: [
-      "Comprendre l'importance de l'état civil",
-      "Connaître les délais légaux de déclaration",
-      "Identifier les pièces nécessaires",
-      "Savoir comment régulariser un enfant sans acte"
+      "Maîtriser la Loi n° 2020-34 portant dispositions spéciales de simplification des actes d'état civil",
+      "Comprendre le rôle de l'ANIP (NPI, Actes sécurisés)",
+      "Connaître les étapes exactes d'une procédure de jugement supplétif d'acte de naissance",
+      "Savoir monter un dossier de régularisation pour un usager"
     ],
-    keyNotions: ["Acte de naissance", "Citoyenneté", "Délais de déclaration", "Jugement supplétif"],
+    keyNotions: ["ANIP", "NPI", "RAVIP", "Loi 2020-34", "Jugement Supplétif"],
     content: `
-# L'Enregistrement des Naissances
+# Module 4 : Sécurisation de l'État Civil au Bénin
 
-L'enregistrement d'une naissance est l'inscription officielle de la naissance d'un enfant auprès de l'autorité administrative. C'est un droit fondamental pour chaque enfant.
+## 1. L'importance vitale de l'état civil
+L'acte de naissance n'est pas qu'un bout de papier, c'est la preuve juridique de l'existence. Au Bénin, sans cela, il est impossible de passer les examens nationaux (CEP, BEPC, BAC), d'obtenir une bourse universitaire, de se faire établir un passeport, ou de s'inscrire sur la liste électorale.
 
-## Pourquoi est-ce important ?
-Sans acte de naissance, un enfant est "invisible" aux yeux de la loi. Il aura des difficultés pour :
-- S'inscrire à l'école et passer des examens.
-- Accéder aux services de santé.
-- Obtenir une carte d'identité ou un passeport.
-- Hériter de ses parents.
-- Voter à l'âge adulte.
+## 2. La Réforme de l'ANIP et le NPI
+Le Bénin a profondément numérisé son état civil via l'**Agence Nationale d'Identification des Personnes (ANIP)**.
+* Le **RAVIP** (Recensement Administratif à Vocation d'Identification de la Population) est devenu la base de données centrale.
+* Chaque citoyen obtient un **Numéro Personnel d'Identification (NPI)**, unique à vie.
+* Le parajuriste doit maîtriser les portails numériques de l'ANIP (services en ligne) pour aider les usagers non-alphabétisés à demander leurs actes de naissance sécurisés ou leurs certificats d'identification personnelle (CIP).
 
-## Les délais légaux
-Au Bénin, la déclaration de naissance doit être faite dans un délai de **21 jours** après l'accouchement. Passé ce délai, la procédure devient plus complexe et coûteuse.
+## 3. Le problème des naissances non déclarées (Loi 2020-34)
+La loi béninoise impose la déclaration de naissance dans les **21 jours** suivant l'accouchement. Passé ce délai, la déclaration à la mairie n'est plus possible.
+Avant, il fallait systématiquement une procédure longue au tribunal. Aujourd'hui, grâce à la Loi 2020-34 et ses décrets d'application, il existe des mesures dérogatoires (souvent annoncées par le gouvernement) permettant de régulariser les enfants recensés au RAVIP sans acte de naissance formel.
 
-## La procédure
-1. **Constat de naissance** : Délivré par la maternité ou le centre de santé.
-2. **Déclaration** : Se rendre à la mairie ou à l'arrondissement avec le constat et les pièces d'identité des parents.
-3. **Retrait** : L'officier d'état civil établit l'acte de naissance.
-
-## Que faire si le délai est passé ?
-Si l'enfant n'a pas été déclaré dans les 21 jours, il faut obtenir un **jugement supplétif** auprès du tribunal. C'est une procédure judiciaire qui confirme la naissance de l'enfant.
+## 4. La procédure de Jugement Supplétif
+Quand la régularisation administrative n'est pas possible, il faut recourir au juge. Le parajuriste accompagne l'usager dans cette démarche :
+1.  **Requête** adressée au Président du Tribunal de Première Instance (ou tribunal de conciliation selon les réformes en cours).
+2.  **Preuves** : Réunir un certificat de non-inscription au registre d'état civil (délivré par la mairie).
+3.  **Témoins** : Présenter deux témoins majeurs (souvent des parents ou le chef de quartier) pouvant attester sous serment de la date et du lieu de naissance devant le juge.
     `,
     quiz: [
       {
         id: "q4_1",
-        question: "Quel est le délai légal pour déclarer une naissance au Bénin ?",
-        options: ["10 jours", "21 jours", "3 mois"],
+        question: "Quel est l'identifiant unique attribué à chaque Béninois par l'ANIP ?",
+        options: ["Le numéro de sécurité sociale", "Le NPI (Numéro Personnel d'Identification)", "Le numéro IFU"],
         correctAnswer: 1
       },
       {
         id: "q4_2",
-        question: "Sans acte de naissance, un enfant peut-il facilement passer ses examens nationaux ?",
-        options: ["Oui, sans problème", "Non, c'est souvent bloquant", "Seulement s'il est bon élève"],
+        question: "Quelle pièce est indispensable pour initier un jugement supplétif au tribunal ?",
+        options: ["Un acte de propriété", "Un certificat de non-inscription au registre d'état civil délivré par la mairie", "Une carte d'étudiant"],
         correctAnswer: 1
-      },
-      {
-        id: "q4_3",
-        question: "Comment appelle-t-on la procédure pour obtenir un acte après le délai légal ?",
-        options: ["Une plainte", "Un jugement supplétif", "Une demande de pardon"],
-        correctAnswer: 1
-      },
-      {
-        id: "q4_4",
-        question: "Qui délivre le constat de naissance ?",
-        options: ["Le maire", "Le chef de quartier", "L'agent de santé à la maternité"],
-        correctAnswer: 2
       }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
   },
   {
     id: 5,
-    title: "Accès aux soins & mutuelles",
-    introduction: "Comment financer sa santé par la solidarité et la prévoyance.",
+    title: "Mécanismes de Protection Sociale (Mutuelles et ARCH)",
+    introduction: "Comprendre comment la solidarité et les politiques publiques béninoises financent l'accès aux soins.",
     objectives: [
-      "Comprendre le fonctionnement d'une mutuelle de santé",
-      "Identifier les avantages de l'adhésion",
-      "Connaître les principes de la solidarité",
-      "Savoir expliquer le concept de 'tiers-payant'"
+      "Expliquer le fonctionnement financier d'une Mutuelle de Santé communautaire",
+      "Comprendre la règlementation UEMOA sur la mutualité",
+      "Maîtriser les volets du programme gouvernemental ARCH",
+      "Identifier les populations cibles pour la gratuité des soins"
     ],
-    keyNotions: ["Solidarité", "Cotisation", "Prévoyance", "Tiers-payant"],
+    keyNotions: ["Projet ARCH", "Mutualité de l'UEMOA", "Tiers-payant", "Ticket modérateur"],
     content: `
-# Accès aux Soins et Mutuelles de Santé
+# Module 5 : Protection Sociale et Assurances Maladie
 
-La maladie est imprévisible et peut coûter cher. Les mutuelles de santé permettent de faire face aux dépenses de santé grâce à la solidarité entre les membres.
+## 1. La Mutualité Sociale (Règlementation UEMOA)
+La maladie est le premier facteur de basculement dans l'extrême pauvreté. Les Mutuelles de Santé sont régies par le **Règlement n°07/2009/CM/UEMOA**. 
+Ce sont des sociétés de personnes à but non lucratif.
+* **La cotisation prévoyante** : L'usager cotise pendant qu'il est en bonne santé (souvent de petites sommes mensuelles ou annuelles).
+* **Le Tiers-Payant** : En cas de maladie, le membre se rend dans un centre de santé conventionné. Il ne paie que le **ticket modérateur** (ex: 20% ou 30% de la facture). La mutuelle règle les 70% ou 80% restants directement à l'hôpital.
 
-## Qu'est-ce qu'une mutuelle de santé ?
-C'est une association à but non lucratif, basée sur la solidarité, où les membres cotisent une petite somme régulièrement pour être pris en charge en cas de maladie.
-
-## Les principes fondamentaux :
-- **Adhésion volontaire** : Chacun est libre d'adhérer.
-- **Solidarité** : Les biens portants cotisent pour soigner les malades.
-- **Gestion démocratique** : Les membres participent aux décisions.
-- **But non lucratif** : L'argent sert uniquement à soigner les membres.
-
-## Les avantages :
-1. **Réduction des coûts** : La mutuelle prend en charge une grande partie des frais (souvent 70% à 80%).
-2. **Accès rapide aux soins** : On n'attend pas d'avoir de l'argent pour aller se faire soigner.
-3. **Qualité des soins** : Les mutuelles passent des conventions avec des centres de santé de qualité.
-
-## Le système du Tiers-Payant
-C'est le mécanisme par lequel le membre ne paie que sa part (le ticket modérateur) au centre de santé. La mutuelle paie directement le reste au centre de santé plus tard.
+## 2. Le Projet ARCH au Bénin
+C'est le programme phare du gouvernement béninois : **Assurance pour le Renforcement du Capital Humain (ARCH)**. Il vise à universaliser l'accès aux soins, la formation, le microcrédit et la retraite.
+Le volet "Assurance Maladie" de l'ARCH cible prioritairement les **"pauvres extrêmes et pauvres non extrêmes"**. 
+* **Comment ça marche ?** Les bénéficiaires sont identifiés via la base de données de l'ANIP. L'État prend en charge 100% de la prime d'assurance pour les personnes extrêmement pauvres.
+* **Rôle du parajuriste** : Informer les populations démunies de leurs droits liés au projet ARCH, vérifier s'ils sont enregistrés au RAVIP (condition préalable), et les orienter vers les centres sociaux (CPS) pour les processus de ciblage et d'obtention de la carte biométrique ARCH.
     `,
     quiz: [
       {
         id: "q5_1",
-        question: "Une mutuelle de santé est-elle basée sur la solidarité ?",
-        options: ["Oui", "Non"],
-        correctAnswer: 0
+        question: "Que signifie le sigle ARCH au Bénin ?",
+        options: ["Association pour la Restructuration des Centres Hospitaliers", "Assurance pour le Renforcement du Capital Humain", "Alliance pour le Retour à la Croissance Harmonique"],
+        correctAnswer: 1
       },
       {
         id: "q5_2",
-        question: "Dans une mutuelle, qui paie pour les soins des malades ?",
-        options: ["L'État", "Les cotisations de tous les membres", "Le président de la mutuelle"],
-        correctAnswer: 1
-      },
-      {
-        id: "q5_3",
-        question: "Le 'ticket modérateur' est :",
-        options: ["Le prix total des soins", "La part que le membre doit payer lui-même", "Une amende pour retard"],
-        correctAnswer: 1
-      },
-      {
-        id: "q5_4",
-        question: "Peut-on adhérer à une mutuelle seulement quand on tombe malade ?",
-        options: ["Oui, c'est fait pour ça", "Non, il faut adhérer et cotiser par prévoyance avant d'être malade", "Seulement si on paie le double"],
+        question: "Qui paie la prime d'assurance maladie pour les populations identifiées comme extrêmement pauvres dans le cadre du projet ARCH ?",
+        options: ["Les mutuelles privées", "L'État béninois à 100%", "La mairie de leur commune"],
         correctAnswer: 1
       }
     ],
@@ -319,126 +239,92 @@ C'est le mécanisme par lequel le membre ne paie que sa part (le ticket modérat
   },
   {
     id: 6,
-    title: "Accès à la justice",
-    introduction: "Les mécanismes et institutions pour faire valoir ses droits.",
+    title: "Organisation judiciaire et Procédures",
+    introduction: "Naviguer dans les arcanes de la justice béninoise, de l'infraction pénale jusqu'au jugement.",
     objectives: [
-      "Identifier les différentes juridictions",
-      "Comprendre le rôle de la police et de la gendarmerie",
-      "Connaître les droits de la personne gardée à vue",
-      "Savoir comment porter plainte"
+      "Cartographier les juridictions béninoises (Tribunal, Cour d'Appel, CRIET)",
+      "Maîtriser les dispositions du Code de Procédure Pénale concernant la garde à vue",
+      "Comprendre la procédure de constitution de partie civile",
+      "Savoir comment rédiger une demande d'aide juridictionnelle"
     ],
-    keyNotions: ["Plainte", "Garde à vue", "Tribunal", "Assistance juridique"],
+    keyNotions: ["Code de Procédure Pénale", "CRIET", "Garde à vue", "Aide Juridictionnelle", "Plainte"],
     content: `
-# Accès à la Justice
+# Module 6 : Accès à la Justice et Organisation des Tribunaux
 
-La justice est un service public destiné à protéger les droits des citoyens et à punir les infractions.
+## 1. L'Organisation Judiciaire au Bénin
+Le parajuriste doit savoir orienter selon le type et la gravité de l'affaire.
+* **Les Tribunaux de Conciliation** (niveau arrondissement) : Pour les conflits de voisinage, petites créances, conflits familiaux légers.
+* **Le Tribunal de Première Instance (TPI)** : Juge la majorité des affaires civiles (divorce, héritage) et pénales (vols, coups et blessures, escroquerie).
+* **La Cour d'Appel** : Si une partie n'est pas satisfaite de la décision du TPI.
+* **La Cour de Répression des Infractions Économiques et du Terrorisme (CRIET)** : Juridiction spéciale siégeant à Porto-Novo, compétente pour le trafic de drogue, le terrorisme, la cybercriminalité (gaymans) et les crimes économiques graves.
 
-## Les institutions de proximité :
-- **La Police Républicaine** : Reçoit les plaintes, mène les enquêtes et assure la sécurité.
-- **Le Tribunal de Première Instance** : Juge les affaires civiles (famille, contrats) et pénales (délits).
+## 2. La Garde à Vue : Droits fondamentaux
+C'est le moment le plus vulnérable pour un citoyen. Le **Code de Procédure Pénale** béninois encadre strictement la privation de liberté par les Officiers de Police Judiciaire (OPJ).
+* **Durée** : La garde à vue est de **48 heures maximum**. Elle peut être prolongée une seule fois de 48h, **exclusivement sur autorisation écrite du Procureur de la République**.
+* **Droits du gardé à vue** : Il a le droit d'être informé des charges retenues contre lui, de faire prévenir sa famille, de garder le silence, et surtout d'être **assisté par son avocat dès la première heure**. La torture ou les mauvais traitements pour extorquer des aveux sont des crimes sévèrement punis.
 
-## Comment porter plainte ?
-Toute personne victime d'une infraction peut porter plainte :
-- Soit oralement ou par écrit auprès d'un commissariat.
-- Soit par courrier adressé au Procureur de la République.
-La plainte est gratuite.
-
-## Droits en cas de Garde à Vue
-Si une personne est retenue par la police :
-1. **Droit d'être informée** du motif de son interpellation.
-2. **Droit de prévenir un proche**.
-3. **Droit d'être assistée par un avocat**.
-4. **Droit d'être examinée par un médecin**.
-La durée initiale est de 48h, prolongeable sous conditions.
-
-## L'Assistance Juridique
-Pour ceux qui n'ont pas les moyens de payer un avocat, l'État peut accorder l'assistance judiciaire pour prendre en charge les frais du procès.
+## 3. L'Action en Justice et l'Aide Juridictionnelle
+* **La Plainte** : L'usager peut déposer plainte à la Police Républicaine (commissariat) ou adresser une plainte écrite directement au **Procureur de la République** (soit plainte simple, soit avec constitution de partie civile).
+* **L'Indigence** : Si un usager n'a pas les moyens de payer les frais de justice (consignation) ou un avocat, l'État béninois prévoit une **Aide Juridictionnelle**. Le parajuriste aide l'usager à fournir un certificat d'indigence (délivré par le CPS et la mairie) pour déposer la demande au tribunal.
     `,
     quiz: [
       {
         id: "q6_1",
-        question: "L'assistance juridique est-elle un droit ?",
-        options: ["Oui", "Non"],
-        correctAnswer: 0
-      },
-      {
-        id: "q6_2",
-        question: "Porter plainte au commissariat est-il payant ?",
-        options: ["Oui, il y a des frais de dossier", "Non, c'est un service gratuit", "Seulement si on gagne le procès"],
+        question: "Quelle est la durée légale initiale d'une garde à vue au Bénin avant toute prolongation ?",
+        options: ["24 heures", "48 heures", "72 heures"],
         correctAnswer: 1
       },
       {
-        id: "q6_3",
-        question: "Quelle est la durée normale d'une garde à vue initiale ?",
-        options: ["12 heures", "24 heures", "48 heures"],
+        id: "q6_2",
+        question: "Quelle juridiction spéciale béninoise est compétente pour juger les affaires de cybercriminalité grave ?",
+        options: ["Le Tribunal de Conciliation", "La Haute Cour de Justice", "La CRIET"],
         correctAnswer: 2
-      },
-      {
-        id: "q6_4",
-        question: "Une personne arrêtée a-t-elle le droit de prévenir sa famille ?",
-        options: ["Oui, c'est un droit fondamental", "Non, pour ne pas gêner l'enquête", "Seulement après 3 jours"],
-        correctAnswer: 0
       }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
   },
   {
     id: 7,
-    title: "Techniques d'écoute et d'orientation",
-    introduction: "L'art de recevoir, d'écouter et de guider les usagers avec empathie et professionnalisme.",
+    title: "Techniques d'Écoute et de Conduite d'Entretien",
+    introduction: "Acquérir les compétences psychosociales pour recevoir des victimes et mener un entretien juridique.",
     objectives: [
-      "Maîtriser les principes de l'écoute active",
-      "Savoir créer un climat de confiance",
-      "Identifier les besoins réels de l'usager",
-      "Savoir orienter vers la bonne structure"
+      "Pratiquer l'écoute active et la reformulation",
+      "Éviter les biais cognitifs et les jugements moraux",
+      "Gérer un entretien avec une victime de traumatisme aigu",
+      "Savoir canaliser un usager agressif ou confus"
     ],
-    keyNotions: ["Empathie", "Confidentialité", "Écoute active", "Non-jugement"],
+    keyNotions: ["Écoute active", "Non-directivité", "Reformulation", "Empathie clinique"],
     content: `
-# Techniques d'Écoute et d'Orientation
+# Module 7 : Psychologie et Techniques d'Entretien
 
-Le premier contact entre le parajuriste et l'usager est déterminant. Une bonne écoute permet de bien comprendre le problème et de proposer la meilleure solution.
+## 1. La posture professionnelle : Empathie et Neutralité
+Le parajuriste, qu'il travaille sur un campus universitaire ou dans une ONG, fait souvent face à la détresse. 
+* **Le Non-Jugement** : C'est la règle d'or. Face à une jeune fille ayant subi un avortement clandestin compliqué (illégal sauf conditions strictes de la loi de 2021 sur la SSR) ou une femme victime de viol, le parajuriste n'est pas un moralisateur. Il ne doit **jamais** dire : "Pourquoi tu as fait ça ?" ou "C'est de ta faute". 
+* **L'Empathie** : Comprendre la souffrance de l'autre sans se laisser submerger par ses propres émotions (la juste distance).
 
-## L'Écoute Active
-Ce n'est pas seulement se taire, c'est montrer qu'on comprend :
-- **Le silence attentif** : Laisser l'autre parler sans l'interrompre.
-- **La reformulation** : Redire avec ses propres mots ce qu'on a compris pour vérifier.
-- **Le questionnement** : Poser des questions ouvertes (Comment ? Pourquoi ?) pour avoir plus de détails.
+## 2. L'Écoute Active (Méthode Carl Rogers)
+L'écoute active n'est pas passive. C'est un travail intellectuel consistant à :
+1.  **Questionnement ouvert** : Utiliser "Comment, Que s'est-il passé, Décrivez-moi..." au lieu de questions fermées "Avez-vous fait X ?".
+2.  **La Reformulation** : Répéter avec ses propres mots les faits essentiels (Ex: "Si je comprends bien, vous dites que votre employeur a refusé de vous payer depuis trois mois après votre licenciement, c'est bien cela ?"). Cela montre à l'usager qu'il est compris et valide les faits juridiques.
+3.  **Le Silence** : Savoir se taire. Le silence permet à l'usager de structurer sa pensée ou d'exprimer une émotion difficile.
 
-## Les attitudes à adopter :
-- **L'empathie** : Se mettre à la place de l'autre sans se laisser submerger par ses émotions.
-- **Le non-jugement** : Ne pas critiquer les choix ou la situation de l'usager.
-- **La confidentialité** : Garantir que ce qui est dit restera secret.
-
-## La structure de l'entretien :
-1. **Accueil** : Mettre à l'aise, se présenter.
-2. **Écoute** : Laisser l'usager exposer son problème.
-3. **Clarification** : Poser des questions pour bien cerner les faits.
-4. **Analyse** : Identifier les aspects juridiques.
-5. **Action/Orientation** : Proposer des pistes ou orienter vers un service spécialisé.
+## 3. Conduire l'entretien (Les 4 phases)
+1.  **L'Accueil** : Mettre en confiance, présenter les règles (gratuité, confidentialité).
+2.  **L'Investigation** : Laisser parler, puis creuser pour obtenir les faits matériels (dates, lieux, témoins, preuves).
+3.  **L'Analyse** : Le parajuriste qualifie juridiquement les faits (s'agit-il d'un conflit civil, d'un délit pénal, d'un problème administratif ?).
+4.  **L'Orientation/Plan d'action** : Proposer des solutions à l'usager sans décider à sa place.
     `,
     quiz: [
       {
         id: "q7_1",
-        question: "L'écoute active est-elle importante pour un parajuriste ?",
-        options: ["Oui", "Non"],
-        correctAnswer: 0
+        question: "Lorsqu'une victime raconte une histoire difficile, quelle est la pire erreur que le parajuriste puisse faire ?",
+        options: ["Garder le silence pour la laisser pleurer", "La culpabiliser ou émettre un jugement moral sur son comportement", "Prendre des notes discrètement"],
+        correctAnswer: 1
       },
       {
         id: "q7_2",
-        question: "Que signifie 'reformuler' ?",
-        options: ["Changer la version des faits", "Répéter ce qu'on a compris pour valider", "Dire à l'usager qu'il a tort"],
-        correctAnswer: 1
-      },
-      {
-        id: "q7_3",
-        question: "Le parajuriste doit-il raconter les problèmes des usagers à ses amis ?",
-        options: ["Oui, pour avoir des conseils", "Non, il doit respecter la confidentialité", "Seulement si c'est une histoire drôle"],
-        correctAnswer: 1
-      },
-      {
-        id: "q7_4",
-        question: "L'empathie consiste à :",
-        options: ["Pleurer avec l'usager", "Comprendre les sentiments de l'autre sans juger", "Donner de l'argent à l'usager"],
+        question: "Qu'est-ce que la reformulation dans un entretien ?",
+        options: ["Répéter exactement les mots de la victime comme un perroquet", "Résumer avec ses propres mots ce que l'usager vient de dire pour s'assurer d'avoir bien compris", "Donner son avis personnel sur l'affaire"],
         correctAnswer: 1
       }
     ],
@@ -446,62 +332,47 @@ Ce n'est pas seulement se taire, c'est montrer qu'on comprend :
   },
   {
     id: 8,
-    title: "Documentation des cas",
-    introduction: "Comment garder des traces fiables, organisées et sécurisées des interventions.",
+    title: "Documentation et Gestion des Preuves",
+    introduction: "Méthodologie stricte pour monter un dossier solide, préserver les preuves et protéger les données.",
     objectives: [
-      "Comprendre l'utilité de la documentation",
-      "Savoir remplir une fiche de suivi de cas",
-      "Organiser l'archivage des dossiers",
-      "Assurer la protection des données personnelles"
+      "Rédiger une fiche de signalement ou d'entretien claire et juridiquement exploitable",
+      "Comprendre la chaîne de conservation des preuves (numériques, physiques, témoignages)",
+      "Appliquer le Code du Numérique sur la protection des données personnelles (APDP)",
+      "Mettre en place un système d'archivage sécurisé"
     ],
-    keyNotions: ["Fiche de cas", "Archivage", "Preuves", "Statistiques"],
+    keyNotions: ["Fiche de cas", "Preuve matérielle", "Données à caractère personnel", "Code du Numérique"],
     content: `
-# Documentation des Cas
+# Module 8 : Méthodologie, Preuves et Traçabilité
 
-Documenter, c'est écrire l'histoire de chaque intervention. C'est essentiel pour le suivi, pour la preuve et pour l'évaluation du travail.
+## 1. L'art de la Documentation
+Les paroles s'envolent, les écrits restent. Un parajuriste inorganisé est inutile. Chaque interaction doit faire l'objet d'une **Fiche de Cas**.
+Celle-ci doit contenir de manière neutre :
+* L'identité complète (anonymisée par un code si besoin pour les bases de données informatiques).
+* La chronologie exacte des faits reprochés.
+* L'inventaire des pièces fournies (contrats, SMS imprimés, photos).
+* L'action entreprise (ex: "Orienté vers le commissariat du 2ème arrondissement le 12/04").
 
-## Pourquoi documenter ?
-- **Pour le suivi** : Savoir où on en est si l'usager revient.
-- **Pour la preuve** : Garder une trace des démarches effectuées.
-- **Pour les statistiques** : Montrer l'ampleur des problèmes dans la communauté aux autorités.
-- **Pour la mémoire** : Transmettre le dossier à un autre parajuriste si besoin.
+## 2. La Préservation de la Preuve
+Le droit fonctionne sur la preuve. Le parajuriste doit conseiller l'usager sur la sauvegarde des éléments à charge ou à décharge :
+* **VBG / Coups et blessures** : Ne pas laver les vêtements déchirés ou ensanglantés, ils constituent des preuves matérielles pour la police scientifique. Obtenir le certificat médical le plus tôt possible.
+* **Preuves numériques (Cybercriminalité/Harcèlement)** : Ne jamais supprimer les messages (WhatsApp, SMS, Facebook) ou les notes vocales de menaces. Faire des captures d'écran et, si possible, les faire constater par un huissier de justice avant toute chose.
 
-## Les éléments d'une bonne fiche de cas :
-1. **Identité de l'usager** (Nom, contact).
-2. **Date de l'ouverture du dossier**.
-3. **Description des faits** (Qui, quoi, quand, où, comment).
-4. **Actions menées** (Conseils donnés, médiation, orientation).
-5. **Résultat obtenu** ou état actuel du dossier.
-
-## La protection des données
-Les dossiers contiennent des informations sensibles. Ils doivent être :
-- Rangés dans un endroit sûr (armoire fermée à clé).
-- Accessibles uniquement aux personnes autorisées.
-- Détruits de manière sécurisée après le délai légal de conservation.
+## 3. Sécurité et Protection des Données (Code du Numérique)
+Le Bénin possède un **Code du Numérique (2018)** très strict sur la protection des données à caractère personnel, veillé par l'APDP (Autorité de Protection des Données Personnelles).
+* Le parajuriste collecte des données extrêmement sensibles (statut sérologique, antécédents pénaux, situation matrimoniale).
+* Il est **interdit** de stocker ces fiches non-sécurisées sur un ordinateur public, de les envoyer via des canaux non cryptés, ou de laisser des dossiers papiers ouverts sur un bureau. Une faille de confidentialité ruine la réputation du parajuriste et l'expose légalement.
     `,
     quiz: [
       {
         id: "q8_1",
-        question: "Doit-on noter la date de l'intervention ?",
-        options: ["Oui", "Non"],
-        correctAnswer: 0
-      },
-      {
-        id: "q8_2",
-        question: "La documentation sert-elle à faire des statistiques pour la communauté ?",
-        options: ["Oui", "Non", "Seulement pour les cas de vol"],
-        correctAnswer: 0
-      },
-      {
-        id: "q8_3",
-        question: "Où doit-on ranger les fiches de cas ?",
-        options: ["Sur la table du bureau", "Dans une armoire fermée à clé", "Dans son sac personnel"],
+        question: "Un usager victime de menaces de mort par SMS vous demande conseil. Que lui dites-vous en premier ?",
+        options: ["Supprimez le numéro pour ne plus être embêté", "Conservez précieusement votre téléphone, faites des captures d'écran et allez faire un constat à la police", "Répondez-lui avec des insultes pour vous défendre"],
         correctAnswer: 1
       },
       {
-        id: "q8_4",
-        question: "Une bonne fiche de cas doit contenir :",
-        options: ["Seulement le nom de l'usager", "Les faits, les actions menées et les résultats", "L'opinion personnelle du parajuriste sur l'usager"],
+        id: "q8_2",
+        question: "Au regard de la loi béninoise, est-il autorisé de partager les fiches détaillées des usagers dans un groupe WhatsApp pour avoir l'avis d'autres parajuristes ?",
+        options: ["Oui, si le groupe est réservé aux parajuristes", "Non, c'est une violation flagrante de la confidentialité et des données personnelles", "Seulement si l'usager est d'accord verbalement"],
         correctAnswer: 1
       }
     ],
@@ -509,59 +380,48 @@ Les dossiers contiennent des informations sensibles. Ils doivent être :
   },
   {
     id: 9,
-    title: "Mobilisation communautaire",
-    introduction: "Agir ensemble pour le changement social et la défense des droits collectifs.",
+    title: "Mobilisation et Plaidoyer Communautaire",
+    introduction: "Techniques pour transformer les constats individuels en réformes systémiques grâce à l'action collective.",
     objectives: [
-      "Définir la mobilisation communautaire",
-      "Identifier les étapes d'une campagne de sensibilisation",
-      "Savoir identifier les leaders d'opinion",
-      "Comprendre l'importance de l'action collective"
+      "Cartographier les parties prenantes et leaders d'opinion locaux",
+      "Concevoir et animer une campagne de sensibilisation ciblée",
+      "Monter une stratégie de plaidoyer auprès des autorités locales (Mairies, Préfectures)",
+      "Utiliser les relais associatifs et estudiantins comme leviers de changement"
     ],
-    keyNotions: ["Sensibilisation", "Plaidoyer", "Action collective", "Changement social"],
+    keyNotions: ["Plaidoyer", "IEC/CCC", "Cartographie des acteurs", "Mobilisation des jeunes"],
     content: `
-# Mobilisation Communautaire
+# Module 9 : De l'Individu au Collectif - Le Plaidoyer
 
-Le parajuriste ne travaille pas seul. Pour changer les choses durablement, il doit mobiliser toute la communauté autour des questions de droit.
+## 1. La Cartographie des acteurs locaux
+Un parajuriste n'a pas de pouvoir coercitif. Sa force réside dans son réseau. Pour mener une action (ex: lutter contre la pollution d'une rivière ou les mariages précoces), il doit identifier :
+* **Les autorités politico-administratives** : Maires, Chefs d'Arrondissement (CA), Chefs de Quartier/Village (CQ/CV).
+* **Les autorités traditionnelles et religieuses** : Têtes couronnées, Imams, Pasteurs, Prêtres (très écoutés au Bénin).
+* **Les dynamiques associatives** : Les ONG de jeunesse, les fédérations d'étudiants, les groupements de femmes.
 
-## Qu'est-ce que la mobilisation ?
-C'est un processus par lequel les membres d'une communauté se rassemblent pour identifier leurs problèmes, trouver des solutions et agir ensemble.
+## 2. L'animation de stand et la Sensibilisation (IEC)
+L'Information, Éducation, Communication (IEC) demande de la préparation.
+* **Adaptation culturelle** : On ne parle pas de planification familiale ou de droits fonciers de la femme de la même manière au Nord et au Sud du Bénin. Le message doit respecter les codes culturels pour être accepté.
+* **Les outils** : Animations de stands dans les universités ou marchés, boîtes à images, théâtre-forum (où le public propose des solutions juridiques à un conflit joué par des acteurs), émissions sur les radios communautaires.
 
-## Les étapes d'une sensibilisation réussie :
-1. **Identifier le problème** : Quel est le sujet urgent ? (ex: les mariages forcés).
-2. **Cibler le public** : À qui s'adresse-t-on ? (parents, chefs religieux, jeunes).
-3. **Choisir le message** : Simple, clair et adapté à la langue locale.
-4. **Choisir le canal** : Causerie éducative, émission radio, théâtre forum.
-5. **Impliquer les leaders** : Obtenir le soutien des chefs de village ou des leaders religieux.
-
-## Le Plaidoyer
-C'est une forme de mobilisation qui vise à influencer les décideurs (Maire, Député, Ministre) pour qu'ils changent une loi ou une pratique injuste.
-
-## L'impact de l'action collective
-Seul, on va vite, mais ensemble, on va plus loin. Une communauté mobilisée est plus forte pour revendiquer ses droits face aux abus.
+## 3. Le Plaidoyer : Exiger le changement
+Si le parajuriste constate un problème récurrent (ex: un commissariat local refuse systématiquement d'enregistrer les plaintes pour violences conjugales en disant "réglez ça en famille"), l'action individuelle ne suffit plus.
+Il faut monter un **plaidoyer** :
+1.  Rassembler les preuves (les statistiques anonymisées tirées des fiches de cas).
+2.  Aller en coalition (avec des ONG, des réseaux de jeunes).
+3.  Rencontrer le Commissaire Central ou le Procureur pour présenter le problème et exiger l'application stricte de la loi.
+Le plaidoyer vise à changer les politiques ou l'application des lois au niveau local ou national.
     `,
     quiz: [
       {
         id: "q9_1",
-        question: "La mobilisation renforce-t-elle l'impact des actions ?",
-        options: ["Oui", "Non"],
-        correctAnswer: 0
+        question: "Quelle est la principale différence entre la sensibilisation et le plaidoyer ?",
+        options: ["Le plaidoyer coûte plus cher", "La sensibilisation vise à informer la population, le plaidoyer vise à influencer les décideurs pour changer une politique ou son application", "Il n'y a aucune différence, ce sont des synonymes"],
+        correctAnswer: 1
       },
       {
         id: "q9_2",
-        question: "Le plaidoyer vise principalement à :",
-        options: ["Donner de l'argent aux pauvres", "Influencer les décideurs pour changer les choses", "Organiser des fêtes au village"],
-        correctAnswer: 1
-      },
-      {
-        id: "q9_3",
-        question: "Pour une sensibilisation efficace, il faut :",
-        options: ["Utiliser des mots compliqués", "Impliquer les leaders d'opinion locaux", "Parler seulement aux enfants"],
-        correctAnswer: 1
-      },
-      {
-        id: "q9_4",
-        question: "La mobilisation communautaire est un processus :",
-        options: ["Individuel", "Collectif", "Secret"],
+        question: "Pourquoi est-il stratégique d'impliquer les chefs religieux et traditionnels dans une campagne contre les mariages forcés ?",
+        options: ["Parce qu'ils ont le pouvoir d'emprisonner les coupables", "Parce qu'ils sont des leaders d'opinion dont la parole a un fort impact sur le changement de comportement des communautés", "Parce qu'ils peuvent financer la campagne"],
         correctAnswer: 1
       }
     ],
@@ -569,8 +429,8 @@ Seul, on va vite, mais ensemble, on va plus loin. Une communauté mobilisée est
   },
   {
     id: 10,
-    title: "Signalement communautaire",
-    introduction: "Utilisez cet espace pour signaler des situations vécues dans votre communauté et contribuer à la veille juridique.",
+    title: "Signalement, Veille et Data communautaire",
+    introduction: "Plateforme interactive et processus pour signaler les violations et contribuer à la justice prédictive.",
     isReporting: true,
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
   }
