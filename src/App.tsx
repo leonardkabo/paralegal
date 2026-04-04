@@ -34,6 +34,7 @@ import {
   Trash2,
   Edit,
   FilePlus,
+  File,
   Video,
   ExternalLink,
   Paperclip,
@@ -1345,6 +1346,8 @@ const ModuleDetail = ({
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Reporting form state
@@ -1475,6 +1478,24 @@ const ModuleDetail = ({
       }
       setAudioPlaying(!audioPlaying);
     }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setAudioCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setAudioDuration(audioRef.current.duration);
+    }
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const handleAudioEnded = () => {
@@ -1615,8 +1636,23 @@ const ModuleDetail = ({
                   ref={audioRef} 
                   src={module.audioUrl} 
                   onEnded={handleAudioEnded}
+                  onTimeUpdate={handleTimeUpdate}
+                  onLoadedMetadata={handleLoadedMetadata}
                   className="hidden"
                 />
+
+                <div className="w-full max-w-xs space-y-2">
+                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-emerald-500 transition-all duration-300" 
+                      style={{ width: `${(audioCurrentTime / audioDuration) * 100}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span>{formatTime(audioCurrentTime)}</span>
+                    <span>-{formatTime(audioDuration - audioCurrentTime)}</span>
+                  </div>
+                </div>
 
                 <div className="flex gap-4">
                   <Button 
@@ -1911,7 +1947,9 @@ const AdminDashboard = ({
   onDeleteCaseStudy,
   onDeleteUser,
   onSaveSettings,
-  onUploadFile
+  onUploadFile,
+  onFetchFiles,
+  onDeleteFile
 }: { 
   onBack: () => void, 
   modules: Module[],
@@ -1929,11 +1967,14 @@ const AdminDashboard = ({
   onDeleteCaseStudy: (id: string) => Promise<boolean>,
   onDeleteUser: (phone: string) => Promise<boolean>,
   onSaveSettings: (s: AppSettings) => Promise<boolean>,
-  onUploadFile: (file: File) => Promise<{ url: string, name: string }>
+  onUploadFile: (file: File) => Promise<{ url: string, name: string }>,
+  onFetchFiles: () => Promise<any[]>,
+  onDeleteFile: (filename: string) => Promise<boolean>
 }) => {
-  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports'>('users');
+  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports' | 'media'>('users');
   const [users, setUsers] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
+  const [files, setFiles] = useState<any[]>([]);
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [editingTerm, setEditingTerm] = useState<GlossaryTerm | null>(null);
   const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
@@ -1947,7 +1988,17 @@ const AdminDashboard = ({
     if (view === 'reports') {
       fetch('/api/reports').then(res => res.json()).then(setReports);
     }
+    if (view === 'media') {
+      onFetchFiles().then(setFiles);
+    }
   }, [view]);
+
+  const handleDeleteFile = async (filename: string) => {
+    if (confirm("Supprimer ce fichier définitivement ?")) {
+      const ok = await onDeleteFile(filename);
+      if (ok) setFiles(files.filter(f => f.name !== filename));
+    }
+  };
 
   const handleDeleteUser = async (phone: string) => {
     if (confirm("Supprimer cet utilisateur ?")) {
@@ -2131,6 +2182,12 @@ const AdminDashboard = ({
           Signalements
         </button>
         <button 
+          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'media' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+          onClick={() => setView('media')}
+        >
+          Médiathèque
+        </button>
+        <button 
           className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'settings' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
           onClick={() => setView('settings')}
         >
@@ -2234,6 +2291,48 @@ const AdminDashboard = ({
                         </div>
                       </div>
                     )}
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {view === 'media' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-slate-500 uppercase tracking-wider text-xs">Fichiers sur le serveur ({files.length})</h3>
+            </div>
+            {files.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-100">
+                <File size={48} className="mx-auto text-slate-200 mb-4" />
+                <p className="text-slate-400 font-medium">Aucun fichier trouvé</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {files.map(file => (
+                  <Card key={file.name} className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 shrink-0">
+                        {file.name.match(/\.(mp3|wav|ogg)$/i) ? <Volume2 size={20} /> : 
+                         file.name.match(/\.(mp4|webm)$/i) ? <Video size={20} /> : 
+                         <FileText size={20} />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">{file.name}</p>
+                        <p className="text-[10px] text-slate-400">
+                          {(file.size / 1024 / 1024).toFixed(2)} MB • {new Date(file.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a href={file.url} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-emerald-500 transition-colors">
+                        <Download size={18} />
+                      </a>
+                      <button onClick={() => handleDeleteFile(file.name)} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </Card>
                 ))}
               </div>
@@ -2995,7 +3094,9 @@ export default function App() {
     saveCaseStudy,
     deleteCaseStudy,
     saveSettings,
-    uploadFile
+    uploadFile,
+    fetchFiles,
+    deleteFile
   } = useAppState();
 
   const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'assistant' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
@@ -3231,6 +3332,8 @@ export default function App() {
               onDeleteUser={deleteUser}
               onSaveSettings={saveSettings}
               onUploadFile={uploadFile}
+              onFetchFiles={fetchFiles}
+              onDeleteFile={deleteFile}
             />
           </motion.div>
         )}

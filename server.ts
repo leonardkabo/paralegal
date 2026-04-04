@@ -1673,6 +1673,36 @@ async function startServer() {
     res.json({ url, name: req.file.originalname });
   });
 
+  app.get("/api/admin/files", (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    const files = fs.readdirSync(uploadDir);
+    const fileDetails = files.map(filename => {
+      const stats = fs.statSync(path.join(uploadDir, filename));
+      return {
+        name: filename,
+        size: stats.size,
+        createdAt: stats.birthtime,
+        url: `/uploads/${filename}`
+      };
+    });
+    res.json(fileDetails);
+  });
+
+  app.delete("/api/admin/files/:filename", (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    const { filename } = req.params;
+    const filePath = path.join(uploadDir, filename);
+    
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: "File not found" });
+    }
+  });
+
   app.get("/api/modules", (req, res) => {
     const modules = db.prepare("SELECT * FROM modules").all() as any[];
     res.json(modules.map(m => ({

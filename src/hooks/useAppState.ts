@@ -348,6 +348,14 @@ export function useAppState() {
     saveCaseStudy,
     deleteCaseStudy,
     saveSettings,
-    uploadFile
+    uploadFile,
+    fetchFiles: async () => {
+      const res = await fetch('/api/admin/files');
+      return await res.json();
+    },
+    deleteFile: async (filename: string) => {
+      const res = await fetch(`/api/admin/files/${filename}`, { method: 'DELETE' });
+      return res.ok;
+    }
   };
 }
