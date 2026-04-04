@@ -29,6 +29,7 @@ export function useAppState() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetchedFromServer, setHasFetchedFromServer] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [glossary, setGlossary] = useState<GlossaryTerm[]>([]);
@@ -65,6 +66,24 @@ export function useAppState() {
       .then(res => res.json())
       .then(data => setCaseStudies(data))
       .catch(err => console.error("Erreur lors du chargement des études de cas:", err));
+
+    if (user) {
+      fetch(`/api/progress/${user.phone}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setProgress(data.progress);
+            localStorage.setItem('paralegal_progress', JSON.stringify(data.progress));
+          }
+          setHasFetchedFromServer(true);
+        })
+        .catch(err => {
+          console.error("Erreur lors de la récupération de la progression:", err);
+          setHasFetchedFromServer(true);
+        });
+    } else {
+      setHasFetchedFromServer(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -77,7 +96,7 @@ export function useAppState() {
 
   useEffect(() => {
     localStorage.setItem('paralegal_progress', JSON.stringify(progress));
-    if (user) {
+    if (user && hasFetchedFromServer) {
       // Sync with backend
       fetch('/api/sync', {
         method: 'POST',
@@ -87,7 +106,7 @@ export function useAppState() {
         console.error("Échec de la synchronisation avec le serveur:", err);
       });
     }
-  }, [progress, user]);
+  }, [progress, user, hasFetchedFromServer]);
 
   const registerUser = async (userData: Omit<User, 'preferredLanguage'>) => {
     setIsLoading(true);

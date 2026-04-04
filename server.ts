@@ -46,7 +46,8 @@ db.exec(`
     audioListened TEXT, -- JSON object
     completedCaseStudies TEXT, -- JSON array
     finalExamScore INTEGER,
-    finalExamDate TEXT
+    finalExamDate TEXT,
+    lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS modules (
@@ -1847,6 +1848,30 @@ async function startServer() {
     res.json(users);
   });
 
+  app.get("/api/progress/:phone", (req, res) => {
+    const { phone } = req.params;
+    try {
+      const progress = db.prepare("SELECT * FROM progress WHERE phone = ?").get(phone) as any;
+      if (progress) {
+        res.json({ 
+          success: true, 
+          progress: {
+            completedModules: JSON.parse(progress.completedModules || '[]'),
+            quizScores: JSON.parse(progress.quizScores || '{}'),
+            audioListened: JSON.parse(progress.audioListened || '{}'),
+            completedCaseStudies: JSON.parse(progress.completedCaseStudies || '[]'),
+            finalExamScore: progress.finalExamScore,
+            finalExamDate: progress.finalExamDate
+          }
+        });
+      } else {
+        res.status(404).json({ error: "Progression non trouvée" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.delete("/api/admin/users/:phone", (req, res) => {
     const { phone } = req.params;
     db.prepare("DELETE FROM users WHERE phone = ?").run(phone);
@@ -1940,7 +1965,7 @@ async function startServer() {
     try {
       const updateProgress = db.prepare(`
         UPDATE progress 
-        SET completedModules = ?, quizScores = ?, audioListened = ?, completedCaseStudies = ?, finalExamScore = ?, finalExamDate = ?
+        SET completedModules = ?, quizScores = ?, audioListened = ?, completedCaseStudies = ?, finalExamScore = ?, finalExamDate = ?, lastUpdated = CURRENT_TIMESTAMP
         WHERE phone = ?
       `);
       updateProgress.run(
@@ -1968,6 +1993,66 @@ async function startServer() {
     }
   });
 
+  app.post("/api/reports", upload.fields([
+    { name: 'audio', maxCount: 1 },
+    { name: 'attachments', maxCount: 5 }
+  ]), (req, res) => {
+    const { id, userId, moduleId, type, description, location, date, anonymous } = req.body;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    
+    let audioUrl = '';
+    if (files['audio'] && files['audio'][0]) {
+      audioUrl = `/uploads/${files['audio'][0].filename}`;
+    }
+
+    const attachments = (files['attachments'] || []).map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      name: file.originalname,
+      url: `/uploads/${file.filename}`,
+      type: file.mimetype.includes('pdf') ? 'pdf' : 'image'
+    }));
+
+    try {
+      db.prepare(`
+        INSERT INTO reports (id, userId, moduleId, type, description, location, date, anonymous, audioUrl, attachments, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        id,
+        userId,
+        parseInt(moduleId),
+        type,
+        description,
+        location, // already stringified from client
+        date,
+        anonymous === 'true' ? 1 : 0,
+        audioUrl,
+        JSON.stringify(attachments),
+        new Date().toISOString()
+      );
+      console.log("Report inserted successfully:", id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error inserting report:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/reports", (req, res) => {
+    try {
+      const reports = db.prepare("SELECT * FROM reports ORDER BY createdAt DESC").all();
+      console.log(`Found ${reports.length} reports in database`);
+      res.json(reports.map((r: any) => ({
+        ...r,
+        location: JSON.parse(r.location || '{}'),
+        attachments: JSON.parse(r.attachments || '[]'),
+        anonymous: r.anonymous === 1
+      })));
+    } catch (error: any) {
+      console.error("Error fetching reports:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -1982,56 +2067,7 @@ async function startServer() {
     });
   }
 
-  app.post("/api/reports", upload.fields([
-  { name: 'audio', maxCount: 1 },
-  { name: 'attachments', maxCount: 5 }
-]), (req, res) => {
-  const { id, userId, moduleId, type, description, location, date, anonymous } = req.body;
-  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-  
-  let audioUrl = '';
-  if (files['audio'] && files['audio'][0]) {
-    audioUrl = `/uploads/${files['audio'][0].filename}`;
-  }
-
-  const attachments = (files['attachments'] || []).map(file => ({
-    id: Math.random().toString(36).substr(2, 9),
-    name: file.originalname,
-    url: `/uploads/${file.filename}`,
-    type: file.mimetype.includes('pdf') ? 'pdf' : 'image'
-  }));
-
-  db.prepare(`
-    INSERT INTO reports (id, userId, moduleId, type, description, location, date, anonymous, audioUrl, attachments, createdAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    id,
-    userId,
-    parseInt(moduleId),
-    type,
-    description,
-    location, // already stringified from client
-    date,
-    anonymous === 'true' ? 1 : 0,
-    audioUrl,
-    JSON.stringify(attachments),
-    new Date().toISOString()
-  );
-
-  res.json({ success: true });
-});
-
-app.get("/api/reports", (req, res) => {
-  const reports = db.prepare("SELECT * FROM reports ORDER BY createdAt DESC").all();
-  res.json(reports.map((r: any) => ({
-    ...r,
-    location: JSON.parse(r.location || '{}'),
-    attachments: JSON.parse(r.attachments || '[]'),
-    anonymous: r.anonymous === 1
-  })));
-});
-
-app.listen(PORT, "0.0.0.0", () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
