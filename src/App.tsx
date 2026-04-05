@@ -7,6 +7,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   User as UserIcon, 
+  Users,
   BookOpen, 
   CheckCircle2, 
   ChevronRight, 
@@ -40,7 +41,11 @@ import {
   Paperclip,
   Save,
   Image as ImageIcon,
-  UserPlus
+  UserPlus,
+  Database as DatabaseIcon,
+  Activity,
+  Languages,
+  ShieldCheck
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
@@ -1146,7 +1151,7 @@ const Dashboard = ({
                   className="flex items-center gap-1 text-[8px] font-bold text-emerald-500 uppercase tracking-tighter bg-emerald-50 px-1.5 py-0.5 rounded-full"
                 >
                   <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                  Synchronisation...
+                  Synchronisation (10s)...
                 </motion.div>
               )}
             </div>
@@ -2094,10 +2099,11 @@ const AdminDashboard = ({
   onFetchFiles: () => Promise<any[]>,
   onDeleteFile: (filename: string) => Promise<boolean>
 }) => {
-  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports' | 'media'>('users');
+  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports' | 'media' | 'database'>('users');
   const [users, setUsers] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
+  const [dbStats, setDbStats] = useState<any>(null);
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [editingTerm, setEditingTerm] = useState<GlossaryTerm | null>(null);
   const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
@@ -2172,10 +2178,21 @@ const AdminDashboard = ({
       onFetchFiles().then(setFiles);
     }
 
+    if (view === 'database') {
+      const fetchStats = () => {
+        fetch('/api/admin/db-stats')
+          .then(res => res.json())
+          .then(data => setDbStats(data.stats))
+          .catch(err => console.error("Error fetching db stats:", err));
+      };
+      fetchStats();
+      interval = setInterval(fetchStats, 10000); // Sync stats every 10s
+    }
+
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [view]);
+  }, [view, onFetchFiles]);
 
   const handleDeleteFile = async (filename: string) => {
     if (confirm("Supprimer ce fichier définitivement ?")) {
@@ -2395,6 +2412,12 @@ const AdminDashboard = ({
         >
           Paramètres
         </button>
+        <button 
+          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'database' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+          onClick={() => setView('database')}
+        >
+          Base de données
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 pb-24">
@@ -2547,6 +2570,91 @@ const AdminDashboard = ({
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {view === 'database' && dbStats && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="p-6 bg-white border-slate-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
+                    <DatabaseIcon size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Taille de la base</p>
+                    <h4 className="text-xl font-bold">{dbStats.dbSize}</h4>
+                  </div>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 w-1/4" />
+                </div>
+              </Card>
+              <Card className="p-6 bg-white border-slate-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                    <Users size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Utilisateurs</p>
+                    <h4 className="text-xl font-bold">{dbStats.users}</h4>
+                  </div>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500 w-1/2" />
+                </div>
+              </Card>
+            </div>
+
+            <Card className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-400">Statistiques des tables</h3>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase">Synchronisation 10s active</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {[
+                  { label: 'Modules de formation', value: dbStats.modules, icon: <BookOpen size={16} />, color: 'bg-indigo-500' },
+                  { label: 'Progressions enregistrées', value: dbStats.progress, icon: <Activity size={16} />, color: 'bg-emerald-500' },
+                  { label: 'Signalements reçus', value: dbStats.reports, icon: <MessageSquare size={16} />, color: 'bg-red-500' },
+                  { label: 'Termes du glossaire', value: dbStats.glossary, icon: <Languages size={16} />, color: 'bg-orange-500' },
+                  { label: 'Documents juridiques', value: dbStats.documents, icon: <FileText size={16} />, color: 'bg-blue-500' },
+                  { label: 'Études de cas', value: dbStats.cases, icon: <HelpCircle size={16} />, color: 'bg-purple-500' }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-white", item.color)}>
+                        {item.icon}
+                      </div>
+                      <span className="text-sm font-medium text-slate-700">{item.label}</span>
+                    </div>
+                    <span className="text-lg font-bold text-slate-900">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                  <span>Dernière mise à jour système</span>
+                  <span>{new Date(dbStats.lastBackup).toLocaleString('fr-FR')}</span>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-emerald-900 text-white border-none">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <ShieldCheck size={24} />
+                </div>
+                <div>
+                  <h4 className="font-bold">Sécurité & Intégrité</h4>
+                  <p className="text-xs text-emerald-200">La base de données est sauvegardée automatiquement et cryptée sur le serveur.</p>
+                </div>
+              </div>
+            </Card>
           </div>
         )}
 

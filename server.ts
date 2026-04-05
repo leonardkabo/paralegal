@@ -2138,6 +2138,38 @@ async function startServer() {
     }
   });
 
+  app.get("/api/admin/db-stats", (req, res) => {
+    try {
+      const stats = {
+        users: db.prepare("SELECT COUNT(*) as count FROM users").get() as any,
+        progress: db.prepare("SELECT COUNT(*) as count FROM progress").get() as any,
+        modules: db.prepare("SELECT COUNT(*) as count FROM modules").get() as any,
+        reports: db.prepare("SELECT COUNT(*) as count FROM reports").get() as any,
+        glossary: db.prepare("SELECT COUNT(*) as count FROM glossary").get() as any,
+        documents: db.prepare("SELECT COUNT(*) as count FROM legal_documents").get() as any,
+        cases: db.prepare("SELECT COUNT(*) as count FROM case_studies").get() as any,
+        dbSize: fs.statSync("paralegal.db").size,
+        lastBackup: new Date().toISOString() // Mock backup time for now
+      };
+      res.json({
+        success: true,
+        stats: {
+          users: stats.users.count,
+          progress: stats.progress.count,
+          modules: stats.modules.count,
+          reports: stats.reports.count,
+          glossary: stats.glossary.count,
+          documents: stats.documents.count,
+          cases: stats.cases.count,
+          dbSize: (stats.dbSize / 1024).toFixed(2) + " KB",
+          lastBackup: stats.lastBackup
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

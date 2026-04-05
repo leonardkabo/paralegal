@@ -109,6 +109,7 @@ export function useAppState() {
     if (!user) return;
 
     const pollInterval = setInterval(() => {
+      console.log("Vérification de la base de données (sync 10s)...");
       fetch(`/api/progress/${user.phone}`)
         .then(res => res.json())
         .then(data => {
@@ -118,7 +119,7 @@ export function useAppState() {
             const localLastUpdated = progress.lastUpdated;
 
             if (serverLastUpdated && (!localLastUpdated || new Date(serverLastUpdated) > new Date(localLastUpdated))) {
-              console.log("Server has newer progress, updating local state...");
+              console.log("Base de données : nouvelles données trouvées, mise à jour...");
               setProgress(data.progress);
               localStorage.setItem('paralegal_progress', JSON.stringify(data.progress));
               
@@ -134,8 +135,8 @@ export function useAppState() {
             }
           }
         })
-        .catch(err => console.error("Polling error:", err));
-    }, 5000); // Poll every 5 seconds for real-time feel
+        .catch(err => console.error("Erreur de synchronisation base de données:", err));
+    }, 10000); // Poll every 10 seconds as requested
 
     return () => clearInterval(pollInterval);
   }, [user, progress.lastUpdated]);
