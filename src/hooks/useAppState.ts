@@ -43,18 +43,6 @@ export function useAppState() {
     logoUrl: ''
   });
   const [isSyncing, setIsSyncing] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
 
   useEffect(() => {
     fetch('/api/modules')
@@ -505,7 +493,6 @@ export function useAppState() {
     saveSettings,
     uploadFile,
     isSyncing,
-    isOnline,
     fetchFiles: async () => {
       const res = await fetch('/api/admin/files');
       return await res.json();

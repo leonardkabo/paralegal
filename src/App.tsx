@@ -644,11 +644,13 @@ const CaseStudiesScreen = ({
   onBack, 
   progress, 
   caseStudies,
+  isSyncing,
   onComplete 
 }: { 
   onBack: () => void, 
   progress: UserProgress, 
   caseStudies: CaseStudy[],
+  isSyncing: boolean,
   onComplete: (id: string) => void 
 }) => {
   const [selectedCase, setSelectedCase] = useState<CaseStudy | null>(null);
@@ -714,6 +716,16 @@ const CaseStudiesScreen = ({
                 <ArrowLeft size={20} />
               </Button>
               <h2 className="font-bold truncate">{selectedCase.title}</h2>
+              {isSyncing && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-1 text-[8px] font-bold text-emerald-500 uppercase tracking-tighter bg-emerald-50 px-1.5 py-0.5 rounded-full"
+                >
+                  <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                  Sauvegarde...
+                </motion.div>
+              )}
             </div>
             
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
@@ -1277,7 +1289,13 @@ const Dashboard = ({
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm leading-tight">{module.title}</h4>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="h-1.5 w-full bg-slate-100 rounded-full mt-2 overflow-hidden">
+                    <div className={cn(
+                      "h-full transition-all duration-500 w-full",
+                      isCompleted ? "bg-emerald-500" : "bg-slate-300"
+                    )} />
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
                     <p className="text-[10px] text-slate-400">
                       {module.isReporting ? "Signalement" : user.preferredLanguage === 'fr' ? "Texte + Quiz" : "Audio"}
                     </p>
@@ -1424,12 +1442,14 @@ const ModuleDetail = ({
   module, 
   user, 
   progress, 
+  isSyncing,
   onBack, 
   onComplete 
 }: { 
   module: Module, 
   user: any, 
   progress: any, 
+  isSyncing: boolean,
   onBack: () => void,
   onComplete: (score?: number) => void 
 }) => {
@@ -1601,6 +1621,16 @@ const ModuleDetail = ({
           <ArrowLeft size={20} />
         </Button>
         <h2 className="font-bold text-sm truncate">{module.title}</h2>
+        {isSyncing && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-1 text-[8px] font-bold text-emerald-500 uppercase tracking-tighter bg-emerald-50 px-1.5 py-0.5 rounded-full"
+          >
+            <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+            Sauvegarde...
+          </motion.div>
+        )}
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={downloadCourse} title="Télécharger le cours">
             <Download size={18} />
@@ -2301,7 +2331,13 @@ const AdminDashboard = ({
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft size={20} />
           </Button>
-          <h2 className="font-bold">Espace Administration</h2>
+          <div>
+            <h2 className="font-bold">Espace Administration</h2>
+            <div className="flex items-center gap-2 mt-0.5">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+              <p className="text-[8px] font-bold text-emerald-600 uppercase tracking-widest">Temps réel activé</p>
+            </div>
+          </div>
         </div>
         {view === 'settings' && (
           <Button size="sm" className="gap-2" onClick={() => onSaveSettings(localSettings)}>
@@ -3302,8 +3338,7 @@ export default function App() {
     uploadFile,
     fetchFiles,
     deleteFile,
-    isSyncing,
-    isOnline
+    isSyncing
   } = useAppState();
 
   const generateCertificate = () => {
@@ -3393,21 +3428,13 @@ export default function App() {
 
   if (!user) {
     return (
-      <>
-        {!isOnline && (
-          <div className="bg-red-500 text-white text-[10px] font-bold py-1 px-4 text-center sticky top-0 z-[100] flex items-center justify-center gap-2 animate-pulse">
-            <Globe size={12} />
-            Mode Hors Ligne : La synchronisation est suspendue. Reconnectez-vous pour sauvegarder.
-          </div>
-        )}
-        <AuthScreen 
-          onRegister={handleRegister} 
-          onLogin={handleLogin} 
-          onResetPassword={resetPassword}
-          isLoading={isLoading} 
-          error={error} 
-        />
-      </>
+      <AuthScreen 
+        onRegister={handleRegister} 
+        onLogin={handleLogin} 
+        onResetPassword={resetPassword}
+        isLoading={isLoading} 
+        error={error} 
+      />
     );
   }
 
@@ -3417,12 +3444,6 @@ export default function App() {
 
   return (
     <div className="max-w-2xl mx-auto bg-slate-50 min-h-screen shadow-2xl shadow-slate-200 relative overflow-x-hidden">
-      {!isOnline && (
-        <div className="bg-red-500 text-white text-[10px] font-bold py-1 px-4 text-center sticky top-0 z-[100] flex items-center justify-center gap-2 animate-pulse">
-          <Globe size={12} />
-          Mode Hors Ligne : La synchronisation est suspendue. Reconnectez-vous pour sauvegarder.
-        </div>
-      )}
       <AnimatePresence mode="wait">
         {currentScreen === 'main' && (
           <motion.div 
@@ -3460,6 +3481,7 @@ export default function App() {
               module={selectedModule}
               user={user}
               progress={progress}
+              isSyncing={isSyncing}
               onBack={() => setCurrentScreen('main')}
               onComplete={(score) => {
                 if (user.preferredLanguage === 'fr') {
@@ -3547,6 +3569,7 @@ export default function App() {
               onBack={() => setCurrentScreen('main')} 
               progress={progress}
               caseStudies={caseStudies}
+              isSyncing={isSyncing}
               onComplete={completeCaseStudy}
             />
           </motion.div>
