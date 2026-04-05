@@ -97,12 +97,18 @@ export function useAppState() {
   useEffect(() => {
     localStorage.setItem('paralegal_progress', JSON.stringify(progress));
     if (user && hasFetchedFromServer) {
+      console.log("Syncing progress with server...", progress);
       // Sync with backend
       fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: user.phone, progress })
-      }).catch(err => {
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Sync failed");
+        console.log("Sync successful");
+      })
+      .catch(err => {
         console.error("Échec de la synchronisation avec le serveur:", err);
       });
     }
@@ -198,88 +204,44 @@ export function useAppState() {
         ? { ...prev.quizScores, [moduleId]: score }
         : prev.quizScores;
 
-      const newProgress = {
+      return {
         ...prev,
         completedModules: newCompleted,
         quizScores: newScores
       };
-
-      // Immediate sync attempt
-      if (user && hasFetchedFromServer) {
-        fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: user.phone, progress: newProgress })
-        }).catch(err => console.error("Sync error:", err));
-      }
-
-      return newProgress;
     });
   };
 
   const markAudioListened = (moduleId: number) => {
     setProgress(prev => {
-      const newProgress = {
+      return {
         ...prev,
         audioListened: { ...prev.audioListened, [moduleId]: true },
         completedModules: prev.completedModules.includes(moduleId) 
           ? prev.completedModules 
           : [...prev.completedModules, moduleId]
       };
-
-      // Immediate sync attempt
-      if (user && hasFetchedFromServer) {
-        fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: user.phone, progress: newProgress })
-        }).catch(err => console.error("Sync error:", err));
-      }
-
-      return newProgress;
     });
   };
 
   const completeCaseStudy = (caseId: string) => {
     setProgress(prev => {
-      const newProgress = {
+      return {
         ...prev,
         completedCaseStudies: prev.completedCaseStudies.includes(caseId)
           ? prev.completedCaseStudies
           : [...prev.completedCaseStudies, caseId]
       };
-
-      // Immediate sync attempt
-      if (user && hasFetchedFromServer) {
-        fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: user.phone, progress: newProgress })
-        }).catch(err => console.error("Sync error:", err));
-      }
-
-      return newProgress;
     });
   };
 
   const setFinalExamScore = (score: number) => {
     setProgress(prev => {
-      const newProgress = {
+      return {
         ...prev,
         finalExamScore: score,
         finalExamDate: new Date().toISOString()
       };
-
-      // Immediate sync attempt
-      if (user && hasFetchedFromServer) {
-        fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: user.phone, progress: newProgress })
-        }).catch(err => console.error("Sync error:", err));
-      }
-
-      return newProgress;
     });
   };
 

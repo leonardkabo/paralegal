@@ -1815,7 +1815,17 @@ async function startServer() {
     const user = db.prepare("SELECT * FROM users WHERE phone = ? AND password = ?").get(phone, password) as any;
     
     if (user) {
-      const progress = db.prepare("SELECT * FROM progress WHERE phone = ?").get(phone) as any;
+      let progress = db.prepare("SELECT * FROM progress WHERE phone = ?").get(phone) as any;
+      
+      if (!progress) {
+        // Create default progress if missing
+        db.prepare(`
+          INSERT INTO progress (phone, completedModules, quizScores, audioListened, completedCaseStudies)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(phone, JSON.stringify([]), JSON.stringify({}), JSON.stringify({}), JSON.stringify([]));
+        progress = db.prepare("SELECT * FROM progress WHERE phone = ?").get(phone) as any;
+      }
+
       res.json({ 
         success: true, 
         user: { 
@@ -2025,6 +2035,11 @@ async function startServer() {
 
   app.post("/api/sync", (req, res) => {
     const { phone, progress } = req.body;
+    console.log(`Sync request received for phone: ${phone}`);
+    if (!phone || !progress) {
+      console.error("Missing phone or progress in sync request");
+      return res.status(400).json({ error: "Données manquantes" });
+    }
     try {
       const syncProgress = db.prepare(`
         INSERT OR REPLACE INTO progress (
@@ -2040,8 +2055,10 @@ async function startServer() {
         progress.finalExamScore || null,
         progress.finalExamDate || null
       );
+      console.log(`Sync successful for phone: ${phone}`);
       res.json({ success: true });
     } catch (error: any) {
+      console.error(`Sync error for phone ${phone}:`, error.message);
       res.status(500).json({ error: error.message });
     }
   });
