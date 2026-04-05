@@ -42,6 +42,19 @@ export function useAppState() {
     contactEmail: 'contact@hai-benin.org',
     logoUrl: ''
   });
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     fetch('/api/modules')
@@ -120,11 +133,21 @@ export function useAppState() {
               console.log("Server has newer progress, updating local state...");
               setProgress(data.progress);
               localStorage.setItem('paralegal_progress', JSON.stringify(data.progress));
+              
+              // Update lastSyncedRef to match the new server data to prevent immediate re-sync
+              lastSyncedRef.current = JSON.stringify({
+                completedModules: data.progress.completedModules,
+                quizScores: data.progress.quizScores,
+                audioListened: data.progress.audioListened,
+                completedCaseStudies: data.progress.completedCaseStudies,
+                finalExamScore: data.progress.finalExamScore,
+                finalExamDate: data.progress.finalExamDate
+              });
             }
           }
         })
         .catch(err => console.error("Polling error:", err));
-    }, 10000); // Poll every 10 seconds
+    }, 5000); // Poll every 5 seconds for real-time feel
 
     return () => clearInterval(pollInterval);
   }, [user, progress.lastUpdated]);
@@ -147,6 +170,7 @@ export function useAppState() {
       }
 
       console.log("Syncing progress with server...", progress);
+      setIsSyncing(true);
       // Sync with backend
       fetch('/api/sync', {
         method: 'POST',
@@ -163,6 +187,9 @@ export function useAppState() {
       })
       .catch(err => {
         console.error("Échec de la synchronisation avec le serveur:", err);
+      })
+      .finally(() => {
+        setIsSyncing(false);
       });
     }
   }, [progress, user, hasFetchedFromServer]);
@@ -477,6 +504,8 @@ export function useAppState() {
     deleteCaseStudy,
     saveSettings,
     uploadFile,
+    isSyncing,
+    isOnline,
     fetchFiles: async () => {
       const res = await fetch('/api/admin/files');
       return await res.json();

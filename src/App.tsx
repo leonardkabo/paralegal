@@ -1084,6 +1084,7 @@ const Dashboard = ({
   progress, 
   modules,
   caseStudies,
+  isSyncing,
   onSelectModule, 
   onOpenSettings,
   onOpenCases,
@@ -1095,6 +1096,7 @@ const Dashboard = ({
   progress: any, 
   modules: Module[],
   caseStudies: CaseStudy[],
+  isSyncing: boolean,
   onSelectModule: (m: Module) => void,
   onOpenSettings: () => void,
   onOpenCases: () => void,
@@ -1123,7 +1125,19 @@ const Dashboard = ({
       <div className="bg-white px-6 pt-12 pb-8 sticky top-0 z-10 border-b border-slate-100">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Tableau de bord</p>
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tableau de bord</p>
+              {isSyncing && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-1 text-[8px] font-bold text-emerald-500 uppercase tracking-tighter bg-emerald-50 px-1.5 py-0.5 rounded-full"
+                >
+                  <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                  Synchronisation...
+                </motion.div>
+              )}
+            </div>
             <h1 className="text-2xl font-bold">Bonjour, {user.fullName.split(' ')[0]}</h1>
           </div>
           <Button variant="ghost" size="icon" onClick={onOpenSettings}>
@@ -2100,21 +2114,37 @@ const AdminDashboard = ({
   }, [editingUser]);
 
   useEffect(() => {
+    let interval: any;
+    
     if (view === 'users') {
-      fetch('/api/admin/users')
-        .then(res => res.json())
-        .then(setUsers)
-        .catch(err => console.error("Error fetching users:", err));
+      const fetchUsers = () => {
+        fetch('/api/admin/users')
+          .then(res => res.json())
+          .then(setUsers)
+          .catch(err => console.error("Error fetching users:", err));
+      };
+      fetchUsers();
+      interval = setInterval(fetchUsers, 5000); // Admin real-time sync
     }
+    
     if (view === 'reports') {
-      fetch('/api/reports')
-        .then(res => res.json())
-        .then(setReports)
-        .catch(err => console.error("Error fetching reports:", err));
+      const fetchReports = () => {
+        fetch('/api/reports')
+          .then(res => res.json())
+          .then(setReports)
+          .catch(err => console.error("Error fetching reports:", err));
+      };
+      fetchReports();
+      interval = setInterval(fetchReports, 5000); // Admin real-time sync
     }
+    
     if (view === 'media') {
       onFetchFiles().then(setFiles);
     }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [view]);
 
   const handleDeleteFile = async (filename: string) => {
@@ -3271,7 +3301,9 @@ export default function App() {
     saveSettings,
     uploadFile,
     fetchFiles,
-    deleteFile
+    deleteFile,
+    isSyncing,
+    isOnline
   } = useAppState();
 
   const generateCertificate = () => {
@@ -3361,13 +3393,21 @@ export default function App() {
 
   if (!user) {
     return (
-      <AuthScreen 
-        onRegister={handleRegister} 
-        onLogin={handleLogin} 
-        onResetPassword={resetPassword}
-        isLoading={isLoading} 
-        error={error} 
-      />
+      <>
+        {!isOnline && (
+          <div className="bg-red-500 text-white text-[10px] font-bold py-1 px-4 text-center sticky top-0 z-[100] flex items-center justify-center gap-2 animate-pulse">
+            <Globe size={12} />
+            Mode Hors Ligne : La synchronisation est suspendue. Reconnectez-vous pour sauvegarder.
+          </div>
+        )}
+        <AuthScreen 
+          onRegister={handleRegister} 
+          onLogin={handleLogin} 
+          onResetPassword={resetPassword}
+          isLoading={isLoading} 
+          error={error} 
+        />
+      </>
     );
   }
 
@@ -3377,6 +3417,12 @@ export default function App() {
 
   return (
     <div className="max-w-2xl mx-auto bg-slate-50 min-h-screen shadow-2xl shadow-slate-200 relative overflow-x-hidden">
+      {!isOnline && (
+        <div className="bg-red-500 text-white text-[10px] font-bold py-1 px-4 text-center sticky top-0 z-[100] flex items-center justify-center gap-2 animate-pulse">
+          <Globe size={12} />
+          Mode Hors Ligne : La synchronisation est suspendue. Reconnectez-vous pour sauvegarder.
+        </div>
+      )}
       <AnimatePresence mode="wait">
         {currentScreen === 'main' && (
           <motion.div 
@@ -3390,6 +3436,7 @@ export default function App() {
               progress={progress} 
               modules={modules}
               caseStudies={caseStudies}
+              isSyncing={isSyncing}
               onSelectModule={handleModuleSelect}
               onOpenSettings={() => setCurrentScreen('settings')}
               onOpenCases={() => setCurrentScreen('cases')}
