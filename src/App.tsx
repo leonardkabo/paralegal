@@ -914,10 +914,12 @@ const PerformanceScreen = ({
 const FinalExamScreen = ({ 
   onBack, 
   onComplete,
+  onDownloadCertificate,
   modules
 }: { 
   onBack: () => void, 
   onComplete: (score: number) => void,
+  onDownloadCertificate: () => void,
   modules: Module[]
 }) => {
   const [step, setStep] = useState<'intro' | 'exam' | 'result'>('intro');
@@ -1005,12 +1007,19 @@ const FinalExamScreen = ({
         </h3>
         <p className="text-slate-500 mb-8 max-w-xs">
           {score >= 80 
-            ? "Vous avez réussi l'examen final. Votre attestation est maintenant disponible dans vos paramètres."
+            ? "Vous avez réussi l'examen final. Votre attestation est maintenant disponible."
             : "Vous n'avez pas atteint le score minimum de 80%. Révisez les modules et réessayez plus tard."}
         </p>
-        <Button className="w-full max-w-xs py-6 rounded-2xl" onClick={onBack}>
-          Retour au tableau de bord
-        </Button>
+        <div className="w-full max-w-xs space-y-3">
+          {score >= 80 && (
+            <Button className="w-full py-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center gap-2" onClick={onDownloadCertificate}>
+              <Download size={20} /> Télécharger mon attestation
+            </Button>
+          )}
+          <Button variant="ghost" className="w-full py-6 rounded-2xl" onClick={onBack}>
+            Retour au tableau de bord
+          </Button>
+        </div>
       </div>
     );
   }
@@ -2050,6 +2059,7 @@ const AdminDashboard = ({
   const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
   const [editingCase, setEditingCase] = useState<CaseStudy | null>(null);
   const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
+  const [editingUser, setEditingUser] = useState<any | null>(null);
   const [showUserForm, setShowUserForm] = useState(false);
   const [newUser, setNewUser] = useState({
     fullName: '',
@@ -2061,6 +2071,33 @@ const AdminDashboard = ({
     password: '',
     isAdmin: false
   });
+
+  useEffect(() => {
+    if (editingUser) {
+      setNewUser({
+        fullName: editingUser.fullName || '',
+        phone: editingUser.phone || '',
+        location: editingUser.location || '',
+        gender: editingUser.gender || 'M',
+        birthDate: editingUser.birthDate || '',
+        educationLevel: editingUser.educationLevel || '',
+        password: editingUser.password || '',
+        isAdmin: !!editingUser.isAdmin
+      });
+      setShowUserForm(true);
+    } else {
+      setNewUser({
+        fullName: '',
+        phone: '',
+        location: '',
+        gender: 'M',
+        birthDate: '',
+        educationLevel: '',
+        password: '',
+        isAdmin: false
+      });
+    }
+  }, [editingUser]);
 
   useEffect(() => {
     if (view === 'users') {
@@ -2142,18 +2179,9 @@ const AdminDashboard = ({
     e.preventDefault();
     const ok = await onSaveUser(newUser);
     if (ok) {
-      alert("Utilisateur créé !");
+      alert(editingUser ? "Utilisateur mis à jour !" : "Utilisateur créé !");
       setShowUserForm(false);
-      setNewUser({
-        fullName: '',
-        phone: '',
-        location: '',
-        gender: 'M',
-        birthDate: '',
-        educationLevel: '',
-        password: '',
-        isAdmin: false
-      });
+      setEditingUser(null);
       // Refresh users
       fetch('/api/admin/users').then(res => res.json()).then(setUsers);
     }
@@ -2493,7 +2521,7 @@ const AdminDashboard = ({
 
         {view === 'users' && (
           <div className="space-y-4">
-            <Button className="w-full gap-2 mb-4" onClick={() => setShowUserForm(true)}>
+            <Button className="w-full gap-2 mb-4" onClick={() => { setEditingUser(null); setShowUserForm(true); }}>
               <UserPlus size={18} /> Créer un utilisateur
             </Button>
 
@@ -2501,14 +2529,14 @@ const AdminDashboard = ({
               <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
                 <Card className="w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-lg">Nouvel Utilisateur</h3>
-                    <Button variant="ghost" size="icon" onClick={() => setShowUserForm(false)}>
+                    <h3 className="font-bold text-lg">{editingUser ? "Modifier l'utilisateur" : "Nouvel Utilisateur"}</h3>
+                    <Button variant="ghost" size="icon" onClick={() => { setShowUserForm(false); setEditingUser(null); }}>
                       <X size={20} />
                     </Button>
                   </div>
                   <form onSubmit={handleSaveUser} className="space-y-4">
                     <Input label="Nom complet" value={newUser.fullName} onChange={e => setNewUser({...newUser, fullName: e.target.value})} required />
-                    <Input label="Téléphone" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} required />
+                    <Input label="Téléphone" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} required disabled={!!editingUser} />
                     <Input label="Localisation" value={newUser.location} onChange={e => setNewUser({...newUser, location: e.target.value})} required />
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase">Genre</label>
@@ -2534,7 +2562,9 @@ const AdminDashboard = ({
                       />
                       <label htmlFor="isAdmin" className="text-sm font-medium text-slate-700">Rôle Administrateur</label>
                     </div>
-                    <Button type="submit" className="w-full">Créer l'utilisateur</Button>
+                    <Button type="submit" className="w-full">
+                      {editingUser ? "Enregistrer les modifications" : "Créer l'utilisateur"}
+                    </Button>
                   </form>
                 </Card>
               </div>
@@ -2542,7 +2572,7 @@ const AdminDashboard = ({
 
             <div className="grid gap-4">
               {users.map(u => {
-                const progressPercent = modules.length > 0 ? Math.round((u.completedModules.length / modules.length) * 100) : 0;
+                const progressPercent = modules.length > 0 ? Math.round(((u.completedModules?.length || 0) / modules.length) * 100) : 0;
                 return (
                   <Card key={u.phone} className="p-4 flex justify-between items-center">
                     <div className="flex-1 min-w-0 mr-4">
@@ -2572,11 +2602,16 @@ const AdminDashboard = ({
                         </div>
                       )}
                     </div>
-                    {!u.isAdmin && (
-                      <Button variant="ghost" size="icon" className="text-red-500 shrink-0" onClick={() => handleDeleteUser(u.phone)}>
-                        <Trash2 size={18} />
+                    <div className="flex gap-2 shrink-0">
+                      <Button variant="ghost" size="icon" className="text-slate-400" onClick={() => setEditingUser(u)}>
+                        <Edit size={18} />
                       </Button>
-                    )}
+                      {!u.isAdmin && (
+                        <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteUser(u.phone)}>
+                          <Trash2 size={18} />
+                        </Button>
+                      )}
+                    </div>
                   </Card>
                 );
               })}
@@ -3499,6 +3534,7 @@ export default function App() {
             <FinalExamScreen 
               onBack={() => setCurrentScreen('main')}
               onComplete={setFinalExamScore}
+              onDownloadCertificate={generateCertificate}
               modules={modules}
             />
           </motion.div>

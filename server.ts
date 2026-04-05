@@ -1874,10 +1874,19 @@ async function startServer() {
       db.prepare(`
         INSERT INTO users (phone, fullName, location, gender, birthDate, educationLevel, password, preferredLanguage, isAdmin)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(phone) DO UPDATE SET
+          fullName = excluded.fullName,
+          location = excluded.location,
+          gender = excluded.gender,
+          birthDate = excluded.birthDate,
+          educationLevel = excluded.educationLevel,
+          password = excluded.password,
+          isAdmin = excluded.isAdmin
       `).run(phone, fullName, location, gender, birthDate, educationLevel, password, 'fr', isAdmin ? 1 : 0);
 
+      // Only insert progress if it doesn't exist
       db.prepare(`
-        INSERT INTO progress (phone, completedModules, quizScores, audioListened, completedCaseStudies)
+        INSERT OR IGNORE INTO progress (phone, completedModules, quizScores, audioListened, completedCaseStudies)
         VALUES (?, ?, ?, ?, ?)
       `).run(phone, JSON.stringify([]), JSON.stringify({}), JSON.stringify({}), JSON.stringify([]));
 
@@ -2017,19 +2026,19 @@ async function startServer() {
   app.post("/api/sync", (req, res) => {
     const { phone, progress } = req.body;
     try {
-      const updateProgress = db.prepare(`
-        UPDATE progress 
-        SET completedModules = ?, quizScores = ?, audioListened = ?, completedCaseStudies = ?, finalExamScore = ?, finalExamDate = ?, lastUpdated = CURRENT_TIMESTAMP
-        WHERE phone = ?
+      const syncProgress = db.prepare(`
+        INSERT OR REPLACE INTO progress (
+          phone, completedModules, quizScores, audioListened, completedCaseStudies, finalExamScore, finalExamDate, lastUpdated
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
       `);
-      updateProgress.run(
-        JSON.stringify(progress.completedModules),
-        JSON.stringify(progress.quizScores),
-        JSON.stringify(progress.audioListened),
+      syncProgress.run(
+        phone,
+        JSON.stringify(progress.completedModules || []),
+        JSON.stringify(progress.quizScores || {}),
+        JSON.stringify(progress.audioListened || {}),
         JSON.stringify(progress.completedCaseStudies || []),
         progress.finalExamScore || null,
-        progress.finalExamDate || null,
-        phone
+        progress.finalExamDate || null
       );
       res.json({ success: true });
     } catch (error: any) {
