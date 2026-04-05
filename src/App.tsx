@@ -2751,28 +2751,31 @@ const AdminDashboard = ({
                   <Card key={u.phone} className="p-4 flex justify-between items-center">
                     <div className="flex-1 min-w-0 mr-4">
                       <div className="flex items-center gap-2">
+                        {!u.isAdmin && (
+                          <span className={cn(
+                            "px-2 py-0.5 text-[9px] font-black rounded-full shrink-0",
+                            progressPercent === 100 ? "bg-emerald-500 text-white" : 
+                            progressPercent > 0 ? "bg-blue-500 text-white" : "bg-slate-200 text-slate-500"
+                          )}>
+                            {progressPercent}%
+                          </span>
+                        )}
                         <p className="font-bold text-sm truncate">{u.fullName}</p>
                         {u.isAdmin && (
-                          <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[8px] font-bold uppercase rounded">Admin</span>
+                          <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[8px] font-bold uppercase rounded shrink-0">Admin</span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 truncate">{u.phone} • {u.location}</p>
+                      <p className="text-[10px] text-slate-500 truncate mt-0.5">{u.phone} • {u.location}</p>
                       
                       {!u.isAdmin && (
-                        <div className="mt-2 space-y-1">
-                          <div className="flex justify-between text-[8px] font-bold text-slate-400 uppercase">
-                            <span>Progression</span>
-                            <span>{progressPercent}%</span>
-                          </div>
-                          <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div 
-                              className={cn(
-                                "h-full transition-all duration-500",
-                                progressPercent === 100 ? "bg-emerald-500" : "bg-emerald-400"
-                              )}
-                              style={{ width: `${progressPercent}%` }}
-                            />
-                          </div>
+                        <div className="mt-2 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div 
+                            className={cn(
+                              "h-full transition-all duration-1000 ease-out",
+                              progressPercent === 100 ? "bg-emerald-500" : "bg-blue-500"
+                            )}
+                            style={{ width: `${progressPercent}%` }}
+                          />
                         </div>
                       )}
                     </div>
