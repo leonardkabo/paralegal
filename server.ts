@@ -1859,7 +1859,7 @@ async function startServer() {
       const users = db.prepare(`
         SELECT 
           u.phone, u.fullName, u.location, u.gender, u.birthDate, u.educationLevel, u.preferredLanguage, u.isAdmin,
-          p.completedModules, p.quizScores, p.audioListened, p.completedCaseStudies, p.finalExamScore
+          p.completedModules, p.quizScores, p.audioListened, p.completedCaseStudies, p.finalExamScore, p.lastUpdated
         FROM users u
         LEFT JOIN progress p ON u.phone = p.phone
       `).all();

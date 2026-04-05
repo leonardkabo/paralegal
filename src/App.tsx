@@ -1157,9 +1157,20 @@ const Dashboard = ({
             </div>
             <h1 className="text-2xl font-bold">Bonjour, {user.fullName.split(' ')[0]}</h1>
           </div>
-          <Button variant="ghost" size="icon" onClick={onOpenSettings}>
-            <Settings size={20} />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={cn("text-slate-400", isSyncing && "animate-spin text-emerald-500")}
+              onClick={() => window.location.reload()} // Simple way to force a full re-sync
+              title="Forcer la synchronisation"
+            >
+              <Activity size={20} />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onOpenSettings}>
+              <Settings size={20} />
+            </Button>
+          </div>
         </div>
         
         <Card className="bg-emerald-600 text-white border-none p-6 overflow-hidden relative mb-6">
@@ -2110,6 +2121,7 @@ const AdminDashboard = ({
   const [editingCase, setEditingCase] = useState<CaseStudy | null>(null);
   const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
   const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [selectedUserProgress, setSelectedUserProgress] = useState<any | null>(null);
   const [showUserForm, setShowUserForm] = useState(false);
   const [newUser, setNewUser] = useState({
     fullName: '',
@@ -2160,7 +2172,7 @@ const AdminDashboard = ({
           .catch(err => console.error("Error fetching users:", err));
       };
       fetchUsers();
-      interval = setInterval(fetchUsers, 5000); // Admin real-time sync
+      interval = setInterval(fetchUsers, 3000); // Admin real-time sync (faster)
     }
     
     if (view === 'reports') {
@@ -2171,7 +2183,7 @@ const AdminDashboard = ({
           .catch(err => console.error("Error fetching reports:", err));
       };
       fetchReports();
-      interval = setInterval(fetchReports, 5000); // Admin real-time sync
+      interval = setInterval(fetchReports, 3000); // Admin real-time sync (faster)
     }
     
     if (view === 'media') {
@@ -2765,7 +2777,14 @@ const AdminDashboard = ({
                           <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[8px] font-bold uppercase rounded shrink-0">Admin</span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 truncate mt-0.5">{u.phone} • {u.location}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-[10px] text-slate-500 truncate">{u.phone} • {u.location}</p>
+                        {u.lastUpdated && (
+                          <span className="text-[8px] text-slate-300 font-medium">
+                            • Mis à jour: {new Date(u.lastUpdated).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
+                      </div>
                       
                       {!u.isAdmin && (
                         <div className="mt-2 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -2780,6 +2799,11 @@ const AdminDashboard = ({
                       )}
                     </div>
                     <div className="flex gap-2 shrink-0">
+                      {!u.isAdmin && (
+                        <Button variant="ghost" size="icon" className="text-blue-500" onClick={() => setSelectedUserProgress(u)}>
+                          <Activity size={18} />
+                        </Button>
+                      )}
                       <Button variant="ghost" size="icon" className="text-slate-400" onClick={() => setEditingUser(u)}>
                         <Edit size={18} />
                       </Button>
@@ -2793,6 +2817,67 @@ const AdminDashboard = ({
                 );
               })}
             </div>
+
+            {selectedUserProgress && (
+              <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+                <Card className="w-full max-w-lg p-6 space-y-6 max-h-[90vh] overflow-y-auto">
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <div>
+                      <h3 className="font-bold text-lg">{selectedUserProgress.fullName}</h3>
+                      <p className="text-xs text-slate-500">{selectedUserProgress.phone} • Progression détaillée</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setSelectedUserProgress(null)}>
+                      <X size={20} />
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Modules complétés</p>
+                      <p className="text-2xl font-black text-slate-900">{selectedUserProgress.completedModules?.length || 0} / {modules.length}</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Score Examen Final</p>
+                      <p className="text-2xl font-black text-slate-900">{selectedUserProgress.finalExamScore || '--'}%</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="font-bold text-sm uppercase tracking-wider text-slate-400">État des modules</h4>
+                    <div className="space-y-2">
+                      {modules.map(m => {
+                        const isCompleted = selectedUserProgress.completedModules?.includes(m.id);
+                        const score = selectedUserProgress.quizScores?.[m.id];
+                        return (
+                          <div key={m.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <div className={cn(
+                                "w-6 h-6 rounded-full flex items-center justify-center",
+                                isCompleted ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"
+                              )}>
+                                {isCompleted ? <CheckCircle2 size={14} /> : <Clock size={14} />}
+                              </div>
+                              <span className="text-xs font-medium text-slate-700 truncate max-w-[200px]">
+                                {m.id}. {m.title}
+                              </span>
+                            </div>
+                            {isCompleted && score !== undefined && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">
+                                Quiz: {score}%
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100">
+                    <Button className="w-full" onClick={() => setSelectedUserProgress(null)}>Fermer</Button>
+                  </div>
+                </Card>
+              </div>
+            )}
           </div>
         )}
 
