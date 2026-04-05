@@ -2170,37 +2170,59 @@ const AdminDashboard = ({
       const fetchUsers = () => {
         fetch('/api/admin/users')
           .then(res => res.json())
-          .then(setUsers)
+          .then(data => {
+            if (Array.isArray(data)) {
+              setUsers(data);
+            } else {
+              console.error("Expected array for users, got:", data);
+            }
+          })
           .catch(err => console.error("Error fetching users:", err));
       };
       fetchUsers();
-      interval = setInterval(fetchUsers, 3000); // Admin real-time sync (faster)
+      interval = setInterval(fetchUsers, 3000);
     }
     
     if (view === 'reports') {
       const fetchReports = () => {
         fetch('/api/reports')
           .then(res => res.json())
-          .then(setReports)
+          .then(data => {
+            if (Array.isArray(data)) {
+              setReports(data);
+            } else {
+              console.error("Expected array for reports, got:", data);
+            }
+          })
           .catch(err => console.error("Error fetching reports:", err));
       };
       fetchReports();
-      interval = setInterval(fetchReports, 3000); // Admin real-time sync (faster)
+      interval = setInterval(fetchReports, 3000);
     }
     
     if (view === 'media') {
-      onFetchFiles().then(setFiles);
+      onFetchFiles().then(data => {
+        if (Array.isArray(data)) {
+          setFiles(data);
+        } else {
+          console.error("Expected array for files, got:", data);
+        }
+      });
     }
 
     if (view === 'database') {
       const fetchStats = () => {
         fetch('/api/admin/db-stats')
           .then(res => res.json())
-          .then(data => setDbStats(data.stats))
+          .then(data => {
+            if (data && data.stats) {
+              setDbStats(data.stats);
+            }
+          })
           .catch(err => console.error("Error fetching db stats:", err));
       };
       fetchStats();
-      interval = setInterval(fetchStats, 10000); // Sync stats every 10s
+      interval = setInterval(fetchStats, 10000);
     }
 
     return () => {
@@ -2443,12 +2465,19 @@ const AdminDashboard = ({
                 variant="ghost" 
                 size="sm" 
                 className="text-emerald-600 h-8 gap-2"
-                onClick={() => fetch('/api/reports').then(res => res.json()).then(setReports)}
+                onClick={() => {
+                  fetch('/api/reports')
+                    .then(res => res.json())
+                    .then(data => {
+                      if (Array.isArray(data)) setReports(data);
+                    })
+                    .catch(err => console.error("Error refreshing reports:", err));
+                }}
               >
                 <Sparkles size={14} /> Actualiser
               </Button>
             </div>
-            {reports.length === 0 ? (
+            {(!Array.isArray(reports) || reports.length === 0) ? (
               <div className="text-center py-12 bg-white rounded-2xl border border-slate-100">
                 <MessageSquare size={48} className="mx-auto text-slate-200 mb-4" />
                 <p className="text-slate-400 font-medium">Aucun signalement pour le moment</p>
@@ -2516,7 +2545,7 @@ const AdminDashboard = ({
                       </div>
                     )}
 
-                    {report.attachments && report.attachments.length > 0 && (
+                    {report.attachments && Array.isArray(report.attachments) && report.attachments.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-xs font-bold text-slate-500 flex items-center gap-1">
                           <Paperclip size={14} /> Pièces jointes ({report.attachments.length})
@@ -2548,9 +2577,9 @@ const AdminDashboard = ({
         {view === 'media' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-slate-500 uppercase tracking-wider text-xs">Fichiers sur le serveur ({files.length})</h3>
+              <h3 className="font-bold text-slate-500 uppercase tracking-wider text-xs">Fichiers sur le serveur ({Array.isArray(files) ? files.length : 0})</h3>
             </div>
-            {files.length === 0 ? (
+            {(!Array.isArray(files) || files.length === 0) ? (
               <div className="text-center py-12 bg-white rounded-2xl border border-slate-100">
                 <File size={48} className="mx-auto text-slate-200 mb-4" />
                 <p className="text-slate-400 font-medium">Aucun fichier trouvé</p>
@@ -2759,7 +2788,7 @@ const AdminDashboard = ({
             )}
 
             <div className="grid gap-4">
-              {users.map(u => {
+              {Array.isArray(users) && users.map(u => {
                 const progressPercent = modules.length > 0 ? Math.round(((u.completedModules?.length || 0) / modules.length) * 100) : 0;
                 return (
                   <Card key={u.phone} className="p-4 flex justify-between items-center">

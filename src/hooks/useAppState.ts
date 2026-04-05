@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy } from '../types';
 
 export function useAppState() {
@@ -494,14 +494,14 @@ export function useAppState() {
     saveSettings,
     uploadFile,
     isSyncing,
-    fetchFiles: async () => {
+    fetchFiles: useCallback(async () => {
       const res = await fetch('/api/admin/files');
       return await res.json();
-    },
-    deleteFile: async (filename: string) => {
+    }, []),
+    deleteFile: useCallback(async (filename: string) => {
       const res = await fetch(`/api/admin/files/${filename}`, { method: 'DELETE' });
       return res.ok;
-    },
+    }, []),
     forceSync: async () => {
       if (!user) return;
       setIsSyncing(true);
