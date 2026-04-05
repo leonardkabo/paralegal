@@ -1107,7 +1107,8 @@ const Dashboard = ({
   onOpenCases,
   onOpenPerformance,
   onOpenExam,
-  onDownloadCertificate
+  onDownloadCertificate,
+  onForceSync
 }: { 
   user: any, 
   progress: any, 
@@ -1119,7 +1120,8 @@ const Dashboard = ({
   onOpenCases: () => void,
   onOpenPerformance: () => void,
   onOpenExam: () => void,
-  onDownloadCertificate: () => void
+  onDownloadCertificate: () => void,
+  onForceSync: () => void
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const totalModules = modules.length;
@@ -1162,7 +1164,7 @@ const Dashboard = ({
               variant="ghost" 
               size="icon" 
               className={cn("text-slate-400", isSyncing && "animate-spin text-emerald-500")}
-              onClick={() => window.location.reload()} // Simple way to force a full re-sync
+              onClick={onForceSync}
               title="Forcer la synchronisation"
             >
               <Activity size={20} />
@@ -2781,7 +2783,15 @@ const AdminDashboard = ({
                         <p className="text-[10px] text-slate-500 truncate">{u.phone} • {u.location}</p>
                         {u.lastUpdated && (
                           <span className="text-[8px] text-slate-300 font-medium">
-                            • Mis à jour: {new Date(u.lastUpdated).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                            • Mis à jour: {(() => {
+                              try {
+                                // SQLite timestamp format: YYYY-MM-DD HH:MM:SS
+                                const dateStr = u.lastUpdated.replace(' ', 'T') + 'Z';
+                                return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                              } catch (e) {
+                                return '--:--';
+                              }
+                            })()}
                           </span>
                         )}
                       </div>
@@ -3534,7 +3544,8 @@ export default function App() {
     uploadFile,
     fetchFiles,
     deleteFile,
-    isSyncing
+    isSyncing,
+    forceSync
   } = useAppState();
 
   const generateCertificate = () => {
@@ -3660,6 +3671,7 @@ export default function App() {
               onOpenPerformance={() => setCurrentScreen('performance')}
               onOpenExam={() => setCurrentScreen('exam')}
               onDownloadCertificate={generateCertificate}
+              onForceSync={forceSync}
             />
           </motion.div>
         )}

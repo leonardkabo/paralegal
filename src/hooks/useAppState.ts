@@ -501,6 +501,33 @@ export function useAppState() {
     deleteFile: async (filename: string) => {
       const res = await fetch(`/api/admin/files/${filename}`, { method: 'DELETE' });
       return res.ok;
+    },
+    forceSync: async () => {
+      if (!user) return;
+      setIsSyncing(true);
+      try {
+        const res = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: user.phone, progress })
+        });
+        const data = await res.json();
+        if (data.success && data.lastUpdated) {
+          setProgress(prev => ({ ...prev, lastUpdated: data.lastUpdated }));
+          lastSyncedRef.current = JSON.stringify({
+            completedModules: progress.completedModules,
+            quizScores: progress.quizScores,
+            audioListened: progress.audioListened,
+            completedCaseStudies: progress.completedCaseStudies,
+            finalExamScore: progress.finalExamScore,
+            finalExamDate: progress.finalExamDate
+          });
+        }
+      } catch (err) {
+        console.error("Force sync failed:", err);
+      } finally {
+        setIsSyncing(false);
+      }
     }
   };
 }
