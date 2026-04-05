@@ -198,39 +198,89 @@ export function useAppState() {
         ? { ...prev.quizScores, [moduleId]: score }
         : prev.quizScores;
 
-      return {
+      const newProgress = {
         ...prev,
         completedModules: newCompleted,
         quizScores: newScores
       };
+
+      // Immediate sync attempt
+      if (user && hasFetchedFromServer) {
+        fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: user.phone, progress: newProgress })
+        }).catch(err => console.error("Sync error:", err));
+      }
+
+      return newProgress;
     });
   };
 
   const markAudioListened = (moduleId: number) => {
-    setProgress(prev => ({
-      ...prev,
-      audioListened: { ...prev.audioListened, [moduleId]: true },
-      completedModules: prev.completedModules.includes(moduleId) 
-        ? prev.completedModules 
-        : [...prev.completedModules, moduleId]
-    }));
+    setProgress(prev => {
+      const newProgress = {
+        ...prev,
+        audioListened: { ...prev.audioListened, [moduleId]: true },
+        completedModules: prev.completedModules.includes(moduleId) 
+          ? prev.completedModules 
+          : [...prev.completedModules, moduleId]
+      };
+
+      // Immediate sync attempt
+      if (user && hasFetchedFromServer) {
+        fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: user.phone, progress: newProgress })
+        }).catch(err => console.error("Sync error:", err));
+      }
+
+      return newProgress;
+    });
   };
 
   const completeCaseStudy = (caseId: string) => {
-    setProgress(prev => ({
-      ...prev,
-      completedCaseStudies: prev.completedCaseStudies.includes(caseId)
-        ? prev.completedCaseStudies
-        : [...prev.completedCaseStudies, caseId]
-    }));
+    setProgress(prev => {
+      const newProgress = {
+        ...prev,
+        completedCaseStudies: prev.completedCaseStudies.includes(caseId)
+          ? prev.completedCaseStudies
+          : [...prev.completedCaseStudies, caseId]
+      };
+
+      // Immediate sync attempt
+      if (user && hasFetchedFromServer) {
+        fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: user.phone, progress: newProgress })
+        }).catch(err => console.error("Sync error:", err));
+      }
+
+      return newProgress;
+    });
   };
 
   const setFinalExamScore = (score: number) => {
-    setProgress(prev => ({
-      ...prev,
-      finalExamScore: score,
-      finalExamDate: new Date().toISOString()
-    }));
+    setProgress(prev => {
+      const newProgress = {
+        ...prev,
+        finalExamScore: score,
+        finalExamDate: new Date().toISOString()
+      };
+
+      // Immediate sync attempt
+      if (user && hasFetchedFromServer) {
+        fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: user.phone, progress: newProgress })
+        }).catch(err => console.error("Sync error:", err));
+      }
+
+      return newProgress;
+    });
   };
 
   const logout = () => {
@@ -247,6 +297,15 @@ export function useAppState() {
 
   const deleteUser = async (phone: string) => {
     const res = await fetch(`/api/admin/users/${phone}`, { method: 'DELETE' });
+    return res.ok;
+  };
+
+  const saveUser = async (userData: any) => {
+    const res = await fetch('/api/admin/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
     return res.ok;
   };
 
@@ -383,6 +442,7 @@ export function useAppState() {
     setFinalExamScore,
     logout,
     deleteUser,
+    saveUser,
     saveModule,
     deleteModule,
     saveGlossaryTerm,

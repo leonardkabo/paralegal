@@ -39,7 +39,8 @@ import {
   ExternalLink,
   Paperclip,
   Save,
-  Image as ImageIcon
+  Image as ImageIcon,
+  UserPlus
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
@@ -1078,7 +1079,8 @@ const Dashboard = ({
   onOpenSettings,
   onOpenCases,
   onOpenPerformance,
-  onOpenExam
+  onOpenExam,
+  onDownloadCertificate
 }: { 
   user: any, 
   progress: any, 
@@ -1088,12 +1090,14 @@ const Dashboard = ({
   onOpenSettings: () => void,
   onOpenCases: () => void,
   onOpenPerformance: () => void,
-  onOpenExam: () => void
+  onOpenExam: () => void,
+  onDownloadCertificate: () => void
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const totalModules = modules.length;
   const completedCount = progress.completedModules.length;
   const percentage = totalModules > 0 ? (completedCount / totalModules) * 100 : 0;
+  const isFullyCompleted = progress.finalExamScore !== undefined && progress.finalExamScore >= 80;
 
   const filteredModules = modules.filter(module => {
     const query = searchQuery.toLowerCase();
@@ -1140,9 +1144,28 @@ const Dashboard = ({
                 <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-yellow-900 shrink-0">
                   <Award size={18} />
                 </div>
-                <p className="text-[10px] font-bold leading-tight">
-                  Félicitations ! Vous avez terminé tous les modules. Vous pouvez maintenant télécharger votre attestation.
-                </p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-[10px] font-bold leading-tight">
+                    Félicitations ! Vous avez terminé tous les modules.
+                  </p>
+                  {isFullyCompleted ? (
+                    <Button 
+                      size="sm" 
+                      className="bg-white text-emerald-600 hover:bg-emerald-50 h-7 text-[10px] font-bold py-0"
+                      onClick={onDownloadCertificate}
+                    >
+                      <Download size={12} className="mr-1" /> Télécharger l'attestation
+                    </Button>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      className="bg-yellow-400 text-yellow-900 hover:bg-yellow-300 h-7 text-[10px] font-bold py-0"
+                      onClick={onOpenExam}
+                    >
+                      Passer l'examen final
+                    </Button>
+                  )}
+                </div>
               </motion.div>
             )}
           </div>
@@ -1991,6 +2014,7 @@ const AdminDashboard = ({
   onSaveCaseStudy,
   onDeleteCaseStudy,
   onDeleteUser,
+  onSaveUser,
   onSaveSettings,
   onUploadFile,
   onFetchFiles,
@@ -2011,6 +2035,7 @@ const AdminDashboard = ({
   onSaveCaseStudy: (c: CaseStudy) => Promise<boolean>,
   onDeleteCaseStudy: (id: string) => Promise<boolean>,
   onDeleteUser: (phone: string) => Promise<boolean>,
+  onSaveUser: (userData: any) => Promise<boolean>,
   onSaveSettings: (s: AppSettings) => Promise<boolean>,
   onUploadFile: (file: File) => Promise<{ url: string, name: string }>,
   onFetchFiles: () => Promise<any[]>,
@@ -2025,6 +2050,17 @@ const AdminDashboard = ({
   const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
   const [editingCase, setEditingCase] = useState<CaseStudy | null>(null);
   const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [newUser, setNewUser] = useState({
+    fullName: '',
+    phone: '',
+    location: '',
+    gender: 'M',
+    birthDate: '',
+    educationLevel: '',
+    password: '',
+    isAdmin: false
+  });
 
   useEffect(() => {
     if (view === 'users') {
@@ -2099,6 +2135,27 @@ const AdminDashboard = ({
         alert("Étude de cas enregistrée !");
         setEditingCase(null);
       }
+    }
+  };
+
+  const handleSaveUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const ok = await onSaveUser(newUser);
+    if (ok) {
+      alert("Utilisateur créé !");
+      setShowUserForm(false);
+      setNewUser({
+        fullName: '',
+        phone: '',
+        location: '',
+        gender: 'M',
+        birthDate: '',
+        educationLevel: '',
+        password: '',
+        isAdmin: false
+      });
+      // Refresh users
+      fetch('/api/admin/users').then(res => res.json()).then(setUsers);
     }
   };
 
@@ -2436,19 +2493,94 @@ const AdminDashboard = ({
 
         {view === 'users' && (
           <div className="space-y-4">
-            {users.map(u => (
-              <Card key={u.phone} className="p-4 flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-sm">{u.fullName}</p>
-                  <p className="text-xs text-slate-500">{u.phone} • {u.location}</p>
-                </div>
-                {!u.isAdmin && (
-                  <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteUser(u.phone)}>
-                    <Trash2 size={18} />
-                  </Button>
-                )}
-              </Card>
-            ))}
+            <Button className="w-full gap-2 mb-4" onClick={() => setShowUserForm(true)}>
+              <UserPlus size={18} /> Créer un utilisateur
+            </Button>
+
+            {showUserForm && (
+              <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+                <Card className="w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-bold text-lg">Nouvel Utilisateur</h3>
+                    <Button variant="ghost" size="icon" onClick={() => setShowUserForm(false)}>
+                      <X size={20} />
+                    </Button>
+                  </div>
+                  <form onSubmit={handleSaveUser} className="space-y-4">
+                    <Input label="Nom complet" value={newUser.fullName} onChange={e => setNewUser({...newUser, fullName: e.target.value})} required />
+                    <Input label="Téléphone" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} required />
+                    <Input label="Localisation" value={newUser.location} onChange={e => setNewUser({...newUser, location: e.target.value})} required />
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase">Genre</label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2">
+                          <input type="radio" name="gender" value="M" checked={newUser.gender === 'M'} onChange={e => setNewUser({...newUser, gender: e.target.value})} /> M
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input type="radio" name="gender" value="F" checked={newUser.gender === 'F'} onChange={e => setNewUser({...newUser, gender: e.target.value})} /> F
+                        </label>
+                      </div>
+                    </div>
+                    <Input label="Date de naissance" type="date" value={newUser.birthDate} onChange={e => setNewUser({...newUser, birthDate: e.target.value})} required />
+                    <Input label="Niveau d'études" value={newUser.educationLevel} onChange={e => setNewUser({...newUser, educationLevel: e.target.value})} required />
+                    <Input label="Mot de passe" type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required />
+                    <div className="flex items-center gap-2 py-2">
+                      <input 
+                        type="checkbox" 
+                        id="isAdmin" 
+                        checked={newUser.isAdmin} 
+                        onChange={e => setNewUser({...newUser, isAdmin: e.target.checked})} 
+                        className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+                      />
+                      <label htmlFor="isAdmin" className="text-sm font-medium text-slate-700">Rôle Administrateur</label>
+                    </div>
+                    <Button type="submit" className="w-full">Créer l'utilisateur</Button>
+                  </form>
+                </Card>
+              </div>
+            )}
+
+            <div className="grid gap-4">
+              {users.map(u => {
+                const progressPercent = modules.length > 0 ? Math.round((u.completedModules.length / modules.length) * 100) : 0;
+                return (
+                  <Card key={u.phone} className="p-4 flex justify-between items-center">
+                    <div className="flex-1 min-w-0 mr-4">
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-sm truncate">{u.fullName}</p>
+                        {u.isAdmin && (
+                          <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[8px] font-bold uppercase rounded">Admin</span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-500 truncate">{u.phone} • {u.location}</p>
+                      
+                      {!u.isAdmin && (
+                        <div className="mt-2 space-y-1">
+                          <div className="flex justify-between text-[8px] font-bold text-slate-400 uppercase">
+                            <span>Progression</span>
+                            <span>{progressPercent}%</span>
+                          </div>
+                          <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                              className={cn(
+                                "h-full transition-all duration-500",
+                                progressPercent === 100 ? "bg-emerald-500" : "bg-emerald-400"
+                              )}
+                              style={{ width: `${progressPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {!u.isAdmin && (
+                      <Button variant="ghost" size="icon" className="text-red-500 shrink-0" onClick={() => handleDeleteUser(u.phone)}>
+                        <Trash2 size={18} />
+                      </Button>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -2908,78 +3040,25 @@ const AdminDashboard = ({
 
 const SettingsScreen = ({ 
   user, 
-  progress,
+  progress, 
   modules,
   settings,
   onUpdateLanguage, 
   onLogout, 
   onBack,
-  onOpenAdmin
+  onOpenAdmin,
+  onDownloadCertificate
 }: { 
   user: any, 
-  progress: any,
+  progress: any, 
   modules: Module[],
   settings: AppSettings,
   onUpdateLanguage: (l: Language) => void, 
   onLogout: () => void, 
   onBack: () => void,
-  onOpenAdmin: () => void
+  onOpenAdmin: () => void,
+  onDownloadCertificate: () => void
 }) => {
-  const generateCertificate = () => {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4'
-    });
-
-    // Background
-    doc.setFillColor(245, 252, 250);
-    doc.rect(0, 0, 297, 210, 'F');
-    
-    // Border
-    doc.setDrawColor(16, 185, 129);
-    doc.setLineWidth(2);
-    doc.rect(10, 10, 277, 190);
-    
-    // Logo if exists
-    if (settings.logoUrl) {
-      try {
-        doc.addImage(settings.logoUrl, 'PNG', 133.5, 20, 30, 30);
-      } catch (e) {
-        console.error("Could not add logo to PDF", e);
-      }
-    }
-
-    // Content
-    doc.setTextColor(15, 23, 42);
-    doc.setFontSize(40);
-    doc.text('ATTESTATION DE RÉUSSITE', 148.5, 70, { align: 'center' });
-    
-    doc.setFontSize(20);
-    doc.text('Décernée à', 148.5, 95, { align: 'center' });
-    
-    doc.setFontSize(32);
-    doc.setTextColor(5, 150, 105);
-    doc.text(user.fullName.toUpperCase(), 148.5, 120, { align: 'center' });
-    
-    doc.setFontSize(16);
-    doc.setTextColor(71, 85, 105);
-    doc.text('Pour avoir complété avec succès la formation de', 148.5, 140, { align: 'center' });
-    doc.setFontSize(20);
-    doc.text('PARAJURISTE COMMUNAUTAIRE', 148.5, 155, { align: 'center' });
-    
-    const date = new Date().toLocaleDateString('fr-FR');
-    doc.setFontSize(12);
-    doc.text(`Délivrée le : ${date}`, 40, 185);
-    doc.text(`Code de vérification : PL-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, 40, 192);
-    
-    doc.text(`Signature de ${settings.organizationName}`, 220, 185);
-    doc.setDrawColor(71, 85, 105);
-    doc.line(200, 195, 260, 195);
-
-    doc.save(`Attestation_Paralegal_${user.fullName.replace(/\s/g, '_')}.pdf`);
-  };
-
   const isFullyCompleted = progress.finalExamScore !== undefined && progress.finalExamScore >= 80;
 
   return (
@@ -3059,7 +3138,7 @@ const SettingsScreen = ({
             
             {user.preferredLanguage === 'fr' ? (
               isFullyCompleted ? (
-                <Button className="w-full gap-2" onClick={generateCertificate}>
+                <Button className="w-full gap-2" onClick={onDownloadCertificate}>
                   <Download size={18} /> Télécharger l'attestation
                 </Button>
               ) : (
@@ -3145,6 +3224,7 @@ export default function App() {
     setFinalExamScore,
     logout,
     deleteUser,
+    saveUser,
     saveModule,
     deleteModule,
     saveGlossaryTerm,
@@ -3158,6 +3238,62 @@ export default function App() {
     fetchFiles,
     deleteFile
   } = useAppState();
+
+  const generateCertificate = () => {
+    if (!user) return;
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Background
+    doc.setFillColor(245, 252, 250);
+    doc.rect(0, 0, 297, 210, 'F');
+    
+    // Border
+    doc.setDrawColor(16, 185, 129);
+    doc.setLineWidth(2);
+    doc.rect(10, 10, 277, 190);
+    
+    // Logo if exists
+    if (settings.logoUrl) {
+      try {
+        doc.addImage(settings.logoUrl, 'PNG', 133.5, 20, 30, 30);
+      } catch (e) {
+        console.error("Could not add logo to PDF", e);
+      }
+    }
+
+    // Content
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(40);
+    doc.text('ATTESTATION DE RÉUSSITE', 148.5, 70, { align: 'center' });
+    
+    doc.setFontSize(20);
+    doc.text('Décernée à', 148.5, 95, { align: 'center' });
+    
+    doc.setFontSize(32);
+    doc.setTextColor(5, 150, 105);
+    doc.text(user.fullName.toUpperCase(), 148.5, 120, { align: 'center' });
+    
+    doc.setFontSize(16);
+    doc.setTextColor(71, 85, 105);
+    doc.text('Pour avoir complété avec succès la formation de', 148.5, 140, { align: 'center' });
+    doc.setFontSize(20);
+    doc.text('PARAJURISTE COMMUNAUTAIRE', 148.5, 155, { align: 'center' });
+    
+    const date = new Date().toLocaleDateString('fr-FR');
+    doc.setFontSize(12);
+    doc.text(`Délivrée le : ${date}`, 40, 185);
+    doc.text(`Code de vérification : PL-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, 40, 192);
+    
+    doc.text(`Signature de ${settings.organizationName}`, 220, 185);
+    doc.setDrawColor(71, 85, 105);
+    doc.line(200, 195, 260, 195);
+
+    doc.save(`Attestation_Paralegal_${user.fullName.replace(/\s/g, '_')}.pdf`);
+  };
 
   const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'assistant' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
@@ -3224,6 +3360,7 @@ export default function App() {
               onOpenCases={() => setCurrentScreen('cases')}
               onOpenPerformance={() => setCurrentScreen('performance')}
               onOpenExam={() => setCurrentScreen('exam')}
+              onDownloadCertificate={generateCertificate}
             />
           </motion.div>
         )}
@@ -3271,6 +3408,7 @@ export default function App() {
               onLogout={logout}
               onBack={() => setCurrentScreen('main')}
               onOpenAdmin={() => setCurrentScreen('admin')}
+              onDownloadCertificate={generateCertificate}
             />
           </motion.div>
         )}
@@ -3391,6 +3529,7 @@ export default function App() {
               onSaveCaseStudy={saveCaseStudy}
               onDeleteCaseStudy={deleteCaseStudy}
               onDeleteUser={deleteUser}
+              onSaveUser={saveUser}
               onSaveSettings={saveSettings}
               onUploadFile={uploadFile}
               onFetchFiles={fetchFiles}

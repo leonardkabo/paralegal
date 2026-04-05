@@ -1844,8 +1844,47 @@ async function startServer() {
 
   // Admin Routes
   app.get("/api/admin/users", (req, res) => {
-    const users = db.prepare("SELECT phone, fullName, location, gender, birthDate, educationLevel, preferredLanguage, isAdmin FROM users").all();
-    res.json(users);
+    try {
+      const users = db.prepare(`
+        SELECT 
+          u.phone, u.fullName, u.location, u.gender, u.birthDate, u.educationLevel, u.preferredLanguage, u.isAdmin,
+          p.completedModules, p.quizScores, p.audioListened, p.completedCaseStudies, p.finalExamScore
+        FROM users u
+        LEFT JOIN progress p ON u.phone = p.phone
+      `).all();
+      
+      const parsedUsers = users.map((u: any) => ({
+        ...u,
+        completedModules: JSON.parse(u.completedModules || '[]'),
+        quizScores: JSON.parse(u.quizScores || '{}'),
+        audioListened: JSON.parse(u.audioListened || '{}'),
+        completedCaseStudies: JSON.parse(u.completedCaseStudies || '[]'),
+        isAdmin: Boolean(u.isAdmin)
+      }));
+      
+      res.json(parsedUsers);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/admin/users", (req, res) => {
+    const { fullName, phone, location, gender, birthDate, educationLevel, password, isAdmin } = req.body;
+    try {
+      db.prepare(`
+        INSERT INTO users (phone, fullName, location, gender, birthDate, educationLevel, password, preferredLanguage, isAdmin)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(phone, fullName, location, gender, birthDate, educationLevel, password, 'fr', isAdmin ? 1 : 0);
+
+      db.prepare(`
+        INSERT INTO progress (phone, completedModules, quizScores, audioListened, completedCaseStudies)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(phone, JSON.stringify([]), JSON.stringify({}), JSON.stringify({}), JSON.stringify([]));
+
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
   });
 
   app.get("/api/progress/:phone", (req, res) => {
