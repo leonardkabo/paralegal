@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy } from '../types';
 
 export function useAppState() {
+  const lastSyncedRef = useRef<string>('');
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('paralegal_user');
     return saved ? JSON.parse(saved) : null;
@@ -17,7 +18,8 @@ export function useAppState() {
         audioListened: parsed.audioListened || {},
         completedCaseStudies: parsed.completedCaseStudies || [],
         finalExamScore: parsed.finalExamScore,
-        finalExamDate: parsed.finalExamDate
+        finalExamDate: parsed.finalExamDate,
+        lastUpdated: parsed.lastUpdated
       };
     }
     return {
@@ -74,6 +76,14 @@ export function useAppState() {
           if (data.success) {
             setProgress(data.progress);
             localStorage.setItem('paralegal_progress', JSON.stringify(data.progress));
+            lastSyncedRef.current = JSON.stringify({
+              completedModules: data.progress.completedModules,
+              quizScores: data.progress.quizScores,
+              audioListened: data.progress.audioListened,
+              completedCaseStudies: data.progress.completedCaseStudies,
+              finalExamScore: data.progress.finalExamScore,
+              finalExamDate: data.progress.finalExamDate
+            });
           }
           setHasFetchedFromServer(true);
         })
@@ -95,8 +105,47 @@ export function useAppState() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
+
+    const pollInterval = setInterval(() => {
+      fetch(`/api/progress/${user.phone}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.progress) {
+            // Only update if server has newer data
+            const serverLastUpdated = data.progress.lastUpdated;
+            const localLastUpdated = progress.lastUpdated;
+
+            if (serverLastUpdated && (!localLastUpdated || new Date(serverLastUpdated) > new Date(localLastUpdated))) {
+              console.log("Server has newer progress, updating local state...");
+              setProgress(data.progress);
+              localStorage.setItem('paralegal_progress', JSON.stringify(data.progress));
+            }
+          }
+        })
+        .catch(err => console.error("Polling error:", err));
+    }, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [user, progress.lastUpdated]);
+
+  useEffect(() => {
     localStorage.setItem('paralegal_progress', JSON.stringify(progress));
+    
     if (user && hasFetchedFromServer) {
+      const currentProgressStr = JSON.stringify({
+        completedModules: progress.completedModules,
+        quizScores: progress.quizScores,
+        audioListened: progress.audioListened,
+        completedCaseStudies: progress.completedCaseStudies,
+        finalExamScore: progress.finalExamScore,
+        finalExamDate: progress.finalExamDate
+      });
+
+      if (currentProgressStr === lastSyncedRef.current) {
+        return; // No real data change
+      }
+
       console.log("Syncing progress with server...", progress);
       // Sync with backend
       fetch('/api/sync', {
@@ -104,9 +153,13 @@ export function useAppState() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: user.phone, progress })
       })
-      .then(res => {
-        if (!res.ok) throw new Error("Sync failed");
-        console.log("Sync successful");
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.lastUpdated) {
+          console.log("Sync successful, updating lastUpdated:", data.lastUpdated);
+          lastSyncedRef.current = currentProgressStr;
+          setProgress(prev => ({ ...prev, lastUpdated: data.lastUpdated }));
+        }
       })
       .catch(err => {
         console.error("Échec de la synchronisation avec le serveur:", err);
@@ -149,6 +202,14 @@ export function useAppState() {
       if (data.success) {
         setUser(data.user);
         setProgress(data.progress);
+        lastSyncedRef.current = JSON.stringify({
+          completedModules: data.progress.completedModules,
+          quizScores: data.progress.quizScores,
+          audioListened: data.progress.audioListened,
+          completedCaseStudies: data.progress.completedCaseStudies,
+          finalExamScore: data.progress.finalExamScore,
+          finalExamDate: data.progress.finalExamDate
+        });
       } else {
         setError(data.error || "Identifiants invalides");
       }
@@ -248,6 +309,7 @@ export function useAppState() {
   const logout = () => {
     localStorage.removeItem('paralegal_user');
     localStorage.removeItem('paralegal_progress');
+    lastSyncedRef.current = '';
     setUser(null);
     setProgress({ 
       completedModules: [], 

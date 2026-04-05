@@ -89,6 +89,7 @@ export interface UserProgress {
   completedCaseStudies: string[]; // IDs of completed case studies
   finalExamScore?: number;
   finalExamDate?: string;
+  lastUpdated?: string;
 }
 
 export interface Report {

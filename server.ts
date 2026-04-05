@@ -1844,7 +1844,8 @@ async function startServer() {
           audioListened: JSON.parse(progress.audioListened || '{}'),
           completedCaseStudies: JSON.parse(progress.completedCaseStudies || '[]'),
           finalExamScore: progress.finalExamScore,
-          finalExamDate: progress.finalExamDate
+          finalExamDate: progress.finalExamDate,
+          lastUpdated: progress.lastUpdated
         }
       });
     } else {
@@ -1919,7 +1920,8 @@ async function startServer() {
             audioListened: JSON.parse(progress.audioListened || '{}'),
             completedCaseStudies: JSON.parse(progress.completedCaseStudies || '[]'),
             finalExamScore: progress.finalExamScore,
-            finalExamDate: progress.finalExamDate
+            finalExamDate: progress.finalExamDate,
+            lastUpdated: progress.lastUpdated
           }
         });
       } else {
@@ -2055,8 +2057,11 @@ async function startServer() {
         progress.finalExamScore || null,
         progress.finalExamDate || null
       );
+      
+      const updated = db.prepare("SELECT lastUpdated FROM progress WHERE phone = ?").get(phone) as any;
+      
       console.log(`Sync successful for phone: ${phone}`);
-      res.json({ success: true });
+      res.json({ success: true, lastUpdated: updated.lastUpdated });
     } catch (error: any) {
       console.error(`Sync error for phone ${phone}:`, error.message);
       res.status(500).json({ error: error.message });
