@@ -42,6 +42,7 @@ import {
   Save,
   Image as ImageIcon,
   UserPlus,
+  RefreshCw,
   Database as DatabaseIcon,
   Activity,
   Languages,
@@ -2738,9 +2739,19 @@ const AdminDashboard = ({
 
         {view === 'users' && (
           <div className="space-y-4">
-            <Button className="w-full gap-2 mb-4" onClick={() => { setEditingUser(null); setShowUserForm(true); }}>
-              <UserPlus size={18} /> Créer un utilisateur
-            </Button>
+            <div className="flex gap-2 mb-4">
+              <Button className="flex-1 gap-2" onClick={() => { setEditingUser(null); setShowUserForm(true); }}>
+                <UserPlus size={18} /> Créer un utilisateur
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => {
+                fetch('/api/admin/users')
+                  .then(res => res.json())
+                  .then(data => Array.isArray(data) && setUsers(data))
+                  .catch(err => console.error("Error refreshing users:", err));
+              }}>
+                <RefreshCw size={18} />
+              </Button>
+            </div>
 
             {showUserForm && (
               <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
@@ -2788,8 +2799,10 @@ const AdminDashboard = ({
             )}
 
             <div className="grid gap-4">
-              {Array.isArray(users) && users.map(u => {
-                const progressPercent = modules.length > 0 ? Math.round(((u.completedModules?.length || 0) / modules.length) * 100) : 0;
+              {Array.isArray(users) && users.length > 0 ? (
+                users.map(u => {
+                const completedCount = Array.isArray(u.completedModules) ? u.completedModules.length : 0;
+                const progressPercent = modules.length > 0 ? Math.round((completedCount / modules.length) * 100) : 0;
                 return (
                   <Card key={u.phone} className="p-4 flex justify-between items-center">
                     <div className="flex-1 min-w-0 mr-4">
@@ -2810,7 +2823,7 @@ const AdminDashboard = ({
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <p className="text-[10px] text-slate-500 truncate">{u.phone} • {u.location}</p>
-                        {u.lastUpdated && (
+                        {u.lastUpdated ? (
                           <span className="text-[8px] text-slate-300 font-medium">
                             • Mis à jour: {(() => {
                               try {
@@ -2821,6 +2834,10 @@ const AdminDashboard = ({
                                 return '--:--';
                               }
                             })()}
+                          </span>
+                        ) : (
+                          <span className="text-[8px] text-slate-300 font-medium italic">
+                            • Aucune activité
                           </span>
                         )}
                       </div>
@@ -2854,8 +2871,15 @@ const AdminDashboard = ({
                     </div>
                   </Card>
                 );
-              })}
-            </div>
+              })
+            ) : (
+              <Card className="p-8 text-center text-slate-500">
+                <UserIcon size={48} className="mx-auto mb-2 opacity-20" />
+                <p>Aucun utilisateur trouvé</p>
+                <p className="text-xs mt-1">Les utilisateurs inscrits apparaîtront ici.</p>
+              </Card>
+            )}
+          </div>
 
             {selectedUserProgress && (
               <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">

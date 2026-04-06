@@ -1864,17 +1864,32 @@ async function startServer() {
         LEFT JOIN progress p ON u.phone = p.phone
       `).all();
       
-      const parsedUsers = users.map((u: any) => ({
-        ...u,
-        completedModules: JSON.parse(u.completedModules || '[]'),
-        quizScores: JSON.parse(u.quizScores || '{}'),
-        audioListened: JSON.parse(u.audioListened || '{}'),
-        completedCaseStudies: JSON.parse(u.completedCaseStudies || '[]'),
-        isAdmin: Boolean(u.isAdmin)
-      }));
+      const parsedUsers = users.map((u: any) => {
+        try {
+          return {
+            ...u,
+            completedModules: JSON.parse(u.completedModules || '[]'),
+            quizScores: JSON.parse(u.quizScores || '{}'),
+            audioListened: JSON.parse(u.audioListened || '{}'),
+            completedCaseStudies: JSON.parse(u.completedCaseStudies || '[]'),
+            isAdmin: Boolean(u.isAdmin)
+          };
+        } catch (e) {
+          console.error(`Error parsing progress for user ${u.phone}:`, e);
+          return {
+            ...u,
+            completedModules: [],
+            quizScores: {},
+            audioListened: {},
+            completedCaseStudies: [],
+            isAdmin: Boolean(u.isAdmin)
+          };
+        }
+      });
       
       res.json(parsedUsers);
     } catch (error: any) {
+      console.error("Error fetching admin users:", error);
       res.status(500).json({ error: error.message });
     }
   });
