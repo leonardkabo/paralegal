@@ -90,6 +90,8 @@ export interface UserProgress {
   finalExamScore?: number;
   finalExamDate?: string;
   lastUpdated?: string;
+  lastActivity?: string;
+  lastModuleId?: number;
 }
 
 export interface Report {

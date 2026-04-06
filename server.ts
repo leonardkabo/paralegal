@@ -7,7 +7,8 @@ import multer from "multer";
 import fs from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const db = new Database("paralegal.db");
+const dbPath = path.join(__dirname, "paralegal.db");
+const db = new Database(dbPath);
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, "uploads");
@@ -120,6 +121,8 @@ db.exec(`
 try { db.exec("ALTER TABLE progress ADD COLUMN completedCaseStudies TEXT DEFAULT '[]'"); } catch (e) {}
 try { db.exec("ALTER TABLE progress ADD COLUMN finalExamScore INTEGER"); } catch (e) {}
 try { db.exec("ALTER TABLE progress ADD COLUMN finalExamDate TEXT"); } catch (e) {}
+try { db.exec("ALTER TABLE progress ADD COLUMN lastActivity TEXT"); } catch (e) {}
+try { db.exec("ALTER TABLE progress ADD COLUMN lastModuleId INTEGER"); } catch (e) {}
 try { db.exec("ALTER TABLE legal_documents ADD COLUMN fileUrl TEXT"); } catch (e) {}
 try { db.exec("ALTER TABLE legal_documents ADD COLUMN fileName TEXT"); } catch (e) {}
 try { db.exec("ALTER TABLE case_studies ADD COLUMN fileUrl TEXT"); } catch (e) {}
@@ -1788,6 +1791,14 @@ async function startServer() {
       };
       
       // Ensure admin has a progress entry
+      const existingUser = db.prepare("SELECT * FROM users WHERE phone = ?").get(adminUser.phone);
+      if (!existingUser) {
+        db.prepare(`
+          INSERT INTO users (phone, fullName, location, gender, birthDate, educationLevel, password, preferredLanguage, isAdmin)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+        `).run(adminUser.phone, adminUser.fullName, adminUser.location, adminUser.gender, adminUser.birthDate, adminUser.educationLevel, adminPasswords[adminIndex], 'fr');
+      }
+
       const existingProgress = db.prepare("SELECT * FROM progress WHERE phone = ?").get(adminUser.phone);
       if (!existingProgress) {
         db.prepare(`
@@ -1807,7 +1818,9 @@ async function startServer() {
           audioListened: JSON.parse(progress.audioListened || '{}'),
           completedCaseStudies: JSON.parse(progress.completedCaseStudies || '[]'),
           finalExamScore: progress.finalExamScore,
-          finalExamDate: progress.finalExamDate
+          finalExamDate: progress.finalExamDate,
+          lastActivity: progress.lastActivity,
+          lastModuleId: progress.lastModuleId
         }
       });
     }
@@ -1845,7 +1858,9 @@ async function startServer() {
           completedCaseStudies: JSON.parse(progress.completedCaseStudies || '[]'),
           finalExamScore: progress.finalExamScore,
           finalExamDate: progress.finalExamDate,
-          lastUpdated: progress.lastUpdated
+          lastUpdated: progress.lastUpdated,
+          lastActivity: progress.lastActivity,
+          lastModuleId: progress.lastModuleId
         }
       });
     } else {
@@ -1859,7 +1874,8 @@ async function startServer() {
       const users = db.prepare(`
         SELECT 
           u.phone, u.fullName, u.location, u.gender, u.birthDate, u.educationLevel, u.preferredLanguage, u.isAdmin,
-          p.completedModules, p.quizScores, p.audioListened, p.completedCaseStudies, p.finalExamScore, p.lastUpdated
+          p.completedModules, p.quizScores, p.audioListened, p.completedCaseStudies, p.finalExamScore, p.lastUpdated,
+          p.lastActivity, p.lastModuleId
         FROM users u
         LEFT JOIN progress p ON u.phone = p.phone
       `).all();
@@ -2051,7 +2067,7 @@ async function startServer() {
   });
 
   app.post("/api/sync", (req, res) => {
-    const { phone, progress } = req.body;
+    const { phone, progress, lastActivity, lastModuleId } = req.body;
     console.log(`Sync request received for phone: ${phone}`);
     if (!phone || !progress) {
       console.error("Missing phone or progress in sync request");
@@ -2060,8 +2076,8 @@ async function startServer() {
     try {
       const syncProgress = db.prepare(`
         INSERT OR REPLACE INTO progress (
-          phone, completedModules, quizScores, audioListened, completedCaseStudies, finalExamScore, finalExamDate, lastUpdated
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          phone, completedModules, quizScores, audioListened, completedCaseStudies, finalExamScore, finalExamDate, lastUpdated, lastActivity, lastModuleId
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)
       `);
       syncProgress.run(
         phone,
@@ -2070,7 +2086,9 @@ async function startServer() {
         JSON.stringify(progress.audioListened || {}),
         JSON.stringify(progress.completedCaseStudies || []),
         progress.finalExamScore || null,
-        progress.finalExamDate || null
+        progress.finalExamDate || null,
+        lastActivity || null,
+        lastModuleId || null
       );
       
       const updated = db.prepare("SELECT lastUpdated FROM progress WHERE phone = ?").get(phone) as any;

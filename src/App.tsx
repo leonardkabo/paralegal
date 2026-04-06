@@ -2808,15 +2808,29 @@ const AdminDashboard = ({
                     <div className="flex-1 min-w-0 mr-4">
                       <div className="flex items-center gap-2">
                         {!u.isAdmin && (
-                          <span className={cn(
-                            "px-2 py-0.5 text-[9px] font-black rounded-full shrink-0",
-                            progressPercent === 100 ? "bg-emerald-500 text-white" : 
-                            progressPercent > 0 ? "bg-blue-500 text-white" : "bg-slate-200 text-slate-500"
-                          )}>
-                            {progressPercent}%
-                          </span>
+                          <div className="flex flex-col gap-0.5 shrink-0">
+                            <span className={cn(
+                              "px-2 py-0.5 text-[9px] font-black rounded-full text-center",
+                              progressPercent === 100 ? "bg-emerald-500 text-white" : 
+                              progressPercent > 0 ? "bg-blue-500 text-white" : "bg-slate-200 text-slate-500"
+                            )}>
+                              {progressPercent}%
+                            </span>
+                            {u.lastModuleId && (
+                              <span className="px-1 py-0.5 bg-slate-100 text-slate-500 text-[7px] font-bold rounded text-center">
+                                M{u.lastModuleId}
+                              </span>
+                            )}
+                          </div>
                         )}
-                        <p className="font-bold text-sm truncate">{u.fullName}</p>
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm truncate">{u.fullName}</p>
+                          {u.lastActivity && (
+                            <p className="text-[8px] text-emerald-600 font-medium truncate italic -mt-0.5">
+                              {u.lastActivity}
+                            </p>
+                          )}
+                        </div>
                         {u.isAdmin && (
                           <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[8px] font-bold uppercase rounded shrink-0">Admin</span>
                         )}

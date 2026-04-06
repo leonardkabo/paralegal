@@ -19,14 +19,18 @@ export function useAppState() {
         completedCaseStudies: parsed.completedCaseStudies || [],
         finalExamScore: parsed.finalExamScore,
         finalExamDate: parsed.finalExamDate,
-        lastUpdated: parsed.lastUpdated
+        lastUpdated: parsed.lastUpdated,
+        lastActivity: parsed.lastActivity,
+        lastModuleId: parsed.lastModuleId
       };
     }
     return {
       completedModules: [],
       quizScores: {},
       audioListened: {},
-      completedCaseStudies: []
+      completedCaseStudies: [],
+      lastActivity: '',
+      lastModuleId: undefined
     };
   });
 
@@ -151,7 +155,9 @@ export function useAppState() {
         audioListened: progress.audioListened,
         completedCaseStudies: progress.completedCaseStudies,
         finalExamScore: progress.finalExamScore,
-        finalExamDate: progress.finalExamDate
+        finalExamDate: progress.finalExamDate,
+        lastActivity: progress.lastActivity,
+        lastModuleId: progress.lastModuleId
       });
 
       if (currentProgressStr === lastSyncedRef.current) {
@@ -164,7 +170,12 @@ export function useAppState() {
       fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: user.phone, progress })
+        body: JSON.stringify({ 
+          phone: user.phone, 
+          progress,
+          lastActivity: progress.lastActivity,
+          lastModuleId: progress.lastModuleId
+        })
       })
       .then(res => res.json())
       .then(data => {
@@ -272,6 +283,9 @@ export function useAppState() {
   };
 
   const completeModule = (moduleId: number, score?: number) => {
+    const module = modules.find(m => m.id === moduleId);
+    const activity = module ? `Module complété: ${module.title}` : `Module ${moduleId} complété`;
+    
     setProgress(prev => {
       const newCompleted = prev.completedModules.includes(moduleId)
         ? prev.completedModules
@@ -284,40 +298,51 @@ export function useAppState() {
       return {
         ...prev,
         completedModules: newCompleted,
-        quizScores: newScores
+        quizScores: newScores,
+        lastActivity: activity,
+        lastModuleId: moduleId
       };
     });
   };
 
   const markAudioListened = (moduleId: number) => {
+    const module = modules.find(m => m.id === moduleId);
+    const activity = module ? `Audio écouté: ${module.title}` : `Audio ${moduleId} écouté`;
+
     setProgress(prev => {
       return {
         ...prev,
         audioListened: { ...prev.audioListened, [moduleId]: true },
         completedModules: prev.completedModules.includes(moduleId) 
           ? prev.completedModules 
-          : [...prev.completedModules, moduleId]
+          : [...prev.completedModules, moduleId],
+        lastActivity: activity,
+        lastModuleId: moduleId
       };
     });
   };
 
   const completeCaseStudy = (caseId: string) => {
+    const activity = `Étude de cas complétée: ${caseId}`;
     setProgress(prev => {
       return {
         ...prev,
         completedCaseStudies: prev.completedCaseStudies.includes(caseId)
           ? prev.completedCaseStudies
-          : [...prev.completedCaseStudies, caseId]
+          : [...prev.completedCaseStudies, caseId],
+        lastActivity: activity
       };
     });
   };
 
   const setFinalExamScore = (score: number) => {
+    const activity = `Examen final complété: ${score}%`;
     setProgress(prev => {
       return {
         ...prev,
         finalExamScore: score,
-        finalExamDate: new Date().toISOString()
+        finalExamDate: new Date().toISOString(),
+        lastActivity: activity
       };
     });
   };
