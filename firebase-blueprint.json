@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Information about the user (admin or learner)",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "location": { "type": "string" },
+        "gender": { "type": "string", "enum": ["M", "F"] },
+        "birthDate": { "type": "string", "format": "date" },
+        "educationLevel": { "type": "string" },
+        "preferredLanguage": { "type": "string", "enum": ["fr", "fon"] },
+        "isAdmin": { "type": "boolean" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "phone", "preferredLanguage"]
+    },
+    "Progress": {
+      "title": "Progress",
+      "description": "Tracking progress for a user",
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string" },
+        "completedModules": { "type": "array", "items": { "type": "integer" } },
+        "quizScores": { "type": "object" },
+        "audioListened": { "type": "object" },
+        "completedCaseStudies": { "type": "array", "items": { "type": "string" } },
+        "finalExamScore": { "type": "number" },
+        "finalExamDate": { "type": "string", "format": "date-time" },
+        "lastUpdated": { "type": "string", "format": "date-time" },
+        "lastActivity": { "type": "string" },
+        "lastModuleId": { "type": "integer" }
+      },
+      "required": ["phone"]
+    },
+    "Module": {
+      "title": "Module",
+      "description": "Training module content",
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string" },
+        "introduction": { "type": "string" },
+        "objectives": { "type": "array", "items": { "type": "string" } },
+        "keyNotions": { "type": "array", "items": { "type": "string" } },
+        "content": { "type": "string" },
+        "audioUrl": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "quiz": { "type": "array" },
+        "attachments": { "type": "array" },
+        "isReporting": { "type": "boolean" },
+        "estimatedDuration": { "type": "number" },
+        "difficultyLevel": { "type": "string" }
+      },
+      "required": ["id", "title"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Incident report from a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "moduleId": { "type": "integer" },
+        "type": { "type": "string" },
+        "description": { "type": "string" },
+        "location": { "type": "object" },
+        "date": { "type": "string" },
+        "anonymous": { "type": "boolean" },
+        "audioUrl": { "type": "string" },
+        "attachments": { "type": "array" },
+        "status": { "type": "string", "enum": ["pending", "resolved", "dismissed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "type", "description"]
+    }
+  },
+  "firestore": {
+    "users/{phone}": {
+      "schema": "User",
+      "description": "Collection of users"
+    },
+    "progress/{phone}": {
+      "schema": "Progress",
+      "description": "Collection of user progress tracking"
+    },
+    "modules/{id}": {
+      "schema": "Module",
+      "description": "Training modules"
+    },
+    "reports/{id}": {
+      "schema": "Report",
+      "description": "User reports"
+    },
+    "settings/{key}": {
+      "schema": { "type": "object" },
+      "description": "App settings"
+    },
+    "glossary/{id}": {
+      "schema": { "type": "object" },
+      "description": "Glossary terms"
+    },
+    "legal_documents/{id}": {
+      "schema": { "type": "object" },
+      "description": "Legal document templates"
+    },
+    "case_studies/{id}": {
+      "schema": { "type": "object" },
+      "description": "Case study exercises"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(phone) {
+      return isAuthenticated() && (
+        request.auth.token.phone_number == phone || 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone == phone
+      );
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true ||
+        request.auth.token.email == "leonardkabo32@gmail.com" ||
+        request.auth.token.email == "healthaccessinitiativehai@gmail.com"
+      );
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return data.fullName is string && data.fullName.size() > 0 &&
+             data.phone is string && data.phone.size() > 0 &&
+             data.preferredLanguage in ['fr', 'fon'];
+    }
+
+    function isValidProgress(data) {
+      return data.phone is string && data.phone.size() > 0;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && (request.auth.uid == userId || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /progress/{phone} {
+      allow read: if isAuthenticated() && (isOwner(phone) || isAdmin());
+      allow create, update: if isAuthenticated() && isValidProgress(request.resource.data) && (isOwner(phone) || isAdmin());
+    }
+
+    match /modules/{moduleId} {
+      allow read: if true; // Modules are public content
+      allow write: if isAdmin();
+    }
+
+    match /reports/{reportId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+    }
+
+    match /settings/{key} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /glossary/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /legal_documents/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /case_studies/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

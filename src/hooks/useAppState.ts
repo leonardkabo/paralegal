@@ -1,5 +1,28 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy } from '../types';
+import { auth, db, handleFirestoreError, OperationType } from '../firebase';
+import { 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc, 
+  collection, 
+  onSnapshot, 
+  query, 
+  getDocs,
+  where,
+  Timestamp,
+  orderBy
+} from 'firebase/firestore';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  signInWithPopup,
+  GoogleAuthProvider
+} from 'firebase/auth';
 
 export function useAppState() {
   const lastSyncedRef = useRef<string>('');
@@ -49,56 +72,99 @@ export function useAppState() {
   const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    fetch('/api/modules')
-      .then(res => res.json())
-      .then(data => setModules(data))
-      .catch(err => console.error("Erreur lors du chargement des modules:", err));
+    // Load modules from Firestore with real-time updates
+    const unsubscribeModules = onSnapshot(collection(db, 'modules'), (snapshot) => {
+      const mods = snapshot.docs.map(doc => doc.data() as Module).sort((a, b) => a.id - b.id);
+      setModules(mods);
+    }, (err) => handleFirestoreError(err, OperationType.LIST, 'modules'));
 
-    fetch('/api/settings')
-      .then(res => res.json())
-      .then(data => setSettings(data))
-      .catch(err => console.error("Erreur lors du chargement des paramètres:", err));
+    // Load settings
+    const unsubscribeSettings = onSnapshot(doc(db, 'settings', 'general'), (snapshot) => {
+      if (snapshot.exists()) {
+        setSettings(snapshot.data() as AppSettings);
+      }
+    }, (err) => handleFirestoreError(err, OperationType.GET, 'settings/general'));
 
-    fetch('/api/glossary')
-      .then(res => res.json())
-      .then(data => setGlossary(data))
-      .catch(err => console.error("Erreur lors du chargement du glossaire:", err));
+    // Load glossary
+    const unsubscribeGlossary = onSnapshot(collection(db, 'glossary'), (snapshot) => {
+      setGlossary(snapshot.docs.map(doc => doc.data() as GlossaryTerm));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, 'glossary'));
 
-    fetch('/api/legal-documents')
-      .then(res => res.json())
-      .then(data => setLegalDocuments(data))
-      .catch(err => console.error("Erreur lors du chargement des documents:", err));
+    // Load documents
+    const unsubscribeDocs = onSnapshot(collection(db, 'legal_documents'), (snapshot) => {
+      setLegalDocuments(snapshot.docs.map(doc => doc.data() as LegalDocument));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, 'legal_documents'));
 
-    fetch('/api/case-studies')
-      .then(res => res.json())
-      .then(data => setCaseStudies(data))
-      .catch(err => console.error("Erreur lors du chargement des études de cas:", err));
+    // Load case studies
+    const unsubscribeCaseStudies = onSnapshot(collection(db, 'case_studies'), (snapshot) => {
+      setCaseStudies(snapshot.docs.map(doc => doc.data() as CaseStudy));
+    }, (err) => handleFirestoreError(err, OperationType.LIST, 'case_studies'));
 
-    if (user) {
-      fetch(`/api/progress/${user.phone}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setProgress(data.progress);
-            localStorage.setItem('paralegal_progress', JSON.stringify(data.progress));
-            lastSyncedRef.current = JSON.stringify({
-              completedModules: data.progress.completedModules,
-              quizScores: data.progress.quizScores,
-              audioListened: data.progress.audioListened,
-              completedCaseStudies: data.progress.completedCaseStudies,
-              finalExamScore: data.progress.finalExamScore,
-              finalExamDate: data.progress.finalExamDate
-            });
+    // Auth listener for persistence and real-time progress
+    const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        // Find user by email (for admins) or custom mapping
+        // In this app we used phone as ID. Link them.
+        const q = query(collection(db, 'users'), where('email', '==', fbUser.email));
+        const userSnap = await getDocs(q);
+        
+        if (!userSnap.empty) {
+          const userData = userSnap.docs[0].data() as User;
+          setUser(userData);
+          
+          // Subscribe to real-time progress
+          const unsubscribeProgress = onSnapshot(doc(db, 'progress', userData.phone), (progressSnap) => {
+            if (progressSnap.exists()) {
+              const data = progressSnap.data() as UserProgress;
+              setProgress(data);
+              localStorage.setItem('paralegal_progress', JSON.stringify(data));
+              lastSyncedRef.current = JSON.stringify({
+                completedModules: data.completedModules,
+                quizScores: data.quizScores,
+                audioListened: data.audioListened,
+                completedCaseStudies: data.completedCaseStudies,
+                finalExamScore: data.finalExamScore,
+                finalExamDate: data.finalExamDate
+              });
+            }
+            setHasFetchedFromServer(true);
+          }, (err) => handleFirestoreError(err, OperationType.GET, `progress/${userData.phone}`));
+          
+          return () => unsubscribeProgress();
+        } else {
+          // If logged in via Google but no user document yet (first time admin?)
+          const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
+          if (fbUser.email && adminEmails.includes(fbUser.email)) {
+            const adminData: User = {
+              fullName: fbUser.displayName || (fbUser.email === adminEmails[0] ? "Leonard Kabo" : "HAI Admin"),
+              phone: fbUser.email, // Use email as unique phone for admins
+              location: "Bénin",
+              gender: "M",
+              birthDate: "1990-01-01",
+              educationLevel: "Expert",
+              preferredLanguage: "fr",
+              isAdmin: true,
+              email: fbUser.email
+            };
+            await setDoc(doc(db, 'users', adminData.phone), adminData);
+            setUser(adminData);
           }
           setHasFetchedFromServer(true);
-        })
-        .catch(err => {
-          console.error("Erreur lors de la récupération de la progression:", err);
-          setHasFetchedFromServer(true);
-        });
-    } else {
-      setHasFetchedFromServer(true);
-    }
+        }
+      } else {
+        setUser(null);
+        setHasFetchedFromServer(true);
+      }
+    });
+
+    return () => {
+      unsubscribeModules();
+      unsubscribeSettings();
+      unsubscribeGlossary();
+      unsubscribeDocs();
+      unsubscribeCaseStudies();
+      unsubscribeAuth();
+    };
   }, []);
 
   useEffect(() => {
@@ -109,108 +175,74 @@ export function useAppState() {
     }
   }, [user]);
 
+  // Combined real-time progress and autosave
   useEffect(() => {
-    if (!user) return;
+    if (!user || !hasFetchedFromServer) return;
 
-    const pollInterval = setInterval(() => {
-      console.log("Vérification de la base de données (sync 10s)...");
-      fetch(`/api/progress/${user.phone}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.progress) {
-            // Only update if server has newer data
-            const serverLastUpdated = data.progress.lastUpdated;
-            const localLastUpdated = progress.lastUpdated;
+    const currentProgressStr = JSON.stringify({
+      completedModules: progress.completedModules,
+      quizScores: progress.quizScores,
+      audioListened: progress.audioListened,
+      completedCaseStudies: progress.completedCaseStudies,
+      finalExamScore: progress.finalExamScore,
+      finalExamDate: progress.finalExamDate,
+      lastActivity: progress.lastActivity,
+      lastModuleId: progress.lastModuleId
+    });
 
-            if (serverLastUpdated && (!localLastUpdated || new Date(serverLastUpdated) > new Date(localLastUpdated))) {
-              console.log("Base de données : nouvelles données trouvées, mise à jour...");
-              setProgress(data.progress);
-              localStorage.setItem('paralegal_progress', JSON.stringify(data.progress));
-              
-              // Update lastSyncedRef to match the new server data to prevent immediate re-sync
-              lastSyncedRef.current = JSON.stringify({
-                completedModules: data.progress.completedModules,
-                quizScores: data.progress.quizScores,
-                audioListened: data.progress.audioListened,
-                completedCaseStudies: data.progress.completedCaseStudies,
-                finalExamScore: data.progress.finalExamScore,
-                finalExamDate: data.progress.finalExamDate
-              });
-            }
-          }
-        })
-        .catch(err => console.error("Erreur de synchronisation base de données:", err));
-    }, 10000); // Poll every 10 seconds as requested
+    if (currentProgressStr === lastSyncedRef.current) return;
 
-    return () => clearInterval(pollInterval);
-  }, [user, progress.lastUpdated]);
-
-  useEffect(() => {
-    localStorage.setItem('paralegal_progress', JSON.stringify(progress));
-    
-    if (user && hasFetchedFromServer) {
-      const currentProgressStr = JSON.stringify({
-        completedModules: progress.completedModules,
-        quizScores: progress.quizScores,
-        audioListened: progress.audioListened,
-        completedCaseStudies: progress.completedCaseStudies,
-        finalExamScore: progress.finalExamScore,
-        finalExamDate: progress.finalExamDate,
-        lastActivity: progress.lastActivity,
-        lastModuleId: progress.lastModuleId
-      });
-
-      if (currentProgressStr === lastSyncedRef.current) {
-        return; // No real data change
-      }
-
-      console.log("Syncing progress with server...", progress);
+    const timeoutId = setTimeout(async () => {
+      console.log("Firebase: Sauvegarde automatique de la progression...");
       setIsSyncing(true);
-      // Sync with backend
-      fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          phone: user.phone, 
-          progress,
-          lastActivity: progress.lastActivity,
-          lastModuleId: progress.lastModuleId
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.lastUpdated) {
-          console.log("Sync successful, updating lastUpdated:", data.lastUpdated);
-          lastSyncedRef.current = currentProgressStr;
-          setProgress(prev => ({ ...prev, lastUpdated: data.lastUpdated }));
-        }
-      })
-      .catch(err => {
-        console.error("Échec de la synchronisation avec le serveur:", err);
-      })
-      .finally(() => {
+      try {
+        const progressRef = doc(db, 'progress', user.phone);
+        await setDoc(progressRef, {
+          ...progress,
+          lastUpdated: new Date().toISOString()
+        }, { merge: true });
+        
+        lastSyncedRef.current = currentProgressStr;
+      } catch (err) {
+        console.error("Erreur de sauvegarde Firebase:", err);
+      } finally {
         setIsSyncing(false);
-      });
-    }
+      }
+    }, 2000); // Debounce save by 2 seconds
+
+    return () => clearTimeout(timeoutId);
   }, [progress, user, hasFetchedFromServer]);
 
   const registerUser = async (userData: Omit<User, 'preferredLanguage'>) => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-      });
-      const data = await res.json();
-      if (data.success) {
-        setUser(data.user);
-      } else {
-        setError(data.error || "Erreur lors de l'inscription");
-      }
+      const userId = userData.phone; // Using phone as doc ID for consistency
+      const userRef = doc(db, 'users', userId);
+      
+      const fullUser: User = { 
+        ...userData, 
+        preferredLanguage: 'fr',
+        isAdmin: false
+      };
+      
+      await setDoc(userRef, fullUser);
+      
+      // Initialize progress
+      const progressRef = doc(db, 'progress', userId);
+      const initialProgress: UserProgress = {
+        completedModules: [],
+        quizScores: {},
+        audioListened: {},
+        completedCaseStudies: [],
+        lastActivity: 'Inscription réussie',
+        lastUpdated: new Date().toISOString()
+      };
+      await setDoc(progressRef, initialProgress);
+      
+      setUser(fullUser);
     } catch (err) {
-      setError("Erreur réseau");
+      handleFirestoreError(err, OperationType.CREATE, 'users');
     } finally {
       setIsLoading(false);
     }
@@ -220,28 +252,42 @@ export function useAppState() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setUser(data.user);
-        setProgress(data.progress);
-        lastSyncedRef.current = JSON.stringify({
-          completedModules: data.progress.completedModules,
-          quizScores: data.progress.quizScores,
-          audioListened: data.progress.audioListened,
-          completedCaseStudies: data.progress.completedCaseStudies,
-          finalExamScore: data.progress.finalExamScore,
-          finalExamDate: data.progress.finalExamDate
-        });
+      // Standard user login via Firestore
+      const userRef = doc(db, 'users', phone);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as User;
+        if (userData.password === password) {
+          setUser(userData);
+          const progressSnap = await getDoc(doc(db, 'progress', phone));
+          if (progressSnap.exists()) {
+            setProgress(progressSnap.data() as UserProgress);
+          }
+        } else {
+          setError("Mot de passe incorrect");
+        }
       } else {
-        setError(data.error || "Identifiants invalides");
+        setError("Utilisateur non trouvé");
       }
     } catch (err) {
-      setError("Erreur réseau");
+      handleFirestoreError(err, OperationType.GET, 'users');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      // Handled by onAuthStateChanged listener
+      return result.user;
+    } catch (err) {
+      setError("Erreur de connexion Google");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -251,20 +297,16 @@ export function useAppState() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, birthDate, newPassword })
-      });
-      const data = await res.json();
-      if (data.success) {
+      const userRef = doc(db, 'users', phone);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists() && userSnap.data().birthDate === birthDate) {
+        await updateDoc(userRef, { password: newPassword });
         return true;
-      } else {
-        setError(data.error || "Erreur lors de la réinitialisation");
-        return false;
       }
+      setError("Informations incorrectes");
+      return false;
     } catch (err) {
-      setError("Erreur réseau");
+      handleFirestoreError(err, OperationType.UPDATE, `users/${phone}`);
       return false;
     } finally {
       setIsLoading(false);
@@ -274,11 +316,11 @@ export function useAppState() {
   const setLanguage = async (lang: Language) => {
     if (user) {
       setUser({ ...user, preferredLanguage: lang });
-      await fetch('/api/update-language', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: user.phone, language: lang })
-      });
+      try {
+        await updateDoc(doc(db, 'users', user.phone), { preferredLanguage: lang });
+      } catch (err) {
+        console.error("Error updating language:", err);
+      }
     }
   };
 
@@ -347,7 +389,8 @@ export function useAppState() {
     });
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await signOut(auth);
     localStorage.removeItem('paralegal_user');
     localStorage.removeItem('paralegal_progress');
     lastSyncedRef.current = '';
@@ -361,117 +404,114 @@ export function useAppState() {
   };
 
   const deleteUser = async (phone: string) => {
-    const res = await fetch(`/api/admin/users/${phone}`, { method: 'DELETE' });
-    return res.ok;
+    try {
+      await deleteDoc(doc(db, 'users', phone));
+      await deleteDoc(doc(db, 'progress', phone));
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   };
 
   const saveUser = async (userData: any) => {
-    const res = await fetch('/api/admin/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    });
-    return res.ok;
+    try {
+      await setDoc(doc(db, 'users', userData.phone), userData, { merge: true });
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   };
 
   const saveModule = async (module: Module) => {
-    const res = await fetch('/api/admin/modules', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(module)
-    });
-    if (res.ok) {
-      const modRes = await fetch('/api/modules');
-      const data = await modRes.json();
-      setModules(data);
+    try {
+      await setDoc(doc(db, 'modules', module.id.toString()), module);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const deleteModule = async (id: number) => {
-    const res = await fetch(`/api/admin/modules/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setModules(modules.filter(m => m.id !== id));
+    try {
+      await deleteDoc(doc(db, 'modules', id.toString()));
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const saveGlossaryTerm = async (term: GlossaryTerm) => {
-    const res = await fetch('/api/admin/glossary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(term)
-    });
-    if (res.ok) {
-      const gRes = await fetch('/api/glossary');
-      const data = await gRes.json();
-      setGlossary(data);
+    try {
+      await setDoc(doc(db, 'glossary', term.id), term);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const deleteGlossaryTerm = async (id: string) => {
-    const res = await fetch(`/api/admin/glossary/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setGlossary(glossary.filter(g => g.id !== id));
+    try {
+      await deleteDoc(doc(db, 'glossary', id));
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
-  const saveLegalDocument = async (doc: LegalDocument) => {
-    const res = await fetch('/api/admin/legal-documents', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(doc)
-    });
-    if (res.ok) {
-      const dRes = await fetch('/api/legal-documents');
-      const data = await dRes.json();
-      setLegalDocuments(data);
+  const saveLegalDocument = async (docObj: LegalDocument) => {
+    try {
+      await setDoc(doc(db, 'legal_documents', docObj.id), docObj);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const deleteLegalDocument = async (id: string) => {
-    const res = await fetch(`/api/admin/legal-documents/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setLegalDocuments(legalDocuments.filter(d => d.id !== id));
+    try {
+      await deleteDoc(doc(db, 'legal_documents', id));
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const saveCaseStudy = async (caseStudy: CaseStudy) => {
-    const res = await fetch('/api/admin/case-studies', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(caseStudy)
-    });
-    if (res.ok) {
-      const cRes = await fetch('/api/case-studies');
-      const data = await cRes.json();
-      setCaseStudies(data);
+    try {
+      await setDoc(doc(db, 'case_studies', caseStudy.id), caseStudy);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const deleteCaseStudy = async (id: string) => {
-    const res = await fetch(`/api/admin/case-studies/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setCaseStudies(caseStudies.filter(c => c.id !== id));
+    try {
+      await deleteDoc(doc(db, 'case_studies', id));
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const saveSettings = async (newSettings: AppSettings) => {
-    const res = await fetch('/api/admin/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newSettings)
-    });
-    if (res.ok) {
-      setSettings(newSettings);
+    try {
+      await setDoc(doc(db, 'settings', 'general'), newSettings);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return res.ok;
   };
 
   const uploadFile = async (file: File) => {
@@ -487,8 +527,39 @@ export function useAppState() {
     throw new Error("Upload failed");
   };
 
+  const [users, setUsers] = useState<User[]>([]);
+  const [allProgress, setAllProgress] = useState<Record<string, UserProgress>>({});
+
+  useEffect(() => {
+    if (user?.isAdmin) {
+      // Real-time users for admin
+      const unsubscribeUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+        setUsers(snapshot.docs.map(doc => doc.data() as User));
+      }, (err) => handleFirestoreError(err, OperationType.LIST, 'users'));
+
+      // Real-time progress for all users (for admin dashboard)
+      const unsubscribeAllProgress = onSnapshot(collection(db, 'progress'), (snapshot) => {
+        const progressMap: Record<string, UserProgress> = {};
+        snapshot.docs.forEach(doc => {
+          progressMap[doc.id] = doc.data() as UserProgress;
+        });
+        setAllProgress(progressMap);
+      }, (err) => handleFirestoreError(err, OperationType.LIST, 'progress'));
+
+      return () => {
+        unsubscribeUsers();
+        unsubscribeAllProgress();
+      };
+    } else {
+      setUsers([]);
+      setAllProgress({});
+    }
+  }, [user?.isAdmin]);
+
   return {
     user,
+    users,
+    allProgress,
     progress,
     modules,
     glossary,
@@ -505,6 +576,7 @@ export function useAppState() {
     markAudioListened,
     completeCaseStudy,
     setFinalExamScore,
+    loginWithGoogle,
     logout,
     deleteUser,
     saveUser,
@@ -528,31 +600,8 @@ export function useAppState() {
       return res.ok;
     }, []),
     forceSync: async () => {
-      if (!user) return;
-      setIsSyncing(true);
-      try {
-        const res = await fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: user.phone, progress })
-        });
-        const data = await res.json();
-        if (data.success && data.lastUpdated) {
-          setProgress(prev => ({ ...prev, lastUpdated: data.lastUpdated }));
-          lastSyncedRef.current = JSON.stringify({
-            completedModules: progress.completedModules,
-            quizScores: progress.quizScores,
-            audioListened: progress.audioListened,
-            completedCaseStudies: progress.completedCaseStudies,
-            finalExamScore: progress.finalExamScore,
-            finalExamDate: progress.finalExamDate
-          });
-        }
-      } catch (err) {
-        console.error("Force sync failed:", err);
-      } finally {
-        setIsSyncing(false);
-      }
+      // Automatic real-time sync with Firebase means this is no longer needed but kept for API compatibility
+      return;
     }
   };
 }
