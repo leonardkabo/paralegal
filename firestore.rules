@@ -42,7 +42,8 @@ service cloud.firestore {
     // ===============================================================
     
     match /users/{userId} {
-      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow get: if true;
+      allow list: if isAuthenticated() && (isOwner(userId) || isAdmin());
       // Special case: allow registration (create) if data is valid
       allow create: if isValidUser(request.resource.data);
       allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
@@ -50,7 +51,8 @@ service cloud.firestore {
     }
 
     match /progress/{userId} {
-      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow get: if true;
+      allow list: if isAuthenticated() && (isOwner(userId) || isAdmin());
       // Allow creation during registration or by admin
       allow create: if isValidProgress(request.resource.data);
       allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());

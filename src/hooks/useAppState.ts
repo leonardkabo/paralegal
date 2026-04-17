@@ -111,6 +111,8 @@ export function useAppState() {
         let phone = '';
         if (fbUser.email?.endsWith('@paralegal.bj')) {
           phone = fbUser.email.split('@')[0];
+          // Try both original and normalized formats if needed
+          // but we'll stick to what worked during registration
         }
 
         let userData: User | null = null;
@@ -310,14 +312,33 @@ export function useAppState() {
     setIsLoading(true);
     setError(null);
     try {
-      const email = `${userData.phone}@paralegal.bj`;
+      // Normalize phone for email (remove + and spaces)
+      const normalizedPhone = userData.phone.replace(/[+\s]/g, '');
+      const email = `${normalizedPhone}@paralegal.bj`;
       const password = userData.password || "password123";
 
+      // Try reading if user exists first (needs public get rule)
+      const userRef = doc(db, 'users', userData.phone);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setError("Ce numéro de téléphone est déjà utilisé.");
+        setIsLoading(false);
+        return;
+      }
+
       // Create Firebase Auth account
-      await createUserWithEmailAndPassword(auth, email, password);
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } catch (authErr: any) {
+        if (authErr.code === 'auth/operation-not-allowed') {
+          setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase (Authentification > Sign-in method).");
+          setIsLoading(false);
+          return;
+        }
+        throw authErr;
+      }
 
       const userId = userData.phone;
-      const userRef = doc(db, 'users', userId);
       
       const fullUser: User = { 
         ...userData, 
@@ -356,11 +377,18 @@ export function useAppState() {
     setIsLoading(true);
     setError(null);
     try {
-      const email = `${phone}@paralegal.bj`;
+      const normalizedPhone = phone.replace(/[+\s]/g, '');
+      const email = `${normalizedPhone}@paralegal.bj`;
       
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (authErr: any) {
+        if (authErr.code === 'auth/operation-not-allowed') {
+          setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
+          setIsLoading(false);
+          return;
+        }
+        
         // If user document exists in Firestore but no Firebase Auth account yet, migrate them
         const userRef = doc(db, 'users', phone);
         const userSnap = await getDoc(userRef);
@@ -369,8 +397,17 @@ export function useAppState() {
           const userData = userSnap.data() as User;
           if (userData.password === password) {
             // Auto-create Firebase Auth account for existing Firestore user
-            await createUserWithEmailAndPassword(auth, email, password);
-            return; // onAuthStateChanged will handle the rest
+            try {
+              await createUserWithEmailAndPassword(auth, email, password);
+              return; // onAuthStateChanged will handle the rest
+            } catch (createErr: any) {
+              if (createErr.code === 'auth/operation-not-allowed') {
+                setError("ERREUR CONFIGURATION : Veuillez activer 'E-mail/Mot de passe' dans Firebase.");
+                setIsLoading(false);
+                return;
+              }
+              throw createErr;
+            }
           }
         }
         throw authErr;
