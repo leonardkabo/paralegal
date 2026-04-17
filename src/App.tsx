@@ -29,6 +29,7 @@ import {
   Sparkles,
   Volume2,
   X,
+  Key,
   HelpCircle,
   Clock,
   Plus,
@@ -3425,7 +3426,8 @@ const SettingsScreen = ({
   onLogout, 
   onBack,
   onOpenAdmin,
-  onDownloadCertificate
+  onDownloadCertificate,
+  onChangePassword
 }: { 
   user: any, 
   progress: any, 
@@ -3435,9 +3437,35 @@ const SettingsScreen = ({
   onLogout: () => void, 
   onBack: () => void,
   onOpenAdmin: () => void,
-  onDownloadCertificate: () => void
+  onDownloadCertificate: () => void,
+  onChangePassword: (pass: string) => Promise<boolean>
 }) => {
   const isFullyCompleted = progress.finalExamScore !== undefined && progress.finalExamScore >= 80;
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [isChanging, setIsChanging] = useState(false);
+  const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 4) {
+      setMessage({ text: 'Le mot de passe doit faire au moins 4 caractères', type: 'error' });
+      return;
+    }
+    setIsChanging(true);
+    const success = await onChangePassword(newPassword);
+    setIsChanging(false);
+    if (success) {
+      setMessage({ text: 'Mot de passe modifié avec succès !', type: 'success' });
+      setNewPassword('');
+      setTimeout(() => {
+        setShowPasswordChange(false);
+        setMessage(null);
+      }, 2000);
+    } else {
+      setMessage({ text: 'Erreur lors de la modification', type: 'error' });
+    }
+  };
 
   return (
     <div className="h-full bg-slate-50 flex flex-col overflow-hidden">
@@ -3547,6 +3575,46 @@ const SettingsScreen = ({
         </div>
 
         <div className="space-y-3">
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sécurité</h4>
+          <Card className="p-4 space-y-4">
+            {!showPasswordChange ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full text-xs"
+                onClick={() => setShowPasswordChange(true)}
+              >
+                <Key size={14} className="mr-2" /> Changer le mot de passe
+              </Button>
+            ) : (
+              <form onSubmit={handlePasswordChange} className="space-y-3">
+                <Input 
+                  label="Nouveau mot de passe" 
+                  type="password" 
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  placeholder="Min. 4 caractères"
+                  autoFocus
+                />
+                {message && (
+                  <p className={cn("text-[10px] font-bold", message.type === 'success' ? "text-emerald-600" : "text-red-600")}>
+                    {message.text}
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <Button type="submit" size="sm" className="flex-1" disabled={isChanging}>
+                    {isChanging ? "Action..." : "Valider"}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setShowPasswordChange(false)} className="flex-1">
+                    Annuler
+                  </Button>
+                </div>
+              </form>
+            )}
+          </Card>
+        </div>
+
+        <div className="space-y-3">
           <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Système</h4>
           <Card className="p-0 overflow-hidden">
             <div className="p-5 flex items-center justify-between border-b border-slate-50">
@@ -3615,6 +3683,7 @@ export default function App() {
     saveCaseStudy,
     deleteCaseStudy,
     saveSettings,
+    changePassword,
     uploadFile,
     fetchFiles,
     deleteFile,
@@ -3796,6 +3865,7 @@ export default function App() {
               onBack={() => setCurrentScreen('main')}
               onOpenAdmin={() => setCurrentScreen('admin')}
               onDownloadCertificate={generateCertificate}
+              onChangePassword={changePassword}
             />
           </motion.div>
         )}

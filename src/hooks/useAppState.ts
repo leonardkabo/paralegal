@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy } from '../types';
 import { auth, db, handleFirestoreError, OperationType } from '../firebase';
+import { MODULES } from '../data/modules';
+import { CASE_STUDIES } from '../data/caseStudies';
+import { GLOSSARY_TERMS, LEGAL_DOCUMENTS } from '../data/extraContent';
 import { 
   doc, 
   getDoc, 
@@ -13,7 +16,8 @@ import {
   getDocs,
   where,
   Timestamp,
-  orderBy
+  orderBy,
+  writeBatch
 } from 'firebase/firestore';
 import { 
   signInWithEmailAndPassword, 
@@ -166,6 +170,66 @@ export function useAppState() {
       unsubscribeAuth();
     };
   }, []);
+
+  // Seeding effect: Initialise Firestore if empty (Admin only)
+  useEffect(() => {
+    if (!user?.isAdmin) return;
+
+    const seedData = async () => {
+      try {
+        // Seed Modules
+        const modSnap = await getDocs(collection(db, 'modules'));
+        if (modSnap.empty) {
+          console.log("Firebase: Initialisation des modules...");
+          const batch = writeBatch(db);
+          MODULES.forEach(m => batch.set(doc(db, 'modules', m.id.toString()), m));
+          await batch.commit();
+        }
+
+        // Seed Glossary
+        const glossarySnap = await getDocs(collection(db, 'glossary'));
+        if (glossarySnap.empty) {
+          console.log("Firebase: Initialisation du glossaire...");
+          const batch = writeBatch(db);
+          GLOSSARY_TERMS.forEach(t => batch.set(doc(db, 'glossary', t.id), t));
+          await batch.commit();
+        }
+
+        // Seed Documents
+        const docSnap = await getDocs(collection(db, 'legal_documents'));
+        if (docSnap.empty) {
+          console.log("Firebase: Initialisation des documents...");
+          const batch = writeBatch(db);
+          LEGAL_DOCUMENTS.forEach(d => batch.set(doc(db, 'legal_documents', d.id), d));
+          await batch.commit();
+        }
+
+        // Seed Case Studies
+        const caseSnap = await getDocs(collection(db, 'case_studies'));
+        if (caseSnap.empty) {
+          console.log("Firebase: Initialisation des études de cas...");
+          const batch = writeBatch(db);
+          CASE_STUDIES.forEach(cs => batch.set(doc(db, 'case_studies', cs.id), cs));
+          await batch.commit();
+        }
+
+        // Seed Settings
+        const settingsSnap = await getDoc(doc(db, 'settings', 'general'));
+        if (!settingsSnap.exists()) {
+          console.log("Firebase: Initialisation des paramètres...");
+          await setDoc(doc(db, 'settings', 'general'), {
+            organizationName: 'Health Access Initiative (HAI)',
+            contactEmail: 'contact@hai-benin.org',
+            logoUrl: ''
+          });
+        }
+      } catch (err) {
+        console.error("Erreur lors de l'initialisation des données:", err);
+      }
+    };
+
+    seedData();
+  }, [user?.isAdmin]);
 
   useEffect(() => {
     if (user) {
@@ -416,7 +480,35 @@ export function useAppState() {
 
   const saveUser = async (userData: any) => {
     try {
+      const isNew = !(await getDoc(doc(db, 'users', userData.phone))).exists();
+      
       await setDoc(doc(db, 'users', userData.phone), userData, { merge: true });
+
+      if (isNew) {
+        // Initialize progress for new users created by admin
+        const initialProgress: UserProgress = {
+          completedModules: [],
+          quizScores: {},
+          audioListened: {},
+          completedCaseStudies: [],
+          lastActivity: 'Compte créé par l\'administrateur',
+          lastUpdated: new Date().toISOString()
+        };
+        await setDoc(doc(db, 'progress', userData.phone), initialProgress);
+      }
+      
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
+  const changePassword = async (newPassword: string) => {
+    if (!user) return false;
+    try {
+      await updateDoc(doc(db, 'users', user.phone), { password: newPassword });
+      setUser({ ...user, password: newPassword });
       return true;
     } catch (err) {
       console.error(err);
@@ -589,6 +681,7 @@ export function useAppState() {
     saveCaseStudy,
     deleteCaseStudy,
     saveSettings,
+    changePassword,
     uploadFile,
     isSyncing,
     fetchFiles: useCallback(async () => {
