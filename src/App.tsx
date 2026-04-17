@@ -109,6 +109,7 @@ const AuthScreen = ({
   onLogin, 
   onLoginWithGoogle,
   onResetPassword,
+  logoUrl,
   isLoading, 
   error 
 }: { 
@@ -116,6 +117,7 @@ const AuthScreen = ({
   onLogin: (phone: string, pass: string) => void,
   onLoginWithGoogle: () => void,
   onResetPassword: (identifier: string) => Promise<boolean>,
+  logoUrl?: string,
   isLoading: boolean,
   error: string | null
 }) => {
@@ -170,8 +172,14 @@ const AuthScreen = ({
   return (
     <div className="min-h-screen p-6 flex flex-col max-w-md mx-auto py-12">
       <div className="mb-8 text-center shrink-0">
-        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <UserIcon size={32} />
+        <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden bg-white shadow-sm border border-slate-100 p-2">
+          {logoUrl ? (
+            <img src={logoUrl} alt="Logo HAI" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+          ) : (
+            <div className="bg-emerald-100 text-emerald-600 w-full h-full flex items-center justify-center rounded-xl">
+              <UserIcon size={32} />
+            </div>
+          )}
         </div>
         <h1 className="text-3xl font-bold tracking-tight">
           {mode === 'login' ? 'Connexion' : mode === 'register' ? 'Inscription' : 'Récupération'}
@@ -2365,6 +2373,18 @@ const AdminDashboard = ({
     }
   };
 
+  const handleSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const { url } = await onUploadFile(file);
+        setLocalSettings({ ...localSettings, directorSignatureUrl: url });
+      } catch (err) {
+        alert("Erreur lors de l'upload");
+      }
+    }
+  };
+
   const handleModuleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'audio' | 'video' | 'pdf') => {
     const file = e.target.files?.[0];
     if (file && editingModule) {
@@ -2785,6 +2805,32 @@ const AdminDashboard = ({
                 value={localSettings.contactEmail} 
                 onChange={e => setLocalSettings({...localSettings, contactEmail: e.target.value})} 
               />
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <h3 className="font-bold text-sm uppercase tracking-wider text-slate-400">Direction & Signature</h3>
+              <Input 
+                label="Nom du Directeur Exécutif" 
+                value={localSettings.directorName || ''} 
+                onChange={e => setLocalSettings({...localSettings, directorName: e.target.value})} 
+                placeholder="Ex: Leonard Kabo"
+              />
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase">Image de la signature</label>
+                <div className="flex items-center gap-6">
+                  <div className="w-32 h-16 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-center overflow-hidden">
+                    {localSettings.directorSignatureUrl ? (
+                      <img src={localSettings.directorSignatureUrl} alt="Signature" className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
+                    ) : (
+                      <Edit size={24} className="text-slate-300" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input type="file" accept="image/*" onChange={handleSignatureUpload} className="text-xs" />
+                    <p className="text-[10px] text-slate-400 mt-1">Format PNG transparent recommandé</p>
+                  </div>
+                </div>
+              </div>
             </Card>
           </div>
         )}
@@ -3753,52 +3799,98 @@ export default function App() {
       format: 'a4'
     });
 
+    const pageWidth = 297;
+    const pageHeight = 210;
+
     // Background
     doc.setFillColor(245, 252, 250);
-    doc.rect(0, 0, 297, 210, 'F');
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
     
     // Border
     doc.setDrawColor(16, 185, 129);
     doc.setLineWidth(2);
-    doc.rect(10, 10, 277, 190);
+    doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+    
+    doc.setDrawColor(16, 185, 129);
+    doc.setLineWidth(0.5);
+    doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
     
     // Logo if exists
     if (settings.logoUrl) {
       try {
-        doc.addImage(settings.logoUrl, 'PNG', 133.5, 20, 30, 30);
+        doc.addImage(settings.logoUrl, 'PNG', pageWidth/2 - 15, 20, 30, 30);
       } catch (e) {
         console.error("Could not add logo to PDF", e);
       }
     }
 
-    // Content
+    // Header
     doc.setTextColor(15, 23, 42);
-    doc.setFontSize(40);
-    doc.text('ATTESTATION DE RÉUSSITE', 148.5, 70, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(36);
+    doc.text('ATTESTATION DE RÉUSSITE', pageWidth/2, 70, { align: 'center' });
     
-    doc.setFontSize(20);
-    doc.text('Décernée à', 148.5, 95, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(18);
+    doc.text('Décernée à', pageWidth/2, 90, { align: 'center' });
     
+    // User Name
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(32);
     doc.setTextColor(5, 150, 105);
-    doc.text(user.fullName.toUpperCase(), 148.5, 120, { align: 'center' });
+    doc.text(user.fullName.toUpperCase(), pageWidth/2, 110, { align: 'center' });
     
+    // Content
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(16);
     doc.setTextColor(71, 85, 105);
-    doc.text('Pour avoir complété avec succès la formation de', 148.5, 140, { align: 'center' });
-    doc.setFontSize(20);
-    doc.text('PARAJURISTE COMMUNAUTAIRE', 148.5, 155, { align: 'center' });
+    const contentText = 'Pour avoir complété avec succès la formation professionnelle de';
+    doc.text(contentText, pageWidth/2, 130, { align: 'center' });
     
-    const date = new Date().toLocaleDateString('fr-FR');
-    doc.setFontSize(12);
-    doc.text(`Délivrée le : ${date}`, 40, 185);
-    doc.text(`Code de vérification : PL-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, 40, 192);
-    
-    doc.text(`Signature de ${settings.organizationName}`, 220, 185);
-    doc.setDrawColor(71, 85, 105);
-    doc.line(200, 195, 260, 195);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(15, 23, 42);
+    doc.text('PARAJURISTE COMMUNAUTAIRE', pageWidth/2, 145, { align: 'center' });
 
-    doc.save(`Attestation_Paralegal_${user.fullName.replace(/\s/g, '_')}.pdf`);
+    // Organization info
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Une initiative de ${settings.organizationName}`, pageWidth/2, 155, { align: 'center' });
+    
+    // Footer Left - Date & Verification
+    const date = new Date().toLocaleDateString('fr-FR');
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Délivrée le : ${date}`, 30, 180);
+    doc.text(`Code de vérification : PL-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, 30, 186);
+    
+    // Footer Right - Signature
+    const signatureX = 220;
+    const signatureY = 175;
+    
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Le Directeur Exécutif HAI', signatureX, 165, { align: 'center' });
+    
+    if (settings.directorSignatureUrl) {
+      try {
+        doc.addImage(settings.directorSignatureUrl, 'PNG', signatureX - 25, 168, 50, 20);
+      } catch (e) {
+        console.error("Could not add signature to PDF", e);
+      }
+    }
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(settings.directorName || 'Directeur HAI', signatureX, 195, { align: 'center' });
+    
+    doc.setDrawColor(16, 185, 129);
+    doc.setLineWidth(0.5);
+    doc.line(signatureX - 30, 190, signatureX + 30, 190);
+
+    doc.save(`Attestation_${user.fullName.replace(/\s/g, '_')}.pdf`);
   };
 
   const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'assistant' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
@@ -3837,6 +3929,7 @@ export default function App() {
         onLogin={handleLogin} 
         onLoginWithGoogle={loginWithGoogle}
         onResetPassword={sendPasswordReset}
+        logoUrl={settings.logoUrl}
         isLoading={isLoading} 
         error={error} 
       />

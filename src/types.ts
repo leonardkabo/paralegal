@@ -47,6 +47,8 @@ export interface AppSettings {
   logoUrl?: string;
   organizationName: string;
   contactEmail: string;
+  directorName?: string;
+  directorSignatureUrl?: string;
 }
 
 export interface GlossaryTerm {

@@ -73,7 +73,9 @@ export function useAppState() {
   const [settings, setSettings] = useState<AppSettings>({
     organizationName: 'Health Access Initiative (HAI)',
     contactEmail: 'contact@hai-benin.org',
-    logoUrl: ''
+    logoUrl: '',
+    directorName: 'Leonard Kabo',
+    directorSignatureUrl: ''
   });
   const [isSyncing, setIsSyncing] = useState(false);
 
