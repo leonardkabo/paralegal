@@ -26,7 +26,8 @@ import {
   onAuthStateChanged,
   signInWithPopup,
   GoogleAuthProvider,
-  updatePassword
+  updatePassword,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 
 export function useAppState() {
@@ -116,34 +117,39 @@ export function useAppState() {
         }
 
         let userData: User | null = null;
+        const identifier = phone || fbUser.email;
         
-        if (phone) {
-          const userSnap = await getDoc(doc(db, 'users', phone));
+        if (identifier) {
+          // 1. Try direct ID (could be phone or email)
+          const userSnap = await getDoc(doc(db, 'users', identifier));
           if (userSnap.exists()) {
             userData = userSnap.data() as User;
-          }
-        } else if (fbUser.email) {
-          const q = query(collection(db, 'users'), where('email', '==', fbUser.email));
-          const userSnap = await getDocs(q);
-          if (!userSnap.empty) {
-            userData = userSnap.docs[0].data() as User;
-          } else {
-            // First time admin login
-            const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
-            if (adminEmails.includes(fbUser.email)) {
-              userData = {
-                fullName: fbUser.displayName || (fbUser.email === adminEmails[0] ? "Leonard Kabo" : "HAI Admin"),
-                phone: fbUser.email,
-                location: "Bénin",
-                gender: "M",
-                birthDate: "1990-01-01",
-                educationLevel: "Expert",
-                preferredLanguage: "fr",
-                isAdmin: true,
-                email: fbUser.email
-              };
-              await setDoc(doc(db, 'users', userData.phone), userData);
+          } else if (fbUser.email) {
+            // 2. Try query by email (in case doc ID was phone but logged in with email)
+            const q = query(collection(db, 'users'), where('email', '==', fbUser.email));
+            const qSnap = await getDocs(q);
+            if (!qSnap.empty) {
+              userData = qSnap.docs[0].data() as User;
             }
+          }
+        }
+
+        if (!userData && fbUser.email) {
+          // First time admin login
+          const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
+          if (adminEmails.includes(fbUser.email)) {
+            userData = {
+              fullName: fbUser.displayName || "Admin",
+              phone: fbUser.email,
+              location: "Bénin",
+              gender: "M",
+              birthDate: "1990-01-01",
+              educationLevel: "Expert",
+              preferredLanguage: "fr",
+              isAdmin: true,
+              email: fbUser.email
+            };
+            await setDoc(doc(db, 'users', fbUser.email), userData);
           }
         }
 
@@ -152,7 +158,8 @@ export function useAppState() {
           localStorage.setItem('paralegal_user', JSON.stringify(userData));
 
           // Subscribe to real-time progress
-          const unsubscribeProgress = onSnapshot(doc(db, 'progress', userData.phone), (progressSnap) => {
+          const userId = userData.phone || userData.email || identifier!;
+          const unsubscribeProgress = onSnapshot(doc(db, 'progress', userId), (progressSnap) => {
             if (progressSnap.exists()) {
               const data = progressSnap.data() as UserProgress;
               setProgress(data);
@@ -312,34 +319,49 @@ export function useAppState() {
     setIsLoading(true);
     setError(null);
     try {
-      // Normalize phone for email (remove + and spaces)
-      const normalizedPhone = userData.phone.replace(/[+\s]/g, '');
-      const email = `${normalizedPhone}@paralegal.bj`;
-      const password = userData.password || "password123";
+      if (!userData.phone && !userData.email) {
+        setError("Veuillez renseigner au moins un numéro de téléphone ou un email.");
+        setIsLoading(false);
+        return;
+      }
 
-      // Try reading if user exists first (needs public get rule)
-      const userRef = doc(db, 'users', userData.phone);
+      // Determine Auth Email
+      let authEmail = userData.email || "";
+      if (userData.phone && !authEmail) {
+        const normalizedPhone = userData.phone.replace(/[+\s]/g, '');
+        authEmail = `${normalizedPhone}@paralegal.bj`;
+      }
+
+      const password = userData.password || "password123";
+      
+      // Use phone as ID if available, otherwise email
+      const userId = userData.phone || userData.email!;
+      const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
+      
       if (userSnap.exists()) {
-        setError("Ce numéro de téléphone est déjà utilisé.");
+        setError("Cet identifiant est déjà utilisé.");
         setIsLoading(false);
         return;
       }
 
       // Create Firebase Auth account
       try {
-        await createUserWithEmailAndPassword(auth, email, password);
+        await createUserWithEmailAndPassword(auth, authEmail, password);
       } catch (authErr: any) {
         if (authErr.code === 'auth/operation-not-allowed') {
-          setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase (Authentification > Sign-in method).");
+          setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
+          setIsLoading(false);
+          return;
+        }
+        if (authErr.code === 'auth/email-already-in-use') {
+          setError("Cet email ou document est déjà utilisé.");
           setIsLoading(false);
           return;
         }
         throw authErr;
       }
 
-      const userId = userData.phone;
-      
       const fullUser: User = { 
         ...userData, 
         preferredLanguage: 'fr',
@@ -363,25 +385,37 @@ export function useAppState() {
       
       setUser(fullUser);
     } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') {
-        setError("Ce numéro de téléphone est déjà utilisé.");
-      } else {
-        handleFirestoreError(err, OperationType.CREATE, 'users');
-      }
+      handleFirestoreError(err, OperationType.CREATE, 'users');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (phone: string, password: string) => {
+  const login = async (identifier: string, password: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const normalizedPhone = phone.replace(/[+\s]/g, '');
-      const email = `${normalizedPhone}@paralegal.bj`;
+      let authEmail = identifier;
+      let targetUserDoc: User | null = null;
+
+      // 1. Try to find user in Firestore to see if they have a real email
+      const userRef = doc(db, 'users', identifier);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        targetUserDoc = userSnap.data() as User;
+        if (targetUserDoc.email && !identifier.includes('@')) {
+          authEmail = targetUserDoc.email;
+        }
+      }
+
+      // 2. If no doc found or no email, and it's a phone, use virtual email
+      if (!identifier.includes('@') && authEmail === identifier) {
+        const normalizedPhone = identifier.replace(/[+\s]/g, '');
+        authEmail = `${normalizedPhone}@paralegal.bj`;
+      }
       
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, authEmail, password);
       } catch (authErr: any) {
         if (authErr.code === 'auth/operation-not-allowed') {
           setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
@@ -389,31 +423,24 @@ export function useAppState() {
           return;
         }
         
-        // If user document exists in Firestore but no Firebase Auth account yet, migrate them
-        const userRef = doc(db, 'users', phone);
-        const userSnap = await getDoc(userRef);
-        
-        if (userSnap.exists()) {
-          const userData = userSnap.data() as User;
-          if (userData.password === password) {
-            // Auto-create Firebase Auth account for existing Firestore user
-            try {
-              await createUserWithEmailAndPassword(auth, email, password);
-              return; // onAuthStateChanged will handle the rest
-            } catch (createErr: any) {
-              if (createErr.code === 'auth/operation-not-allowed') {
-                setError("ERREUR CONFIGURATION : Veuillez activer 'E-mail/Mot de passe' dans Firebase.");
-                setIsLoading(false);
-                return;
-              }
-              throw createErr;
+        // Migration/Fallback check (if not found in Auth, check if we need to migrate)
+        if (targetUserDoc && targetUserDoc.password === password) {
+          try {
+            await createUserWithEmailAndPassword(auth, authEmail, password);
+            return;
+          } catch (createErr: any) {
+            if (createErr.code === 'auth/operation-not-allowed') {
+              setError("ERREUR CONFIGURATION.");
+              setIsLoading(false);
+              return;
             }
+            throw createErr;
           }
         }
         throw authErr;
       }
     } catch (err: any) {
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setError("Identifiants incorrects");
       } else {
         handleFirestoreError(err, OperationType.GET, 'users');
@@ -443,20 +470,24 @@ export function useAppState() {
     }
   };
 
-  const resetPassword = async (phone: string, birthDate: string, newPassword: string) => {
+  const sendPasswordReset = async (emailOrPhone: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const userRef = doc(db, 'users', phone);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists() && userSnap.data().birthDate === birthDate) {
-        await updateDoc(userRef, { password: newPassword });
-        return true;
+      let email = emailOrPhone;
+      if (!emailOrPhone.includes('@')) {
+        const normalizedPhone = emailOrPhone.replace(/[+\s]/g, '');
+        email = `${normalizedPhone}@paralegal.bj`;
       }
-      setError("Informations incorrectes");
-      return false;
-    } catch (err) {
-      handleFirestoreError(err, OperationType.UPDATE, `users/${phone}`);
+      
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found') {
+        setError("Utilisateur non trouvé.");
+      } else {
+        setError("Erreur lors de l'envoi du code de réinitialisation.");
+      }
       return false;
     } finally {
       setIsLoading(false);
@@ -755,7 +786,7 @@ export function useAppState() {
     error,
     registerUser,
     login,
-    resetPassword,
+    sendPasswordReset,
     setLanguage,
     completeModule,
     markAudioListened,

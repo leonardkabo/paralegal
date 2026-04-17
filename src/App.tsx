@@ -115,7 +115,7 @@ const AuthScreen = ({
   onRegister: (data: any) => void, 
   onLogin: (phone: string, pass: string) => void,
   onLoginWithGoogle: () => void,
-  onResetPassword: (phone: string, birthDate: string, pass: string) => Promise<boolean>,
+  onResetPassword: (identifier: string) => Promise<boolean>,
   isLoading: boolean,
   error: string | null
 }) => {
@@ -123,6 +123,7 @@ const AuthScreen = ({
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
+    email: '',
     location: '',
     gender: '',
     birthDate: '',
@@ -135,28 +136,36 @@ const AuthScreen = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mode === 'register') {
+      if (!formData.phone && !formData.email) {
+        alert("Veuillez renseigner au moins un numéro de téléphone ou un email.");
+        return;
+      }
       if (formData.password !== formData.confirmPassword) {
         alert("Les mots de passe ne correspondent pas.");
         return;
       }
       onRegister(formData);
     } else if (mode === 'login') {
-      onLogin(formData.phone, formData.password);
-    } else if (mode === 'forgot-password') {
-      if (formData.password !== formData.confirmPassword) {
-        alert("Les mots de passe ne correspondent pas.");
+      const identifier = formData.phone || formData.email;
+      if (!identifier) {
+        alert("Veuillez entrer votre téléphone ou email.");
         return;
       }
-      const success = await onResetPassword(formData.phone, formData.birthDate, formData.password);
+      onLogin(identifier, formData.password);
+    } else if (mode === 'forgot-password') {
+      const identifier = formData.phone || formData.email;
+      if (!identifier) {
+        alert("Veuillez entrer votre téléphone ou email.");
+        return;
+      }
+      const success = await onResetPassword(identifier);
       if (success) {
         setResetSuccess(true);
-        setTimeout(() => {
-          setResetSuccess(false);
-          setMode('login');
-        }, 3000);
       }
     }
   };
+
+  const resetMode = mode === 'forgot-password';
 
   return (
     <div className="min-h-screen p-6 flex flex-col max-w-md mx-auto py-12">
@@ -172,14 +181,18 @@ const AuthScreen = ({
             ? 'Connectez-vous pour retrouver votre progression.' 
             : mode === 'register'
             ? 'Inscrivez-vous pour commencer votre formation de parajuriste.'
-            : 'Entrez votre numéro et votre date de naissance pour réinitialiser votre mot de passe.'}
+            : 'Entrez votre email ou numéro de téléphone pour recevoir un lien de réinitialisation.'}
         </p>
       </div>
 
       {resetSuccess ? (
-        <div className="bg-emerald-50 text-emerald-700 p-4 rounded-xl text-center mb-6">
-          <p className="font-bold">Succès !</p>
-          <p className="text-sm">Votre mot de passe a été réinitialisé. Redirection vers la connexion...</p>
+        <div className="bg-emerald-50 text-emerald-700 p-6 rounded-2xl text-center mb-6">
+          <CheckCircle2 size={48} className="mx-auto mb-4 text-emerald-500" />
+          <p className="font-bold text-lg">Vérifiez vos messages</p>
+          <p className="text-sm mt-2">Si un compte correspond à cet identifiant, vous recevrez un lien/code pour réinitialiser votre mot de passe.</p>
+          <Button variant="outline" className="w-full mt-6" onClick={() => { setResetSuccess(false); setMode('login'); }}>
+            Retour à la connexion
+          </Button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -192,38 +205,49 @@ const AuthScreen = ({
               onChange={e => setFormData({...formData, fullName: e.target.value})}
             />
           )}
-          <Input 
-            label="Numéro de téléphone" 
-            type="tel" 
-            placeholder="Ex: +229 ..." 
-            required 
-            value={formData.phone}
-            onChange={e => setFormData({...formData, phone: e.target.value})}
-          />
-          {(mode === 'register' || mode === 'forgot-password') && (
+          
+          <div className="grid grid-cols-1 gap-4">
+            <Input 
+              label={mode === 'login' || mode === 'forgot-password' ? "Téléphone ou Email" : "Numéro de téléphone"} 
+              type={mode === 'register' ? "tel" : "text"} 
+              placeholder={mode === 'register' ? "Ex: +229 ..." : "Votre téléphone ou email"} 
+              required={mode === 'register' ? !formData.email : true}
+              value={formData.phone}
+              onChange={e => setFormData({...formData, phone: e.target.value})}
+            />
+            
+            {mode === 'register' && (
+              <Input 
+                label="Email (Facultatif)" 
+                type="email" 
+                placeholder="Ex: jean@exemple.com" 
+                required={!formData.phone}
+                value={formData.email}
+                onChange={e => setFormData({...formData, email: e.target.value})}
+              />
+            )}
+          </div>
+
+          {mode === 'register' && (
             <>
-              {mode === 'register' && (
-                <Input 
-                  label="Commune / Quartier" 
-                  placeholder="Ex: Cotonou, Akpakpa" 
-                  required 
-                  value={formData.location}
-                  onChange={e => setFormData({...formData, location: e.target.value})}
+              <Input 
+                label="Commune / Quartier" 
+                placeholder="Ex: Cotonou, Akpakpa" 
+                required 
+                value={formData.location}
+                onChange={e => setFormData({...formData, location: e.target.value})}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <Select 
+                  label="Sexe" 
+                  options={[
+                    { value: 'M', label: 'Masculin' },
+                    { value: 'F', label: 'Féminin' }
+                  ]} 
+                  required
+                  value={formData.gender}
+                  onChange={e => setFormData({...formData, gender: e.target.value})}
                 />
-              )}
-              <div className={cn("grid gap-4", mode === 'register' ? "grid-cols-2" : "grid-cols-1")}>
-                {mode === 'register' && (
-                  <Select 
-                    label="Sexe" 
-                    options={[
-                      { value: 'M', label: 'Masculin' },
-                      { value: 'F', label: 'Féminin' }
-                    ]} 
-                    required
-                    value={formData.gender}
-                    onChange={e => setFormData({...formData, gender: e.target.value})}
-                  />
-                )}
                 <Input 
                   label="Date de naissance" 
                   type="date" 
@@ -232,32 +256,33 @@ const AuthScreen = ({
                   onChange={e => setFormData({...formData, birthDate: e.target.value})}
                 />
               </div>
-              {mode === 'register' && (
-                <Select 
-                  label="Niveau d'instruction" 
-                  options={[
-                    { value: 'aucun', label: 'Aucun' },
-                    { value: 'primaire', label: 'Primaire' },
-                    { value: 'secondaire', label: 'Secondaire' },
-                    { value: 'superieur', label: 'Supérieur' }
-                  ]} 
-                  required
-                  value={formData.educationLevel}
-                  onChange={e => setFormData({...formData, educationLevel: e.target.value})}
-                />
-              )}
+              <Select 
+                label="Niveau d'instruction" 
+                options={[
+                  { value: 'aucun', label: 'Aucun' },
+                  { value: 'primaire', label: 'Primaire' },
+                  { value: 'secondaire', label: 'Secondaire' },
+                  { value: 'superieur', label: 'Supérieur' }
+                ]} 
+                required
+                value={formData.educationLevel}
+                onChange={e => setFormData({...formData, educationLevel: e.target.value})}
+              />
             </>
           )}
-          <Input 
-            label={mode === 'forgot-password' ? "Nouveau mot de passe" : "Mot de passe"} 
-            type="password" 
-            placeholder="••••••••" 
-            required 
-            value={formData.password}
-            onChange={e => setFormData({...formData, password: e.target.value})}
-          />
 
-          {(mode === 'register' || mode === 'forgot-password') && (
+          {!resetMode && (
+            <Input 
+              label="Mot de passe" 
+              type="password" 
+              placeholder="••••••••" 
+              required 
+              value={formData.password}
+              onChange={e => setFormData({...formData, password: e.target.value})}
+            />
+          )}
+
+          {mode === 'register' && (
             <Input 
               label="Confirmer le mot de passe" 
               type="password" 
@@ -266,6 +291,18 @@ const AuthScreen = ({
               value={formData.confirmPassword}
               onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
             />
+          )}
+          
+          {mode === 'login' && (
+            <div className="flex justify-end">
+              <button 
+                type="button"
+                onClick={() => setMode('forgot-password')}
+                className="text-xs font-bold text-emerald-600 hover:text-emerald-700"
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
           )}
           
           {error && <p className="text-xs text-red-500 text-center font-medium">{error}</p>}
@@ -2182,6 +2219,7 @@ const AdminDashboard = ({
   const [newUser, setNewUser] = useState({
     fullName: '',
     phone: '',
+    email: '',
     location: '',
     gender: 'M',
     birthDate: '',
@@ -2195,6 +2233,7 @@ const AdminDashboard = ({
       setNewUser({
         fullName: editingUser.fullName || '',
         phone: editingUser.phone || '',
+        email: editingUser.email || '',
         location: editingUser.location || '',
         gender: editingUser.gender || 'M',
         birthDate: editingUser.birthDate || '',
@@ -2207,6 +2246,7 @@ const AdminDashboard = ({
       setNewUser({
         fullName: '',
         phone: '',
+        email: '',
         location: '',
         gender: 'M',
         birthDate: '',
@@ -2768,7 +2808,21 @@ const AdminDashboard = ({
                   </div>
                   <form onSubmit={handleSaveUser} className="space-y-4">
                     <Input label="Nom complet" value={newUser.fullName} onChange={e => setNewUser({...newUser, fullName: e.target.value})} required />
-                    <Input label="Téléphone" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} required disabled={!!editingUser} />
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input 
+                        label="Téléphone" 
+                        value={newUser.phone} 
+                        onChange={e => setNewUser({...newUser, phone: e.target.value})} 
+                        required={!newUser.email}
+                      />
+                      <Input 
+                        label="Email" 
+                        type="email"
+                        value={newUser.email} 
+                        onChange={e => setNewUser({...newUser, email: e.target.value})} 
+                        required={!newUser.phone}
+                      />
+                    </div>
                     <Input label="Localisation" value={newUser.location} onChange={e => setNewUser({...newUser, location: e.target.value})} required />
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase">Genre</label>
@@ -3665,7 +3719,7 @@ export default function App() {
     registerUser, 
     login,
     loginWithGoogle,
-    resetPassword,
+    sendPasswordReset,
     setLanguage, 
     completeModule, 
     markAudioListened,
@@ -3782,7 +3836,7 @@ export default function App() {
         onRegister={handleRegister} 
         onLogin={handleLogin} 
         onLoginWithGoogle={loginWithGoogle}
-        onResetPassword={resetPassword}
+        onResetPassword={sendPasswordReset}
         isLoading={isLoading} 
         error={error} 
       />

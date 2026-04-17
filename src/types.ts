@@ -2,7 +2,7 @@ export type Language = 'fr' | 'fon';
 
 export interface User {
   fullName: string;
-  phone: string;
+  phone?: string;
   email?: string;
   location: string;
   gender: string;
