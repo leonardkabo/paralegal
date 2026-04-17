@@ -8,18 +8,20 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isOwner(phone) {
+    function isOwner(phoneOrId) {
       return isAuthenticated() && (
-        request.auth.token.phone_number == phone || 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone == phone
+        request.auth.uid == phoneOrId ||
+        request.auth.token.email == phoneOrId ||
+        request.auth.token.phone_number == phoneOrId ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone == phoneOrId
       );
     }
 
     function isAdmin() {
       return isAuthenticated() && (
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true ||
         request.auth.token.email == "leonardkabo32@gmail.com" ||
-        request.auth.token.email == "healthaccessinitiativehai@gmail.com"
+        request.auth.token.email == "healthaccessinitiativehai@gmail.com" ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
       );
     }
 
@@ -28,12 +30,11 @@ service cloud.firestore {
     // ===============================================================
     function isValidUser(data) {
       return data.fullName is string && data.fullName.size() > 0 &&
-             data.phone is string && data.phone.size() > 0 &&
-             data.preferredLanguage in ['fr', 'fon'];
+             data.phone is string && data.phone.size() > 0;
     }
 
     function isValidProgress(data) {
-      return data.phone is string && data.phone.size() > 0;
+      return data.keys().hasAny(['completedModules', 'quizScores']);
     }
 
     // ===============================================================
@@ -41,15 +42,18 @@ service cloud.firestore {
     // ===============================================================
     
     match /users/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow create: if isAuthenticated() && isValidUser(request.resource.data) && (request.auth.uid == userId || isAdmin());
-      allow update: if isAuthenticated() && isValidUser(request.resource.data) && (request.auth.uid == userId || isAdmin());
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      // Special case: allow registration (create) if data is valid
+      allow create: if isValidUser(request.resource.data);
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
       allow delete: if isAdmin();
     }
 
-    match /progress/{phone} {
-      allow read: if isAuthenticated() && (isOwner(phone) || isAdmin());
-      allow create, update: if isAuthenticated() && isValidProgress(request.resource.data) && (isOwner(phone) || isAdmin());
+    match /progress/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      // Allow creation during registration or by admin
+      allow create: if isValidProgress(request.resource.data);
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
     }
 
     match /modules/{moduleId} {

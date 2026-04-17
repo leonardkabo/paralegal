@@ -57,7 +57,7 @@ export function useAppState() {
       audioListened: {},
       completedCaseStudies: [],
       lastActivity: '',
-      lastModuleId: undefined
+      lastModuleId: 0
     };
   });
 
@@ -261,10 +261,21 @@ export function useAppState() {
       setIsSyncing(true);
       try {
         const progressRef = doc(db, 'progress', user.phone);
-        await setDoc(progressRef, {
-          ...progress,
+        
+        // Sanitize data to avoid Firestore "undefined" error
+        const sanitizedProgress = {
+          completedModules: progress.completedModules || [],
+          quizScores: progress.quizScores || {},
+          audioListened: progress.audioListened || {},
+          completedCaseStudies: progress.completedCaseStudies || [],
+          finalExamScore: progress.finalExamScore ?? null,
+          finalExamDate: progress.finalExamDate ?? null,
+          lastActivity: progress.lastActivity || '',
+          lastModuleId: progress.lastModuleId ?? 0,
           lastUpdated: new Date().toISOString()
-        }, { merge: true });
+        };
+
+        await setDoc(progressRef, sanitizedProgress, { merge: true });
         
         lastSyncedRef.current = currentProgressStr;
       } catch (err) {
@@ -349,8 +360,12 @@ export function useAppState() {
       const result = await signInWithPopup(auth, provider);
       // Handled by onAuthStateChanged listener
       return result.user;
-    } catch (err) {
-      setError("Erreur de connexion Google");
+    } catch (err: any) {
+      if (err.code === 'auth/popup-blocked') {
+        setError("La fenêtre de connexion Google a été bloquée par votre navigateur. Veuillez autoriser les fenêtres surgissantes (popups) pour ce site.");
+      } else {
+        setError("Erreur de connexion Google");
+      }
       console.error(err);
     } finally {
       setIsLoading(false);
