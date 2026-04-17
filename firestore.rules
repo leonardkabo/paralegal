@@ -12,8 +12,7 @@ service cloud.firestore {
       return isAuthenticated() && (
         request.auth.uid == phoneOrId ||
         request.auth.token.email == phoneOrId ||
-        request.auth.token.phone_number == phoneOrId ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone == phoneOrId
+        request.auth.token.email == phoneOrId + "@paralegal.bj"
       );
     }
 
@@ -21,7 +20,8 @@ service cloud.firestore {
       return isAuthenticated() && (
         request.auth.token.email == "leonardkabo32@gmail.com" ||
         request.auth.token.email == "healthaccessinitiativehai@gmail.com" ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
+        (exists(/databases/$(database)/documents/users/$(request.auth.token.email)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.isAdmin == true)
       );
     }
 
