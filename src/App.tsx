@@ -88,7 +88,6 @@ import { Input } from './components/Input';
 import { Select } from './components/Select';
 import { ProgressBar } from './components/ProgressBar';
 import { useAppState } from './hooks/useAppState';
-import { GoogleGenAI } from "@google/genai";
 import { cn } from './lib/utils';
 
 // --- Components ---
@@ -635,43 +634,85 @@ const DocumentsScreen = ({ onBack, documents }: { onBack: () => void, documents:
   );
 };
 
-const AssistantScreen = ({ onBack }: { onBack: () => void }) => {
-  const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string}[]>([
-    { role: 'assistant', text: "Bonjour ! Je suis votre tuteur juridique. Comment puis-je vous aider aujourd'hui ? Vous pouvez me poser des questions sur les cours ou sur une procédure juridique au Bénin." }
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+const ReportingScreen = ({ 
+  user, 
+  module, 
+  onBack, 
+  onComplete 
+}: { 
+  user: any, 
+  module: Module, 
+  onBack: () => void,
+  onComplete: () => void 
+}) => {
+  const [reportData, setReportData] = useState<{
+    type: string;
+    description: string;
+    location: string;
+    date: string;
+    anonymous: boolean;
+    audioBlob: Blob | null;
+    attachments: File[];
+    coordinates: [number, number] | null;
+  }>({
+    type: '',
+    description: '',
+    location: '',
+    date: '',
+    anonymous: false,
+    audioBlob: null,
+    attachments: [],
+    coordinates: null
+  });
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleReportSubmit = async () => {
+    if (!reportData.type || !reportData.description) {
+      alert("Veuillez remplir les champs obligatoires.");
+      return;
     }
-  }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-
-    const userMsg = input;
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setIsLoading(true);
-
+    setIsSubmitting(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: userMsg,
-        config: {
-          systemInstruction: "Tu es un tuteur juridique expert pour des parajuristes en formation au Bénin. Réponds de manière professionnelle, simple et pédagogique. Utilise des exemples concrets du droit béninois quand c'est possible. Si l'utilisateur pose une question hors du cadre juridique ou de la formation, redirige-le poliment vers le sujet."
-        }
+      const formData = new FormData();
+      formData.append('id', Math.random().toString(36).substr(2, 9));
+      formData.append('userId', user.phone || user.email);
+      formData.append('moduleId', module.id.toString());
+      formData.append('type', reportData.type);
+      formData.append('description', reportData.description);
+      formData.append('location', JSON.stringify({
+        address: reportData.location,
+        latitude: reportData.coordinates?.[0],
+        longitude: reportData.coordinates?.[1]
+      }));
+      formData.append('date', reportData.date);
+      formData.append('anonymous', reportData.anonymous.toString());
+
+      if (reportData.audioBlob) {
+        formData.append('audio', reportData.audioBlob, 'report-audio.webm');
+      }
+
+      reportData.attachments.forEach(file => {
+        formData.append('attachments', file);
       });
-      
-      setMessages(prev => [...prev, { role: 'assistant', text: response.text || "Désolé, je n'ai pas pu générer de réponse." }]);
+
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        alert("Signalement envoyé avec succès !");
+        onComplete();
+      } else {
+        throw new Error("Failed to submit report");
+      }
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'assistant', text: "Désolé, une erreur est survenue lors de la connexion à l'assistant." }]);
+      console.error(err);
+      alert("Erreur lors de l'envoi du signalement.");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -681,49 +722,127 @@ const AssistantScreen = ({ onBack }: { onBack: () => void }) => {
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft size={20} />
         </Button>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
-            <Sparkles size={18} />
-          </div>
-          <h2 className="font-bold">Tuteur Juridique IA</h2>
+        <div className="flex items-center gap-2 text-emerald-600">
+          <MessageSquare size={20} />
+          <h2 className="font-bold">Cas de Signalement</h2>
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 pb-24">
-        {messages.map((msg, i) => (
-          <div key={i} className={cn(
-            "max-w-[85%] p-4 rounded-2xl text-sm",
-            msg.role === 'user' 
-              ? "bg-emerald-600 text-white ml-auto rounded-tr-none" 
-              : "bg-white text-slate-700 shadow-sm border border-slate-100 rounded-tl-none"
-          )}>
-            {msg.text}
+      <div className="flex-1 overflow-y-auto p-6 pb-24">
+        <div className="space-y-6">
+          <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+            <p className="text-sm text-emerald-800">Remplissez ce formulaire pour signaler un cas communautaire. Votre signalement sera traité par HAI.</p>
           </div>
-        ))}
-        {isLoading && (
-          <div className="bg-white text-slate-400 p-4 rounded-2xl rounded-tl-none text-xs flex items-center gap-2 shadow-sm border border-slate-100 w-fit">
-            <div className="flex gap-1">
-              <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce" />
-              <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:0.2s]" />
-              <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:0.4s]" />
-            </div>
-            L'assistant réfléchit...
-          </div>
-        )}
-      </div>
 
-      <div className="p-4 bg-white border-t border-slate-100 fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl">
-        <div className="flex gap-2">
-          <input 
-            type="text"
-            placeholder="Posez votre question..."
-            className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSend()}
+          <Select 
+            label="Type de problème" 
+            options={[
+              { value: 'justice', label: 'Justice' },
+              { value: 'sante', label: 'Santé' },
+              { value: 'foncier', label: 'Foncier' },
+              { value: 'enfance', label: 'Enfance' },
+              { value: 'vbg', label: 'VBG' },
+              { value: 'autre', label: 'Autre' }
+            ]}
+            value={reportData.type}
+            onChange={e => setReportData({...reportData, type: e.target.value})}
           />
-          <Button size="icon" onClick={handleSend} disabled={isLoading}>
-            <Send size={18} />
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Description du cas</label>
+            <textarea 
+              className="w-full p-4 bg-white border border-slate-200 rounded-xl min-h-[120px] focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              placeholder="Décrivez la situation en détail..."
+              value={reportData.description}
+              onChange={e => setReportData({...reportData, description: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Enregistrement audio (Optionnel)</label>
+            <AudioRecorder onRecordingComplete={(blob) => setReportData({...reportData, audioBlob: blob})} />
+            {reportData.audioBlob && (
+              <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                <CheckCircle2 size={12} /> Audio enregistré avec succès
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Localisation précise (Map)</label>
+            <LocationPicker 
+              initialLocation={reportData.coordinates} 
+              onLocationSelect={(lat, lng) => setReportData({...reportData, coordinates: [lat, lng]})} 
+            />
+            <Input 
+              label="Adresse ou repères" 
+              placeholder="Quartier, ville, point de repère..." 
+              value={reportData.location}
+              onChange={e => setReportData({...reportData, location: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Pièces jointes (Images, PDF)</label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col items-center justify-center p-4 bg-white border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 hover:bg-emerald-50 transition-all">
+                <Paperclip size={20} className="text-slate-400 mb-1" />
+                <span className="text-[10px] font-bold text-slate-500">Ajouter des fichiers</span>
+                <input 
+                  type="file" 
+                  multiple 
+                  accept="image/*,.pdf" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setReportData({
+                        ...reportData, 
+                        attachments: [...reportData.attachments, ...Array.from(e.target.files)]
+                      });
+                    }
+                  }}
+                />
+              </label>
+              <div className="space-y-1">
+                {reportData.attachments.map((file, i) => (
+                  <div key={i} className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-lg text-[10px]">
+                    <span className="truncate max-w-[80px]">{file.name}</span>
+                    <button onClick={() => setReportData({
+                      ...reportData,
+                      attachments: reportData.attachments.filter((_, idx) => idx !== i)
+                    })}>
+                      <X size={12} className="text-red-400" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <Input 
+            label="Date de l'incident" 
+            type="date" 
+            value={reportData.date}
+            onChange={e => setReportData({...reportData, date: e.target.value})}
+          />
+
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100">
+            <input 
+              type="checkbox" 
+              id="anon" 
+              className="w-5 h-5 accent-emerald-500"
+              checked={reportData.anonymous}
+              onChange={e => setReportData({...reportData, anonymous: e.target.checked})}
+            />
+            <label htmlFor="anon" className="text-sm font-medium text-slate-600">Soumettre anonymement</label>
+          </div>
+
+          <Button 
+            className="w-full h-14 text-lg shadow-lg shadow-emerald-500/20" 
+            onClick={handleReportSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Envoi en cours..." : "Envoyer le signalement"}
           </Button>
         </div>
       </div>
@@ -1598,7 +1717,7 @@ const ModuleDetail = ({
     try {
       const formData = new FormData();
       formData.append('id', Math.random().toString(36).substr(2, 9));
-      formData.append('userId', user.phone);
+      formData.append('userId', user.phone || user.email);
       formData.append('moduleId', module.id.toString());
       formData.append('type', reportData.type);
       formData.append('description', reportData.description);
@@ -1636,10 +1755,6 @@ const ModuleDetail = ({
       setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    if (module.isReporting) setView('reporting');
-  }, [module]);
 
   const handleQuizSubmit = () => {
     if (!module.quiz) return;
@@ -1837,6 +1952,11 @@ const ModuleDetail = ({
                 {module.quiz && module.quiz.length > 0 && (
                   <Button className="w-full" onClick={() => setView('quiz')}>
                     Passer au Quiz
+                  </Button>
+                )}
+                {module.isReporting && (
+                  <Button className="w-full" onClick={() => setView('reporting')}>
+                    Passer au Signalement
                   </Button>
                 )}
               </div>
@@ -3806,19 +3926,35 @@ export default function App() {
     doc.setFillColor(245, 252, 250);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
     
-    // Border
+    // Decorative Border
     doc.setDrawColor(16, 185, 129);
-    doc.setLineWidth(2);
-    doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+    doc.setLineWidth(1.5);
+    doc.rect(8, 8, pageWidth - 16, pageHeight - 16);
     
     doc.setDrawColor(16, 185, 129);
     doc.setLineWidth(0.5);
-    doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
+    doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
     
-    // Logo if exists
+    // Corners
+    const cornerSize = 15;
+    doc.setLineWidth(2);
+    // Top Left
+    doc.line(8, 8, 8 + cornerSize, 8);
+    doc.line(8, 8, 8, 8 + cornerSize);
+    // Top Right
+    doc.line(pageWidth - 8, 8, pageWidth - 8 - cornerSize, 8);
+    doc.line(pageWidth - 8, 8, pageWidth - 8, 8 + cornerSize);
+    // Bottom Left
+    doc.line(8, pageHeight - 8, 8 + cornerSize, pageHeight - 8);
+    doc.line(8, pageHeight - 8, 8, pageHeight - 8 - cornerSize);
+    // Bottom Right
+    doc.line(pageWidth - 8, pageHeight - 8, pageWidth - 8 - cornerSize, pageHeight - 8);
+    doc.line(pageWidth - 8, pageHeight - 8, pageWidth - 8, pageHeight - 8 - cornerSize);
+
+    // Logo
     if (settings.logoUrl) {
       try {
-        doc.addImage(settings.logoUrl, 'PNG', pageWidth/2 - 15, 20, 30, 30);
+        doc.addImage(settings.logoUrl, 'PNG', pageWidth/2 - 15, 18, 30, 30);
       } catch (e) {
         console.error("Could not add logo to PDF", e);
       }
@@ -3827,70 +3963,81 @@ export default function App() {
     // Header
     doc.setTextColor(15, 23, 42);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(36);
-    doc.text('ATTESTATION DE RÉUSSITE', pageWidth/2, 70, { align: 'center' });
+    doc.setFontSize(38);
+    doc.text('ATTESTATION DE RÉUSSITE', pageWidth/2, 65, { align: 'center' });
     
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(18);
-    doc.text('Décernée à', pageWidth/2, 90, { align: 'center' });
+    doc.setFontSize(16);
+    doc.text('Le présent document est fièrement décerné à', pageWidth/2, 80, { align: 'center' });
     
-    // User Name
+    // User Name with auto font size
+    let nameSize = 34;
+    const name = user.fullName.toUpperCase();
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(32);
     doc.setTextColor(5, 150, 105);
-    doc.text(user.fullName.toUpperCase(), pageWidth/2, 110, { align: 'center' });
+    
+    // Shrink font size if name is too long
+    const nameWidth = doc.getTextWidth(name);
+    if (nameWidth > 200) {
+      nameSize = (200 / nameWidth) * nameSize;
+    }
+    doc.setFontSize(nameSize);
+    doc.text(name, pageWidth/2, 100, { align: 'center' });
     
     // Content
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(16);
     doc.setTextColor(71, 85, 105);
-    const contentText = 'Pour avoir complété avec succès la formation professionnelle de';
-    doc.text(contentText, pageWidth/2, 130, { align: 'center' });
+    const contentText = 'Pour avoir complété avec succès le programme de formation intensive de';
+    doc.text(contentText, pageWidth/2, 118, { align: 'center' });
     
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
+    doc.setFontSize(24);
     doc.setTextColor(15, 23, 42);
-    doc.text('PARAJURISTE COMMUNAUTAIRE', pageWidth/2, 145, { align: 'center' });
+    doc.text('PARAJURISTE COMMUNAUTAIRE', pageWidth/2, 132, { align: 'center' });
 
     // Organization info
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('helvetica', 'italic');
     doc.setFontSize(12);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Une initiative de ${settings.organizationName}`, pageWidth/2, 155, { align: 'center' });
+    doc.text(`Propulsé par ${settings.organizationName}`, pageWidth/2, 142, { align: 'center' });
     
-    // Footer Left - Date & Verification
+    // Footer - Info Left
     const date = new Date().toLocaleDateString('fr-FR');
-    doc.setFontSize(10);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`Délivrée le : ${date}`, 30, 180);
-    doc.text(`Code de vérification : PL-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, 30, 186);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(148, 163, 184);
+    doc.text(`Délivrée le : ${date}`, 25, 185);
+    doc.text(`Identifiant de vérification : ${Math.random().toString(36).substr(2, 12).toUpperCase()}`, 25, 190);
+    doc.text('Ce document certifie la maîtrise des 10 modules de base du parajuralisme au Bénin.', 25, 195);
     
-    // Footer Right - Signature
-    const signatureX = 220;
-    const signatureY = 175;
+    // Footer - Signature Right
+    const sigX = 225;
+    const sigY = 175;
     
-    doc.setFontSize(11);
+    doc.setFontSize(12);
     doc.setTextColor(15, 23, 42);
     doc.setFont('helvetica', 'bold');
-    doc.text('Le Directeur Exécutif HAI', signatureX, 165, { align: 'center' });
+    doc.text('Le Directeur Exécutif HAI', sigX, 165, { align: 'center' });
     
+    // Signature Line
+    doc.setDrawColor(16, 185, 129);
+    doc.setLineWidth(0.5);
+    doc.line(sigX - 35, 188, sigX + 35, 188);
+
     if (settings.directorSignatureUrl) {
       try {
-        doc.addImage(settings.directorSignatureUrl, 'PNG', signatureX - 25, 168, 50, 20);
+        doc.addImage(settings.directorSignatureUrl, 'PNG', sigX - 25, 168, 50, 20);
       } catch (e) {
         console.error("Could not add signature to PDF", e);
       }
     }
     
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text(settings.directorName || 'Directeur HAI', signatureX, 195, { align: 'center' });
-    
-    doc.setDrawColor(16, 185, 129);
-    doc.setLineWidth(0.5);
-    doc.line(signatureX - 30, 190, signatureX + 30, 190);
+    doc.setFontSize(12);
+    doc.text(settings.directorName || 'Directeur HAI', sigX, 195, { align: 'center' });
 
-    doc.save(`Attestation_${user.fullName.replace(/\s/g, '_')}.pdf`);
+    doc.save(`Attestation_HAI_${user.fullName.replace(/\s/g, '_')}.pdf`);
   };
 
   const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'assistant' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
@@ -4050,9 +4197,20 @@ export default function App() {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-50 bg-slate-50 max-w-2xl mx-auto shadow-2xl overflow-y-auto"
+            className="fixed inset-0 z-50 bg-slate-50 max-w-2xl mx-auto shadow-2xl overflow-hidden"
           >
-            <AssistantScreen onBack={() => setCurrentScreen('main')} />
+            <ModuleDetail 
+              module={modules.find(m => m.id === 10) || modules[modules.length - 1]}
+              user={user}
+              progress={progress}
+              isSyncing={isSyncing}
+              onBack={() => setCurrentScreen('main')}
+              onComplete={(score) => {
+                const module10Id = modules.find(m => m.id === 10)?.id || 10;
+                completeModule(module10Id, score);
+                setCurrentScreen('main');
+              }}
+            />
           </motion.div>
         )}
 
@@ -4148,21 +4306,21 @@ export default function App() {
       </AnimatePresence>
 
       {/* Bottom Navigation (Mini) */}
-      {currentScreen === 'main' && (
+      {['main', 'assistant'].includes(currentScreen) && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-[calc(672px-3rem)] bg-slate-900 text-white rounded-2xl p-2 flex justify-around items-center shadow-xl z-20">
           <button className={cn("p-3 transition-colors", currentScreen === 'main' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('main')}>
             <BookOpen size={24} />
           </button>
-          <button className="p-3 text-slate-400 hover:text-white" onClick={() => setCurrentScreen('glossary')}>
+          <button className={cn("p-3 transition-colors", currentScreen === 'glossary' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('glossary')}>
             <Library size={24} />
           </button>
-          <button className="p-3 text-slate-400 hover:text-white" onClick={() => setCurrentScreen('assistant')}>
-            <Sparkles size={24} />
+          <button className={cn("p-3 transition-colors", currentScreen === 'assistant' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('assistant')}>
+            <MessageSquare size={24} />
           </button>
-          <button className="p-3 text-slate-400 hover:text-white" onClick={() => setCurrentScreen('documents')}>
+          <button className={cn("p-3 transition-colors", currentScreen === 'documents' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('documents')}>
             <FileText size={24} />
           </button>
-          <button className="p-3 text-slate-400 hover:text-white" onClick={() => setCurrentScreen('settings')}>
+          <button className={cn("p-3 transition-colors", currentScreen === 'settings' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('settings')}>
             <UserIcon size={24} />
           </button>
         </div>

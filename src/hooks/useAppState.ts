@@ -249,7 +249,9 @@ export function useAppState() {
           await setDoc(doc(db, 'settings', 'general'), {
             organizationName: 'Health Access Initiative (HAI)',
             contactEmail: 'contact@hai-benin.org',
-            logoUrl: ''
+            logoUrl: '',
+            directorName: 'Leonard Kabo',
+            directorSignatureUrl: ''
           });
         }
       } catch (err) {

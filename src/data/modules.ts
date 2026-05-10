@@ -3,42 +3,91 @@ import { Module } from '../types';
 export const MODULES: Module[] = [
   {
     id: 1,
-    title: "Introduction au parajuridisme communautaire",
-    introduction: "Ce module pose les fondations du métier de parajuriste, ses frontières légales et son importance cruciale dans le contexte ouest-africain et béninois.",
+    title: "LE PARAJURISTE COMMUNAUTAIRE ET SON APPROCHE DE TRAVAIL",
+    introduction: "Définition, compétences et déontologie du parajuriste communautaire au Bénin.",
     objectives: [
-      "Maîtriser l'approche du Legal Empowerment (Renforcement du pouvoir juridique)",
-      "Identifier avec précision les limites légales de l'intervention pour éviter l'exercice illégal de la profession d'avocat",
-      "Intégrer les principes déontologiques stricts : gratuité, confidentialité, impartialité",
-      "Cartographier les acteurs de la chaîne judiciaire au Bénin"
+      "Comprendre le rôle du parajuriste",
+      "Connaître les limites de ses compétences",
+      "Maîtriser les principes déontologiques",
+      "Savoir respecter les droits des personnes accompagnées"
     ],
-    keyNotions: ["Legal Empowerment", "Médiation para-légale", "Déontologie", "Exercice illégal du droit"],
+    keyNotions: ["Parajuriste", "MARC", "Déontologie", "Droits de l'accompagné"],
     content: `
-# Module 1 : Fondements et Déontologie du Parajuriste
+# MODULE 1 LE PARAJURISTE COMMUNAUTAIRE ET SON APPROCHE DE TRAVAIL
 
-## 1. Contexte et nécessité au Bénin
-Au Bénin, l'accès à la justice formelle se heurte à plusieurs obstacles : la barrière linguistique (la justice est rendue en français), l'éloignement géographique des tribunaux, la complexité des procédures et surtout le coût des services d'un avocat. C'est ici qu'intervient le parajuriste communautaire. Il n'est pas un substitut à l'avocat, mais le **premier maillon de la chaîne d'accès au droit**.
+## I. Définition : Qu'est-ce qu'un parajuriste communautaire ?
 
-Le concept central est le **Legal Empowerment** : il ne s'agit pas d'assister passivement les populations, mais de leur transférer les connaissances nécessaires pour qu'elles puissent revendiquer et défendre leurs droits elles-mêmes face aux administrations et aux juridictions.
+Le parajuristes est un membre d'une communauté formé comme éducateur, animateur, activiste et « plaidant » (au sens qu’il fait des plaidoyers). 
 
-## 2. Le mandat du parajuriste : Ce qu'il fait et ne fait pas
-Pour protéger l'usager et se protéger lui-même, le parajuriste doit connaître ses limites. Le Bénin réprime l'exercice illégal de la profession d'avocat.
+OSJI (Open Society Justice Initiative) définie « parajuriste » comme quelqu’un qui n’est pas juriste mais qui : 
 
-**Ce que le parajuriste DOIT faire :**
-* **Vulgarisation juridique** : Traduire les lois (Code Pénal, Code des Personnes et de la Famille) en langues locales (Fon, Bariba, Dendi, Yoruba, etc.) lors de séances communautaires ou universitaires.
-* **Orientation (Référencement)** : Diriger les victimes vers les structures compétentes (Centres de Promotion Sociale - CPS, Commissariats, Cliniques juridiques).
-* **Médiation de base** : Aider à la résolution de petits litiges civils (conflits de voisinage, petits conflits fonciers) par le dialogue, avant que cela ne devienne une affaire judiciaire.
-* **Accompagnement administratif** : Aider à remplir un formulaire, rédiger une simple demande manuscrite.
+• a des compétences basiques sur le droit, le système juridique et ces procédures, et des techniques légales ;
+• est un membre de communauté cible ou d’une organisation qui travaille dans la communauté et qui sait les manières par lesquelles les (autres) membres de communautés accèdent à la justice (même par les mécanismes coutumiers ou informels) ;
+• a des compétences sur les Modes Alternatifs de Résolution des Conflits (en sigles, MARC), y compris la médiation, la conciliation, et la négociation ; 
+• peut communiquer des idées et des informations aux membres de la communauté cible par des méthodes participatifs/interactifs d’enseignement ;
+• peut maintenir des relations constructives avec les autorités locales et les agences publiques ou non-gouvernementales ; et a le savoir-faire de mobilisation des communautés pour faire face aux problèmes systématiques pour eux-mêmes dans l’avenir.
 
-**Ce que le parajuriste NE PEUT PAS faire :**
-* Représenter un client ou plaider devant un juge au Tribunal de Première Instance ou à la Cour d'Appel.
-* Rédiger des actes juridiques complexes (contrats de vente de domaine, testaments).
-* Percevoir des honoraires. Son action est fondamentalement bénévole ou prise en charge par une ONG/structure d'appui.
+## II. Les compétences des parajuristes
 
-## 3. Les piliers déontologiques
-Le parajuriste est un confident de la communauté. Il est tenu par :
-1.  **Le secret professionnel** : Tout ce qui est dit lors d'un entretien ne doit jamais être divulgué, même aux chefs de quartier, sauf en cas de danger de mort imminent ou d'abus sur mineur (obligation de signalement).
-2.  **L'impartialité** : Dans une médiation, il n'est ni juge ni arbitre. Il ne prend pas parti, même si l'une des parties est un proche.
-3.  **La probité** : Le refus absolu de toute corruption ou trafic d'influence auprès des agents de police ou de mairie.
+Les services que les parajuristes peuvent offrir sont :
+
+• **Donner des informations juridiques et des conseils plus généraux.** Les parajuristes peut donner des informations et des conseils aux clients pour les aider à gérer leurs problèmes ou aussi les référer aux ONG spécialisées dans les domaines appropriés. Idéalement, le programme des services parajuristes aura un réseau de contacts avec d'autres parajuristes, agences et ONG qui peut aider la communauté. 
+• **Accompagner les clients auprès des autorités ou mécanismes de justice.** Sans être juriste ou avocat, les parajuristes peuvent toujours accompagner leurs clients auprès des autorités, par exemple pour faire plainte à la police ou des autorités coutumières. Si le client est rendu à la justice et qu'il n’a pas accès à l’aide légale, le parajuriste peut l’accompagner pendant le procès pénal (bien sur sans le représenter formellement). 
+• **Aider avec des conseils, médiation ou d’autres MARC.** Les parajuristes peuvent aider les membres de la communauté à résoudre leurs problèmes en utilisant des MARC ou des autres techniques qui peuvent permettre de rendre « justice » sans saisir les juridictions. Ces techniques peuvent comprendre les conseils individus, la médiation, la conciliation, la négociation, etc. 
+• **Education communautaire.** Les parajuristes peuvent organiser des ateliers dans le but de sensibiliser leurs communautés sur leurs droits ou de renforcer la capacité des associations ou autorités locaux. C’est alors important qu’ils aient des matériaux sensibles à distribuer pendant ces ateliers. 
+
+### Les limites des compétences des parajuristes
+
+Même s'ils peuvent jouer des rôles très utiles, c’est important de toujours se souvenir que les parajuristes ne sont pas juristes ou avocats. Il y a des limites qu’ils doivent respecter. Les parajuristes doivent toujours expliquer qu’ils ne sont pas juristes et ne jamais apparaître comme représentant légal auprès les juridictions. Les parajuristes doivent toujours comprendre et ne pas dépasser les limites de leurs connaissances et compétences, même si leurs clients font face à des barrières sérieuses pour accéder à la justice sans les services d’un juriste ou avocat. 
+
+## III. La déontologie du parajuriste
+
+Un parajuriste peut offrir plusieurs services aux clients qui cherchent leurs services. Certaine tâche du parajuriste impliquera de travailler avec un juriste et/ou un avocat, mais la plupart de son travail sera indépendant. Par exemple, un parajuriste pourra donner des informations légales et d’autres conseils au client ; mener une enquête pour documenter un cas et après le référer à un autre professionnel ; accompagner le client auprès des autorités extrajudiciaires, etc. Aussi, beaucoup de travail du parajuriste impliquera de travailler avec d’autres organisations ou les autorités, de l'Etat ou coutumières. 
+
+Il est important alors que les parajuristes aient un « code de conduite » pour guider leur travail et, en plus, savoir et respecter les droits des personnes accompagnées.
+
+### 1. Définition de déontologie
+
+Selon le lexique des termes juridiques "La déontologie regroupe, pour les personnes exerçant certaines activités publiques ou privées, les règles juridiques et morales qu'elles ont le devoir de respecter. Tel est le cas pour les fonctionnaires, les magistrats (ex: obligation de réserve, secret du délibéré) et pour les membres des professions libérales règlementées (ex: avocats, médecins, officier ministériel)"
+
+Les manquements aux règles de la déontologie qui sont variables d'une fonction à une autre et d'une profession à une autre sont de nature à provoquer des poursuites disciplinaires.
+
+**C’est quoi un code de déontologie ou code de conduite**
+
+### 2. La conduite du parajuriste
+
+Pour gagner la confiance des personnes accompagnées et le respect des autorités avec qui le parajuriste travaillera, le parajuriste devra toujours se conformer aux règles de professionnalisme. Comme beaucoup d’autres professions (les médecins, les avocats, entre autres), les programmes de services parajuridiques développent des règles pour guider le travail, appelé un « code de conduite ».
+Chaque organisation qui offre des services parajuridiques pourra développer son propre code de conduite qui répond aux circonstances uniques de son programme.
+
+A l'instar de toutes les autres corporations, les parajuristes communautaires du Bénin ont aussi leur code de conduite qui sera mis à votre disposition à la fin de votre formation dès que vous entrerez officiellement en activité en tant que parajuriste.
+
+### 3. La déontologie propre du parajuriste 
+
+Il n’y a pas une déontologie universellement applicable aux parajuristes communautaires. Chaque pays, chaque organisation édicte sa déontologie en fonction de ses réalités ainsi que des expériences vécues. Toutefois, il n'y a pas un grand écart entre les déontologies d'une organisation à une autre.
+
+Mais quel qu'en soit l'organisation, la déontologie du parajuriste communautaires s'inspire presque toujours de la déontologie de l’avocat. 
+
+**Des concepts clés de la déontologie de la profession d’avocat**
+
+Il y a certains concepts clés dans la déontologie de la profession d’avocat :
+- les principes de loyauté et de désintéressement
+- les principes de compétence, de diligence, et de prudence
+- le principe du secret professionnel
+- le principe de conflit d’intérêt
+- le devoir de conduire l’affaire jusqu'à son terme
+
+## IV. Les droits de la personne accompagnée
+
+Toutes les personnes accompagnées ont des droits qui doivent être respectés par les praticiens juridiques et même les parajuristes. Parmi eux, certains des plus fondamentaux sont :
+
+1. Le droit de définir les objectifs de son cas ;
+2. Le droit de recevoir des informations promptes et régulières on son cas ;
+3. Le droit de recevoir les copies de tous les documents liés à son cas ; 
+4. Le droit de recevoir des réponses promptes à toutes questions ou demandes posées au parajuriste ; 
+5. Le droit de participer à la définition de la stratégie (au début et à d’autres moments importants) du cas en consultation avec le parajuriste ; et
+6. Le droit de décider à ne plus poursuivre le cas. 
+
+Il est énormément important que le parajuriste respecte toujours les droits de la personne accompagnée.
     `,
     quiz: [
       {
@@ -58,89 +107,218 @@ Le parajuriste est un confident de la communauté. Il est tenu par :
   },
   {
     id: 2,
-    title: "Le Droit à la Santé : Cadre légal et déterminants",
-    introduction: "Analyse approfondie du droit à la santé au Bénin, incluant la responsabilité médicale et les facteurs environnementaux.",
+    title: "MODULE 2. INTRODUCTION AU DROIT ET SYSTEME JUDICIAIRE BENINOIS",
+    introduction: "Comprendre l'essentiel du droit, ses sources et l'organisation judiciaire au Bénin.",
     objectives: [
-      "Maîtriser la Loi n° 2020-37 portant protection de la santé au Bénin",
-      "Comprendre les obligations des formations sanitaires (publiques et privées)",
-      "Identifier les voies de recours en cas de négligence médicale",
-      "Intégrer l'impact de l'environnement (gestion des déchets, hygiène) sur la santé publique"
+      "Définir le droit et ses spécificités",
+      "Identifier les sources directes et indirectes du droit béninois",
+      "Maîtriser la hiérarchie des normes",
+      "Connaître les différentes juridictions du système judiciaire"
     ],
-    keyNotions: ["Loi 2020-37", "Responsabilité médicale", "Non-assistance à personne en danger", "Déterminants environnementaux"],
+    keyNotions: ["Droit", "Constitution", "Jurisprudence", "CRIET", "CSAF"],
     content: `
-# Module 2 : Le Droit à la Santé et ses dimensions
+# MODULE 2. INTRODUCTION AU DROIT ET SYSTEME JUDICIAIRE BENINOIS
 
-## 1. Le cadre normatif au Bénin
-Le droit à la santé est garanti par la Constitution béninoise. Récemment, la **Loi n° 2020-37 portant protection de la santé en République du Bénin** est venue renforcer les obligations de l'État et des prestataires de soins. 
-Le droit à la santé ne signifie pas que l'État garantit une santé parfaite, mais qu'il met en place un système de prévention, de traitement et de contrôle accessible à tous (le standard "AAAQ" de l'OMS : Accessibilité, Acceptabilité, Disponibilité, Qualité).
+Les parajuristes doivent comprendre l’essentiel du droit. Le droit et un des outils que les parajuristes utilisent pour aider leurs clients, les personnes qui demandent leur accompagnement. Pour chaque nouveau cas, un parajuriste doit se demander : « Quelles lois sont importantes pour ce cas ? Quelles lois pourraient aider mon client ? »
+ 
+## I. Définition du droit
+Dans le langage courant, le mot droit peut avoir deux significations : dans l’expression « je maîtrise le droit de mon pays », j’essaie certainement de signifier que je maîtrise l’ensemble des règles ou normes à caractère juridique de mon pays. Par contre, lorsque je dis « j’ai le droit de vendre ma voiture », je veux dire que j’ai le pouvoir, la prérogative, la liberté de vendre ma voiture.
 
-## 2. Les Droits du Patient et les Obligations Médicales
-Dans les centres de santé ou CHUD (Centres Hospitaliers Universitaires Départementaux), le patient possède des droits inaliénables :
-* **Le droit à l'information et au consentement** : Le médecin doit expliquer le traitement en termes simples. Aucun soin (sauf urgence vitale) ne peut être imposé sans consentement.
-* **Le droit aux soins d'urgence** : Le refus de prise en charge pour une urgence vitale sous prétexte de manque de moyens financiers (défaut de paiement de la caution) expose le personnel médical à des poursuites pénales pour **non-assistance à personne en danger** (Article 325 du Code Pénal).
-* **La séquestration illégale** : Il est strictement illégal pour un hôpital de retenir un patient (ou un nouveau-né et sa mère) contre son gré parce qu'il n'a pas payé sa facture. C'est une infraction pénale (atteinte à la liberté d'aller et venir) que le parajuriste doit savoir signaler au Procureur.
+### Ce que le droit n’est pas !
 
-## 3. Santé Environnementale et Responsabilité Communautaire
-Le droit à la santé s'étend aux conditions de vie. Les maladies hydriques, le paludisme, ou les infections respiratoires sont souvent liés à la mauvaise gestion des déchets, à l'absence de tri et au manque d'assainissement.
-L'État et les communes ont l'obligation d'assurer la salubrité publique. Le parajuriste peut utiliser les lois sur l'hygiène publique pour interpeller les élus locaux (maires, chefs d'arrondissement) sur l'insalubrité, soutenant ainsi des initiatives locales d'économie circulaire et de gestion des déchets.
+Le droit n’est pas la morale. Le droit n’est pas la religion.
+
+➔ Différence entre le droit et la morale
+
+La morale est exigeante vis-à-vis de l’homme, elle attend de lui un dépassement. La morale est individualiste. Le droit ne régit pas les consciences mais le corps social. Vous pouvez, en toute impunité, avoir des envies de meurtre, des envies les plus inavouables, le droit ne s’en préoccupe pas, tant que vous ne passez pas à l’acte.
+
+➔ Différence entre le droit et la religion
+
+La règle religieuse présente des commandements comme venant de Dieu. Elle veille au salut de l'être humain. La règle de droit ne se confond pas à la règle religieuse. L’article premier de la constitution sénégalaise précise que : « La République du Sénégal est laïque, démocratique et sociale. ». 
+Il y a des contradictions évidentes entre le contenu de certaines règles de droit et l'enseignement de la religion.
+
+Exemple : Contradiction entre la légitime défense et le comportement qui consiste à tendre l'autre joue ou encore le recours possible à l'avortement ou au divorce.
+
+
+## II. Sources du droit
+Les sources du droit son diverses. Mais en général dans la francophonie (système de droit romano-germanique) elles sont divisées en deux : les sources directes (qui s’appliquent aux faits en directe) et les sources indirectes (où nous pouvons voir l’application dans la pratique du droit ou où les règles ne sont pas écrites).
+
+### 1. Les sources directes 
+Les sources de droit écrites sont organisées en une hiérarchie stricte :
+
+1. La Constitution 
+La Constitution de la République du Benin a été adopté par référendum le 3 décembre 1990 après la Conférence des Forces Vives tenue en février de la même année. Elle est « la Loi Suprême de l’État. ». Cette constitution a été révisée par la loi N° 2019 - 40 du 07 novembre 2019 portant révision de la loi N° 90-32 du 11 décembre, 1990 portant Constitution de la République du Bénin.
+
+Selon l’article 3 de la Constitution, « Toute loi, tout texte réglementaire et tout acte administratif contraires aux [les dispositions de la Constitution] sont nuls et non avenus. En conséquence, tout citoyen a le droit de se pourvoir devant la Cour constitutionnelle contre les lois, textes et actes présumés inconstitutionnels. »
+
+Comme loi fondamentale, la Constitution donne et limite les pouvoirs du gouvernement. Le concept d’état de droit veut dire que le gouvernement n’a aucun pouvoir sauf ceux donnés par la Constitution. La Constitution aussi contrôle le gouvernement par la séparation des pouvoirs – c’est-à-dire, la division du travail entre le pouvoir exécutif, législatif et judiciaire. 
+
+
+2. Les traités ou accords internationaux 
+Au dehors de la hiérarchie de sources du droit interne, il y a les traités internationaux. Selon l’article 147 de la Constitution, « Les traités ou accords régulièrement ratifiés ont, dès leur publication, une autorité supérieure à celle des lois, sous réserve pour chaque accord ou traité, de son application par l'autre partie. »
+
+Un traité est un accord entre deux ou plusieurs pays et ils sont la source principale du droit international. Un traité ne contraint pas les pays sauf s’il est ratifié. Au Bénin, le Président de la République a le pouvoir de négocier et signer les traités, sauf certaines catégories de traités qui doivent être ratifié par une loi de l’Assemblée Nationale. 
+
+
+3. Les textes législatives (lois) 
+Dans la hiérarchie des sources du droit écrites, la deuxième catégorie comprend les lois votées par le pouvoir législative (l’Assemblée Nationale). L’Article 98 de la Constitution détermine les sujets qui sont dans le domaine de la loi., la procédure pour l’adoption des lois est différente selon qu'il s'agit d'une loi organique et d'une loi ordinaire. 
+
+Une loi organique est une loi complétant la Constitution afin de préciser l’organisation des pouvoirs publics. Elle est au-dessus d’une loi ordinaire. Comme exemples, il y a la Loi no. 1992-10 portant loi organique sur le Conseil économique et social (une loi organique). Chaque loi organique doit être soumis au contrôle direct, c’est-à-dire revue par la Cour Constitutionnelle avant d’être promulgué. 
+
+
+4. Textes réglementaires (décrets, arrêtés, circulaires) 
+Après les lois, la prochaine source de droit dans la hiérarchie comprend les textes règlementaires, adoptés par le pouvoir exécutif. Les textes réglementaires sont divers, il s'agit des décrets, arrêtés, circulaires, entre autres. Selon l’article 100, « les matières autres que celles qui sont du domaine de la loi [selon l’article 98] ont un caractère réglementaire. ».
+
+• les décrets : dans la hiérarchie des normes, le décret est un acte réglementaire et non pas législatif. C'est un acte de l'exécutif qui doit se conformer à la loi votée par le Parlement. On distingue deux types de décrets (décrets d'application et décrets autonomes) ;
+• les arrêtés : on distingue les arrêtés selon leur auteur et ceux-ci se classent hiérarchiquement selon leur autorité. Au premier rang se trouvent les arrêtés ministériels ou interministériels, ensuite les arrêtés préfectoraux et enfin les arrêtés municipaux ;
+• les circulaires : les actes par lesquelles un ministre donne des instructions à des fonctionnaires pour le fonctionnement du service. 
+Par exemple, le Ministère de la Santé a promulgué un Décret portant sur la déontologie en médecine traditionnelle. Il y a aussi un Arrêté interministériel portant sur la fermeture des établissements privés d’enseignement et de formation dans le domaine spécifique de la santé. Les deux sont exemples des textes réglementaires. 
+
+Les textes réglementaires, comme les lois ordinaires, sont soumis au contrôle indirect de la Cour Constitutionnelle, c’est-à-dire qu’un citoyen doit se pourvoir devant la Cour constitutionnelle contre l’inconstitutionnalité présumée après la promulgation. 
+
+5. Règlements intérieurs 
+Les règlements intérieurs sont une catégorie particulière de règlement comprend les règlements intérieurs, qui sont les règles procédurales qui régissent les cours, tribunaux et d’autres institutions publiques. 
+
+Certains règlements intérieurs sont aussi importants dans le cadre constitutionnel au Benin qu’ils sont soumis au control direct de la Cour Constitutionnelle comme les lois organiques. Ce sont ceux de l’Assemblée Nationale, de la Hautes Autorité de l’Audiovisuel et de la Communication et du Conseil Économique et Social.
+
+### 2. Les sources indirectes
+Les sources indirectes du droit n'ont pas de pouvoir directement créateur de droit. Elles interviennent principalement dans l’interprétation de la règle de droit. Elles en favorisent la compréhension et l’évolution du droit. Elles contribuent indirectement à la construction de l’édifice du droit. Dans le système juridique du Bénin, comme la reste de la Francophonie, les sources de droit écrites ci-dessus sont les plus importants. 
+
+1. La jurisprudence 
+Le mot jurisprudence réfère toujours aux décisions des tribunaux. Au sens plus large, la jurisprudence recouvre ensemble les décisions rendues par les tribunaux sur certaine matière / branche du droit. Dans le système juridique du Bénin, comme dans le reste de la Francophonie, le travail des juges ou magistrats est d’appliquer le droit aux faits particuliers ; en théorie, ils n’interprètent pas le droit. Mais on peut toujours apprendre beaucoup sur le droit en pratique si on lit les décisions des tribunaux. 
+
+Pour rechercher les jurisprudences, on peut utiliser le site www.jurisprudencebenin.org qui contient actuellement les jugements du Tribunal de Première Instance de Cotonou et de la Cour d’Appel Cotonou en matière correctionnelle, sociale, commerciale, et civile. Le site d’internet de la Cour Constitutionnelle publie aussi leurs décisions en matière de contrôle de conformité et de contentieux électoral. On peut trouver beaucoup de décisions de la Cour Suprême sur le site www.juricaf.org en matières diverses, with peu de décisions d’autres tribunaux béninois.  
+
+2. La coutume
+La coutume réfère aux pratiques qui se répètent, se dégagent lentement, et que la conscience populaire finit par considérer comme obligatoire. Dans la francophonie, en général, la coutume n’est pas une source du droit mais parfois les autorités judiciaires les avalisent dans ses décisions, par ex. en matière commerciale (l’interprétation des contrats commerciaux).
+
+Au Benin, bien sûr, on parle aussi du droit coutumier, c’est-à-dire, les systèmes de droit en pratique avant le colonialisme qui ont été modifié, incorporé, et largement remplacé par le système du droit dite « formel » ci-dessus. Récemment le droit coutumier continuait en force principalement en matière foncière et matière civile. Mais le Code des Personnes et de la Famille en 2004 notamment l’article 1030 dispose que « les coutumes cessent d’avoir force de loi en toutes matières régies par le (…) code ». 
+
+
+## III. Système judiciaire
+
+1. Les Tribunaux de première instance
+
+Le tribunal de première instance est le premier degré de juridiction. Il en existe deux types: les tribunaux de première instance de première classe et les tribunaux de première instance de deuxième classe. Les premiers siègent dans les chefs-lieux des communes à statut particulier que sont Cotonou, Porto Novo et Parakou. Les deuxièmes sont au nombre de vingt-cinq répartis sur l’ensemble du territoire à raison d’un Tribunal pour trois communes voisines.
+
+2. Le Tribunal de Commerce de Cotonou (TCC) 
+
+C’est une juridiction spécialisée chargée de trancher les litiges commerciaux entre commerçants, les sociétés commerciales, et de gérer les baux commerciaux ou difficultés d'entreprises.
+
+3. Les cours d’appel
+
+Les décisions des tribunaux de première instance sont susceptibles d’appel devant les cours d’appel. Ces derniers sont au nombre de trois : la cour d’appel de Cotonou dont la juridiction s’étend aux départements du Littoral, de l’Atlantique, de l’Ouémé et du Plateau; la cour d’appel d’Abomey compétente dans les départements du Zou, des Collines, du Mono et du Couffo et la cour d’appel de Parakou qui a juridiction sur les départements du Borgou, de l’Alibori, de l’Atacora et de la Donga.
+ 
+4. La Cour Spéciale des Affaires Foncières (CSAF) 
+
+La CSAF a pour mission principale de juger les litiges fonciers et immobiliers pour endiguer l'insécurité foncière. Créée en 2022, elle traite l'expropriation pour cause d'utilité publique, les actions réelles, et ordonne la libération des espaces publics, notamment dans le Grand Nokoué.
+
+
+5. La Cour de Répression des Infractions Économiques (CRIET)
+La Cour de Répression des Infractions Économiques et du Terrorisme est une juridiction spéciale à compétence nationale, créée en 2018 pour lutter efficacement contre la criminalité organisée. Sa mission principale est de poursuivre et réprimer le terrorisme, le blanchiment de capitaux, la cybercriminalité, le trafic de stupéfiants et les infractions économiques.
+
+La CRIET traite les cas de viol, d'atteintes sexuelles sur mineures de moins de 13 ans, de harcèlement commis par un enseignant sur son apprenant, de mariage forcé et de mariage précoce.
+
+
+6. La Cour suprême du Bénin 
+
+Elle est la plus haute juridiction en matière administrative, judiciaire et des comptes de l'État, assurant le contrôle de la légalité des actes de l'administration et l'harmonisation de la jurisprudence nationale. Elle statue en dernier ressort sur les pourvois en cassation et le contentieux des élections locales.
+
+Elle exerce un contrôle de cassation sur les décisions rendues par les cours et tribunaux inférieurs en matière civile, commerciale, sociale et pénale.
+
+En tant que juge de droit commun de l'administration, elle contrôle la légalité des actes du pouvoir exécutif et des collectivités territoriales, avec compétence pour annuler des actes irréguliers.
+
+
+7. La Haute Cour de Justice
+
+La Haute Cour de Justice est composée des membres de la Cour Constitutionnelle à l’exception de son président, de six députés élus par l’Assemblée Nationale et du Président de la Cour Suprême. Elle élit en son sein son président. Elle est compétente pour juger le président de la république et les membres du gouvernement à raison de faits qualifiés de haute trahison, d’infraction commise dans l’exercice ou à l’occasion de l’exercice de leurs fonctions ainsi que pour juger leurs complices en cas de complot contre la sûreté de l’Etat.
     `,
     quiz: [
       {
         id: "q2_1",
-        question: "Un centre de santé peut-il retenir une femme qui vient d'accoucher parce qu'elle n'a pas payé sa facture ?",
-        options: ["Oui, c'est la procédure normale de recouvrement", "Non, c'est une privation illégale de liberté (séquestration)", "Seulement avec l'accord du chef de village"],
+        question: "Quelle est la 'Loi Suprême' de l'État au Bénin ?",
+        options: ["Le Code Pénal", "La Constitution", "Le Code Foncier"],
         correctAnswer: 1
-      },
-      {
-        id: "q2_2",
-        question: "L'accès à l'eau potable et la gestion correcte des déchets font-ils partie du droit à la santé ?",
-        options: ["Oui, ce sont des déterminants essentiels de la santé", "Non, cela relève uniquement du ministère de l'environnement"],
-        correctAnswer: 0
       }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
   },
   {
     id: 3,
-    title: "VBG et Protection de la Femme et de l'Enfant",
-    introduction: "Les infractions, les peines et le circuit de référencement pour la protection des victimes de Violences Basées sur le Genre.",
+    title: "Introduction aux droits humains et mécanismes de protection",
+    introduction: "Analyse des droits universels et des voies de recours internes et internationales.",
     objectives: [
-      "Appliquer les dispositions de la Loi n° 2011-26 et du Code Pénal de 2018",
-      "Maîtriser les procédures de saisine de l'Institut National de la Femme (INF)",
-      "Connaître le circuit de prise en charge : médical, psychosocial et judiciaire",
-      "Appréhender la notion de harcèlement en milieu universitaire et professionnel"
+      "Définir les droits de l'homme et leurs sources",
+      "Distinguer les droits d'exercice individuel et collectif",
+      "Comprendre les droits catégoriels (femme, enfant, handicapés)",
+      "Identifier les organisations et voies de recours pour protéger les droits"
     ],
-    keyNotions: ["Loi 2011-26", "Institut National de la Femme (INF)", "Viol", "Harcèlement", "Centres de Promotion Sociale (CPS)"],
+    keyNotions: ["DUDH", "Charte africaine", "Cour Constitutionnelle", "CBDH", "CPI"],
     content: `
-# Module 3 : Lutte contre les VBG (Violences Basées sur le Genre)
+# MODULE 3. INTRODUCTION AUX DROITS HUMAINS ET MECANISMES DE PROTECTION
 
-## 1. L'arsenal juridique : Loi 2011-26 et Code Pénal
-Le Bénin s'est doté de lois extrêmement sévères contre les VBG. La **Loi n° 2011-26 du 09 janvier 2012** portant prévention et répression des violences faites aux femmes, couplée au **Code Pénal (Loi n° 2018-16)**, criminalise de nombreuses pratiques :
-* **Le Viol** : C'est un crime (et non un simple délit), passible de la réclusion criminelle (jusqu'à 20 ans, voire la perpétuité si la victime est mineure). La loi ne reconnaît *aucune justification* (ni tenue vestimentaire, ni mariage). Le viol conjugal est reconnu et puni.
-* **Le Harcèlement sexuel** : Notamment en milieu scolaire, universitaire (abus d'autorité d'un professeur sur une étudiante) ou professionnel.
-* **Mutilations Génitales Féminines (MGF) et Mariage Forcé** : Pratiques sévèrement réprimées. Quiconque facilite ou participe à ces actes est complice.
-* **Violences économiques et psychologiques** : Priver son épouse de ressources essentielles, confisquer ses documents ou la soumettre à des violences verbales répétées sont des délits pénaux.
+## Définition
+Les droits de l'Homme sont une notion selon laquelle tout être humain possède des droits universels, inaliénables, quel que soit le droit en vigueur dans l'Etat ou groupe d'Etats où il se trouve, quelles que soient les coutumes au niveau local, liées à l'ethnie, à la nationalité ou à la religion.
 
-## 2. L'Institut National de la Femme (INF)
-Une révolution récente au Bénin est la création de l'INF. Cet institut, en plus de sensibiliser, dispose de la **capacité d'ester en justice**. L'INF peut se constituer partie civile et poursuivre les auteurs de VBG même si la victime (sous pression familiale) décide de retirer sa plainte. Le parajuriste doit avoir les contacts des démembrements de l'INF dans sa région (ex: Borgou).
+## I. Les sources de droit de l’homme 
+### 1. Les sources internationales
+- **La Déclaration universelle des droits de l'homme du 10 décembre 1948** : Adoptée par l’assemblée générale des Nations Unies. Elle exprime des positions de principe : « tous les êtres humains naissent libres et égaux en dignité et en droit ».
+- **Les Pactes internationaux** : Le pacte international relatif aux droits civils et politiques et le pacte international relatif aux droits économiques sociaux et culturels (1966).
+- **La Charte africaine des droits de l’homme et des peuples** : Adoptée en 1981, entrée en vigueur en 1986. Elle est originale par l'intégration de la notion de « devoir ».
 
-## 3. Le Parcours de la Victime et le Rôle du Parajuriste
-Le temps est le plus grand ennemi dans les cas de violences (surtout sexuelles).
-1.  **L'Urgence Médicale (Les 72h critiques)** : Orientations immédiates vers un centre de santé pour les soins (Prévention VIH/IST, contraception d'urgence) et l'établissement du **certificat médical**. Sans certificat, la procédure judiciaire est très difficile.
-2.  **Le Signalement** : Utilisation du numéro vert national (le **132** au Bénin) ou saisine immédiate de la Police Républicaine.
-3.  **L'Accompagnement Psychosocial** : Orienter vers les Centres de Promotion Sociale (CPS) ou des ONG spécialisées pour un soutien psychologique et un hébergement d'urgence si la victime est en danger chez elle.
+### 2. La source nationale : la constitution
+Le titre II de la constitution béninoise est consacré aux droits de la personne humaine. Il consacre dans ses 34 articles des droits indivisibles : droits fondamentaux, droits civils et politiques, droits économiques, sociaux et culturels.
+• **Article 15** : Tout individu a droit à la vie, à la liberté, à la sécurité et à l’intégrité de sa personne.
+• **Article 17** : Toute personne accusée d’un acte délictueux est présumée innocente jusqu’à ce que sa culpabilité ait été légalement établie...
+
+## II. Les droits de l’homme en général
+### 1. Les droits d’exercice individuel
+Considérés comme les droits qui protègent l’individu contre l’Etat.
+- **Le droit à la vie** (Article 15 Constitution, Article 3 DUDH).
+- **Le droit à l’intégrité physique** : Interdiction de la torture, des peines et traitements inhumains et dégradants (Convention de l'ONU de 1984).
+- **Le droit de ne pas être soumis à l’esclavage**, la servitude, le travail forcé et obligatoire.
+- **La liberté de circulation** (Article 10 Constitution).
+- **La liberté de religion** : Droit de pratiquer la religion choisie et de manifester son culte.
+- **Le droit au travail** : Droit de gagner sa vie par un travail choisi librement.
+- **Le droit à la sécurité sociale** : Garanties en cas de maladie, accident ou besoin familial.
+- **Le droit à l’éducation** : Article 13 du PIDESC. L'enseignement primaire doit être obligatoire et gratuit pour tous.
+- **Le droit à la santé** : Moyen nécessaire à la protection de la santé.
+- **La liberté d’expression** : Droit de rechercher, recevoir et répandre des informations ou idées.
+
+### 2. Les droits d’exercice collectif
+- **La liberté de presse** : Liberté de communiquer ses opinions sous forme orale ou écrite.
+- **La liberté de réunion** : Rencontre épisodique pacifique.
+- **La liberté d’association**
+- **Le droit à un environnement sain**
+- **La liberté syndicale** : Droit de former des syndicats et de s’y affilier.
+
+### 3. Les droits catégoriels 
+- **Les droits de l’enfant** : Convention Internationale des Droits de l’enfant (CIDE) de 1989.
+  * Droits à la survie, au développement, à la protection, à la participation, à l'identité.
+  * Au plan national : Loi n°2015-08 portant code de l’enfant en République du Bénin.
+- **Les droits de la femme et des handicapés** : Constitution béninoise (Article 26), Protocole de Maputo. Loi n° 2017-06 portant protection et promotion des droits des personnes handicapées.
+
+## III. Système de protection des droits de l’homme
+### 1. Les organisations de défense des droits de l’homme
+Elles font la veille citoyenne et dénoncent les abus :
+- Amnesty International Benin
+- Human Rights Watch
+- Commission Béninoise des Droits de l’Homme (CBDH)
+- Prisonniers Sans Frontières, Caritas, etc.
+
+### 2. Les voies de recours
+- **Au plan interne : Cour constitutionnelle** : Elle peut être saisie pour violation des droits de la personne humaine et doit statuer dans les 15 jours.
+- **Au plan international** :
+  * Cour de justice de la CEDEAO
+  * Cour Africaine des Droits de l’homme
+  * Cour Pénale Internationale (CPI)
+  * Haut-Commissariat des Nations Unies aux droits de l’homme (HCDH)
     `,
     quiz: [
       {
         id: "q3_1",
-        question: "Une étudiante est harcelée par un professeur qui exige des faveurs sexuelles contre des notes. Que doit faire le parajuriste ?",
-        options: ["Lui conseiller de céder pour avoir son diplôme", "Organiser une médiation secrète avec le professeur", "L'orienter vers l'Institut National de la Femme (INF) et la police pour un dépôt de plainte"],
-        correctAnswer: 2
-      },
-      {
-        id: "q3_2",
-        question: "Si une victime de viol souhaite retirer sa plainte sous la pression de sa famille, l'INF peut-il poursuivre la procédure ?",
-        options: ["Non, la volonté de la victime prime toujours", "Oui, l'INF a le pouvoir de se constituer partie civile et de poursuivre l'auteur"],
+        question: "Quel article de la Constitution béninoise garantit le droit à la vie ?",
+        options: ["Article 1", "Article 15", "Article 98"],
         correctAnswer: 1
       }
     ],
@@ -148,48 +326,57 @@ Le temps est le plus grand ennemi dans les cas de violences (surtout sexuelles).
   },
   {
     id: 4,
-    title: "État civil, ANIP et Identité Juridique",
-    introduction: "Maitriser les nouvelles procédures d'identification au Bénin et les solutions aux cas de non-déclaration.",
+    title: "L'engagement des communautés et le droit environnemental",
+    introduction: "Droit à l'information, à la participation et protection de l'environnement face aux projets de développement.",
     objectives: [
-      "Maîtriser la Loi n° 2020-34 portant dispositions spéciales de simplification des actes d'état civil",
-      "Comprendre le rôle de l'ANIP (NPI, Actes sécurisés)",
-      "Connaître les étapes exactes d'une procédure de jugement supplétif d'acte de naissance",
-      "Savoir monter un dossier de régularisation pour un usager"
+      "Comprendre les droits des communautés face aux projets de développement",
+      "Identifier les sources du droit environnemental au Bénin",
+      "Maîtriser les étapes de l'engagement communautaire",
+      "Connaître les mécanismes de financement et de protection des banques"
     ],
-    keyNotions: ["ANIP", "NPI", "RAVIP", "Loi 2020-34", "Jugement Supplétif"],
+    keyNotions: ["Loi environnementale", "Droit à l'information", "Participation publique", "Banque Mondiale"],
     content: `
-# Module 4 : Sécurisation de l'État Civil au Bénin
+# MODULE 4. L’ENGAGEMENT DES COMMUNAUTES ET LE DROIT ENVIRONNEMENTAL
 
-## 1. L'importance vitale de l'état civil
-L'acte de naissance n'est pas qu'un bout de papier, c'est la preuve juridique de l'existence. Au Bénin, sans cela, il est impossible de passer les examens nationaux (CEP, BEPC, BAC), d'obtenir une bourse universitaire, de se faire établir un passeport, ou de s'inscrire sur la liste électorale.
+## I. Les projets de développement et le droit d’engagement des communautés
+Les projets de développement peuvent être très importants pour le travail d'un parajuriste communautaire. Une collectivité peut être touchée par un projet de développement apporté par le gouvernement ou une autre institution (p. ex. une société par actions). Dans ce cas, les parajuristes peuvent aider leurs clients à comprendre leurs droits relatifs à ce projet. 
 
-## 2. La Réforme de l'ANIP et le NPI
-Le Bénin a profondément numérisé son état civil via l'**Agence Nationale d'Identification des Personnes (ANIP)**.
-* Le **RAVIP** (Recensement Administratif à Vocation d'Identification de la Population) est devenu la base de données centrale.
-* Chaque citoyen obtient un **Numéro Personnel d'Identification (NPI)**, unique à vie.
-* Le parajuriste doit maîtriser les portails numériques de l'ANIP (services en ligne) pour aider les usagers non-alphabétisés à demander leurs actes de naissance sécurisés ou leurs certificats d'identification personnelle (CIP).
+Qu'entendons-nous par projet de développement ? 
+Un projet de développement en général désigne l'installation ou la modernisation d'infrastructures, par exemple la construction de canaux ou d'égouts, l'élargissement de routes, le forage de puits, etc. Ces projets peuvent être de très petite envergure ou à grande échelle (construction d'un barrage hydroélectrique). 
 
-## 3. Le problème des naissances non déclarées (Loi 2020-34)
-La loi béninoise impose la déclaration de naissance dans les **21 jours** suivant l'accouchement. Passé ce délai, la déclaration à la mairie n'est plus possible.
-Avant, il fallait systématiquement une procédure longue au tribunal. Aujourd'hui, grâce à la Loi 2020-34 et ses décrets d'application, il existe des mesures dérogatoires (souvent annoncées par le gouvernement) permettant de régulariser les enfants recensés au RAVIP sans acte de naissance formel.
+Qui réalise les projets de développement ? 
+Les projets peuvent être réalisés par le gouvernement (l’Etat ou les collectivités territoriales), les Organisations Non-Gouvernementales (ONG), les entreprises privées ou les communautés elles-mêmes. Souvent, les projets gouvernementaux sont soutenus par des « partenaires au développement » (Banque mondiale, BAD, USAID, GIZ). 
 
-## 4. La procédure de Jugement Supplétif
-Quand la régularisation administrative n'est pas possible, il faut recourir au juge. Le parajuriste accompagne l'usager dans cette démarche :
-1.  **Requête** adressée au Président du Tribunal de Première Instance (ou tribunal de conciliation selon les réformes en cours).
-2.  **Preuves** : Réunir un certificat de non-inscription au registre d'état civil (délivré par la mairie).
-3.  **Témoins** : Présenter deux témoins majeurs (souvent des parents ou le chef de quartier) pouvant attester sous serment de la date et du lieu de naissance devant le juge.
+Il est très important que les parajuristes identifient tous ces partenaires parce que leur implication peut renforcer le droit de la communauté à participer au projet.
+
+## II. Le droit de s’engager et de défendre son environnement face aux projets de développement
+Tout d'abord, un parajuriste qui s'engage with des projets de développement doit se rappeler certaines sources du droit : 
+• Constitution de la République du Bénin ;
+• Charte africaine des droits de l'homme et des peuples (CADHP) ; 
+• Pactes internationaux (PIDCP, PIDESC) ;
+• Convention de Kampala.
+
+De toutes ces sources, nous avons les règles suivantes : 
+• **Le droit à l'information** : Protégé par l'article 23 de la Constitution. Toute personne a droit à la liberté d'opinion et d'expression dans le respect de l'ordre public.
+• **Le droit à la participation du public** : Garanti par l'article 13 de la CADHP. Tous les citoyens ont le droit de participer librement à la direction des affaires publiques de leur pays.
+• **Le droit au développement** : Garanti par l'article 22 de la CADHP et l’article 9 de la Constitution. Tout être humain a droit au développement et au plein épanouissement de sa personne.
+• **Le droit à l'environnement** : Garanti par l'article 24 de la CADHP et l’article 27 de la Constitution. Toute personne a droit à un environnement sain, satisfaisant et durable et a le devoir de le défendre.
+
+**NOTEZ BIEN** : le droit à la propriété, à un procès équitable, à un niveau de vie adéquat (logement convenable) et l’interdiction des expulsions forcées peuvent également être affectés par les projets de développement ! 
+
+### Quelles législations étatiques nous permettent d’exercer ces droits ? 
+• **L’article 23 de la Constitution** sur la liberté de l'information.
+• **La loi N°030-98 portant loi-cadre sur l’environnement** au Bénin : elle exige une évaluation des mesures de protection et des répercussions avant le début de tout projet.
+• **La loi N° 2016-06 portant loi-cadre sur l’aménagement du territoire** : favorise l'intégration des populations.
+
+### Financement et banques de développement : 
+Les banques multilatérales (BMD) comme la Banque Mondiale ont leurs propres règles internes qui imposent le respect de la participation publique, le traitement des griefs et la compensation des impacts négatifs (politique de réinstallation des personnes touchées). Les banques privées internationales adhèrent souvent aux **Principes de l’Équateur**.
     `,
     quiz: [
       {
         id: "q4_1",
-        question: "Quel est l'identifiant unique attribué à chaque Béninois par l'ANIP ?",
-        options: ["Le numéro de sécurité sociale", "Le NPI (Numéro Personnel d'Identification)", "Le numéro IFU"],
-        correctAnswer: 1
-      },
-      {
-        id: "q4_2",
-        question: "Quelle pièce est indispensable pour initier un jugement supplétif au tribunal ?",
-        options: ["Un acte de propriété", "Un certificat de non-inscription au registre d'état civil délivré par la mairie", "Une carte d'étudiant"],
+        question: "Quel article de la Constitution béninoise garantit le droit à un environnement sain ?",
+        options: ["Article 8", "Article 27", "Article 98"],
         correctAnswer: 1
       }
     ],
@@ -197,41 +384,70 @@ Quand la régularisation administrative n'est pas possible, il faut recourir au 
   },
   {
     id: 5,
-    title: "Mécanismes de Protection Sociale (Mutuelles et ARCH)",
-    introduction: "Comprendre comment la solidarité et les politiques publiques béninoises financent l'accès aux soins.",
+    title: "Les modes alternatifs de règlements des conflits (MARC)",
+    introduction: "Maîtriser la médiation et la négociation pour résoudre les litiges à l'amiable.",
     objectives: [
-      "Expliquer le fonctionnement financier d'une Mutuelle de Santé communautaire",
-      "Comprendre la règlementation UEMOA sur la mutualité",
-      "Maîtriser les volets du programme gouvernemental ARCH",
-      "Identifier les populations cibles pour la gratuité des soins"
+      "Distinguer la médiation, la négociation et l'arbitrage",
+      "Maîtriser les étapes d'une négociation réussie",
+      "Comprendre le rôle du médiateur et les étapes de la médiation",
+      "Identifier les situations où la médiation est déconseillée"
     ],
-    keyNotions: ["Projet ARCH", "Mutualité de l'UEMOA", "Tiers-payant", "Ticket modérateur"],
+    keyNotions: ["Médiation", "Négociation", "Arbitrage", "Accord à l'amiable"],
     content: `
-# Module 5 : Protection Sociale et Assurances Maladie
+# MODULE 5. LES MODES ALTERNATIFS DE REGLEMENTS DES CONFLITS / LITIGES
 
-## 1. La Mutualité Sociale (Règlementation UEMOA)
-La maladie est le premier facteur de basculement dans l'extrême pauvreté. Les Mutuelles de Santé sont régies par le **Règlement n°07/2009/CM/UEMOA**. 
-Ce sont des sociétés de personnes à but non lucratif.
-* **La cotisation prévoyante** : L'usager cotise pendant qu'il est en bonne santé (souvent de petites sommes mensuelles ou annuelles).
-* **Le Tiers-Payant** : En cas de maladie, le membre se rend dans un centre de santé conventionné. Il ne paie que le **ticket modérateur** (ex: 20% ou 30% de la facture). La mutuelle règle les 70% ou 80% restants directement à l'hôpital.
+La plupart des personnes utilisent des méthodes alternatives de résolution des conflits (MARC) dans leur vie quotidienne. Quand ce type de compétence est utilisé dans un cadre plus formel (pour régler une affaire qui pourrait mener à des poursuites), nous les appelons MARC. Généralement, le recours aux MARC se fait de manière volontaire et devrait permettre la signature d’un accord écrit entre les parties.
 
-## 2. Le Projet ARCH au Bénin
-C'est le programme phare du gouvernement béninois : **Assurance pour le Renforcement du Capital Humain (ARCH)**. Il vise à universaliser l'accès aux soins, la formation, le microcrédit et la retraite.
-Le volet "Assurance Maladie" de l'ARCH cible prioritairement les **"pauvres extrêmes et pauvres non extrêmes"**. 
-* **Comment ça marche ?** Les bénéficiaires sont identifiés via la base de données de l'ANIP. L'État prend en charge 100% de la prime d'assurance pour les personnes extrêmement pauvres.
-* **Rôle du parajuriste** : Informer les populations démunies de leurs droits liés au projet ARCH, vérifier s'ils sont enregistrés au RAVIP (condition préalable), et les orienter vers les centres sociaux (CPS) pour les processus de ciblage et d'obtention de la carte biométrique ARCH.
+Les trois principales méthodes sont : 
+1. **Médiation** – Une personne neutre (le médiateur) aide les deux parties à trouver un accord qui résout la dispute par un compromis.
+2. **Négociation** – Les parties échangent directement entre elles afin de trouver un accord sans tiers.
+3. **Arbitration** – Les parties présentent le cas à un comité d’experts (arbitres) et acceptent en avance d'appliquer leur décision.
+
+## I. NEGOCIATION
+La négociation est un acte simple qui permet de trouver un terrain d’entente pour répondre à un besoin ou résoudre un problème. Il faut parfois faire des compromis ou des concessions pour trouver une solution.
+
+### Étapes de la négociation :
+1. **Rencontrer le client** : Comprendre le problème et discuter de l'option négociation.
+2. **Préparer et planifier** : Comprendre la position du client et de l’autre partie.
+3. **Contact with l’autre partie** : Présenter les faits et essayer de négocier.
+4. **Retourner vers le client** : Discuter de la proposition faite par l’autre camp.
+5. **Finaliser l’accord** : Écrire immédiatement une lettre exposant l’accord et la faire signer.
+
+## II. MEDIATION
+La médiation est un processus volontaire où des personnes se réunissent with l’aide d’un ‘médiateur’. Celui-ci est impartial et neutre. Il n’y a pas de gagnants et de perdants.
+
+### La médiation est utile pour :
+• Maintenir une relation bénéfique pour les deux parties.
+• Litige trop cher pour une partie.
+• Garder les faits confidentiels.
+• Conflits locatifs, familiaux ou de voisinage.
+
+### Il ne peut pas avoir de médiation quand :
+• Le conflit porte sur un crime sérieux (viol, meurtre).
+• La vie de personnes est en jeu.
+• Les droits fondamentaux sont violés.
+• Une partie refuse la solution commune.
+
+### Étapes pour une médiation réussie :
+1. **Préparation** : Organisation logistique.
+2. **Ouverture** : Règles de base (pas d'insultes, récit libre).
+3. **Récit** : Chaque partie raconte son histoire ; résumé des besoins.
+4. **Comprendre le problème** : Identification des intérêts sous-jacents.
+5. **Explorer les solutions** : Rechercher un terrain d'entente.
+6. **Accord** : Reformuler l'accord final et le signer.
+7. **Suivi post-résolution**.
+
+**Atténuer les déséquilibres de pouvoir** : Le médiateur doit corriger les déséquilibres (niveau d'éducation, intimidation) en posant des questions, en définissant l'ordre du jour ou en utilisant des caucus.
+
+### Rôle du parajuriste :
+1. **Défenseur** : Accompagne le client pendant la médiation et facilite le suivi.
+2. **Médiateur** : Sert de tiers neutre (attention : on ne peut pas être à la fois médiateur et défenseur dans le même cas).
     `,
     quiz: [
       {
         id: "q5_1",
-        question: "Que signifie le sigle ARCH au Bénin ?",
-        options: ["Association pour la Restructuration des Centres Hospitaliers", "Assurance pour le Renforcement du Capital Humain", "Alliance pour le Retour à la Croissance Harmonique"],
-        correctAnswer: 1
-      },
-      {
-        id: "q5_2",
-        question: "Qui paie la prime d'assurance maladie pour les populations identifiées comme extrêmement pauvres dans le cadre du projet ARCH ?",
-        options: ["Les mutuelles privées", "L'État béninois à 100%", "La mairie de leur commune"],
+        question: "Dans quel type de conflit la médiation est-elle formellement déconseillée ?",
+        options: ["Conflit de voisinage", "Crime sérieux comme le viol ou le meurtre", "Problème de loyer"],
         correctAnswer: 1
       }
     ],
@@ -239,92 +455,115 @@ Le volet "Assurance Maladie" de l'ARCH cible prioritairement les **"pauvres extr
   },
   {
     id: 6,
-    title: "Organisation judiciaire et Procédures",
-    introduction: "Naviguer dans les arcanes de la justice béninoise, de l'infraction pénale jusqu'au jugement.",
+    title: "Le droit pénal et la procédure pénale",
+    introduction: "Comprendre les infractions, la garde à vue et le rôle des acteurs de la justice pénale.",
     objectives: [
-      "Cartographier les juridictions béninoises (Tribunal, Cour d'Appel, CRIET)",
-      "Maîtriser les dispositions du Code de Procédure Pénale concernant la garde à vue",
-      "Comprendre la procédure de constitution de partie civile",
-      "Savoir comment rédiger une demande d'aide juridictionnelle"
+      "Distinguer les contraventions, les délits et les crimes",
+      "Connaître les droits du gardé à vue et les délais",
+      "Maîtriser les étapes de la procédure pénale",
+      "Identifier les différents acteurs de la chaîne pénale"
     ],
-    keyNotions: ["Code de Procédure Pénale", "CRIET", "Garde à vue", "Aide Juridictionnelle", "Plainte"],
+    keyNotions: ["Infraction", "Garde à vue", "Procureur", "Juge d'instruction"],
     content: `
-# Module 6 : Accès à la Justice et Organisation des Tribunaux
+# MODULE 6. LE DROIT PENAL ET LA PROCEDURE PENALE
 
-## 1. L'Organisation Judiciaire au Bénin
-Le parajuriste doit savoir orienter selon le type et la gravité de l'affaire.
-* **Les Tribunaux de Conciliation** (niveau arrondissement) : Pour les conflits de voisinage, petites créances, conflits familiaux légers.
-* **Le Tribunal de Première Instance (TPI)** : Juge la majorité des affaires civiles (divorce, héritage) et pénales (vols, coups et blessures, escroquerie).
-* **La Cour d'Appel** : Si une partie n'est pas satisfaite de la décision du TPI.
-* **La Cour de Répression des Infractions Économiques et du Terrorisme (CRIET)** : Juridiction spéciale siégeant à Porto-Novo, compétente pour le trafic de drogue, le terrorisme, la cybercriminalité (gaymans) et les crimes économiques graves.
+## I. Le droit pénal
+Le droit pénal est l’ensemble des règles juridiques qui organisent la réaction de l’État vis-à-vis des délinquants et des comportements qui portent atteinte à l’intérêt général (ou infractions). 
 
-## 2. La Garde à Vue : Droits fondamentaux
-C'est le moment le plus vulnérable pour un citoyen. Le **Code de Procédure Pénale** béninois encadre strictement la privation de liberté par les Officiers de Police Judiciaire (OPJ).
-* **Durée** : La garde à vue est de **48 heures maximum**. Elle peut être prolongée une seule fois de 48h, **exclusivement sur autorisation écrite du Procureur de la République**.
-* **Droits du gardé à vue** : Il a le droit d'être informé des charges retenues contre lui, de faire prévenir sa famille, de garder le silence, et surtout d'être **assisté par son avocat dès la première heure**. La torture ou les mauvais traitements pour extorquer des aveux sont des crimes sévèrement punis.
+### 1. L’infraction :
+C’est un comportement (acte ou omission) interdit par la loi et puni d'une peine. 
+On distingue trois catégories d'infractions selon leur gravité : 
+• **Le crime** (p. ex. le meurtre, le viol) : puni de réclusion ou de détention criminelle. 
+• **Le délit** (p. ex. le vol simple, l’escroquerie, les coups et blessures volontaires) : puni d’une peine d'emprisonnement et/ou d'amende. 
+• **Le contravention** : infraction la moins grave, punie simplement d'une amende. 
 
-## 3. L'Action en Justice et l'Aide Juridictionnelle
-* **La Plainte** : L'usager peut déposer plainte à la Police Républicaine (commissariat) ou adresser une plainte écrite directement au **Procureur de la République** (soit plainte simple, soit avec constitution de partie civile).
-* **L'Indigence** : Si un usager n'a pas les moyens de payer les frais de justice (consignation) ou un avocat, l'État béninois prévoit une **Aide Juridictionnelle**. Le parajuriste aide l'usager à fournir un certificat d'indigence (délivré par le CPS et la mairie) pour déposer la demande au tribunal.
+### 2. Les éléments de l’infraction :
+Pour qu'il y ait une infraction, trois conditions doivent être réunies : 
+• **Élément légal** : l'acte doit être prévu et interdit par un texte de loi au moment des faits. 
+• **Élément matériel** : il doit y avoir un acte concret (on ne punit pas une pensée). 
+• **Élément moral** : l’auteur doit avoir agi with une certaine volonté ou conscience (l'intention coupable).
+
+## II. La procédure pénale
+La procédure pénale est l’ensemble des règles qui fixent comment l’infraction doit être recherchée, jugée et punie. 
+
+### 1. La plainte :
+C’est l'acte par lequel une victime informe la justice (Police, Gendarmerie ou Procureur) qu'une infraction a été commise.
+
+### 2. La garde à vue :
+C’est une mesure de privation de liberté décidée par un officier de police judiciaire (OPJ). 
+**Les règles clés (selon le Code de procédure pénale)** : 
+• Elle dure **48 heures maximum**. 
+• Elle peut être prolongée de 48h sur autorisation du Procureur. 
+• Le gardé à vue a le droit d'être examiné par un médecin, de faire prévenir un proche, de se taire et d’être assisté d’un avocat. 
+
+### 3. Les acteurs de la chaîne pénale :
+• **Le Procureur de la République** : Il reçoit les plaintes et décide de poursuivre ou non l’auteur (opportunité des poursuites). Il représente l’intérêt de la société. 
+• **Le Juge d’instruction** : Il intervient pour les affaires complexes ou les crimes. Il « instruit » le dossier (recherche les preuves à charge et à décharge). 
+• **Le Tribunal / La Cour** : C’est la juridiction qui juge l’affaire et rend la sentence. 
+• **L’avocat** : Il conseille et défend les droits de l’auteur ou de la victime. 
     `,
     quiz: [
       {
         id: "q6_1",
-        question: "Quelle est la durée légale initiale d'une garde à vue au Bénin avant toute prolongation ?",
+        question: "Quelle est la durée maximale d'une garde à vue au Bénin (sans compter la prolongation) ?",
         options: ["24 heures", "48 heures", "72 heures"],
         correctAnswer: 1
-      },
-      {
-        id: "q6_2",
-        question: "Quelle juridiction spéciale béninoise est compétente pour juger les affaires de cybercriminalité grave ?",
-        options: ["Le Tribunal de Conciliation", "La Haute Cour de Justice", "La CRIET"],
-        correctAnswer: 2
       }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
   },
   {
     id: 7,
-    title: "Techniques d'Écoute et de Conduite d'Entretien",
-    introduction: "Acquérir les compétences psychosociales pour recevoir des victimes et mener un entretien juridique.",
+    title: "Le droit civil et les procédures civiles",
+    introduction: "Maîtriser les bases du droit des personnes, de la famille et des contrats.",
     objectives: [
-      "Pratiquer l'écoute active et la reformulation",
-      "Éviter les biais cognitifs et les jugements moraux",
-      "Gérer un entretien avec une victime de traumatisme aigu",
-      "Savoir canaliser un usager agressif ou confus"
+      "Comprendre les concepts de base du droit civil",
+      "Maîtriser les étapes d'un procès civil",
+      "Distinguer la responsabilité civile contractuelle et délictuelle",
+      "Connaître les modes de preuve en matière civile"
     ],
-    keyNotions: ["Écoute active", "Non-directivité", "Reformulation", "Empathie clinique"],
+    keyNotions: ["Capacité juridique", "Mariage", "Contrat", "Responsabilité civile"],
     content: `
-# Module 7 : Psychologie et Techniques d'Entretien
+# MODULE 7. LE DROIT CIVIL ET LES PROCEDURES CIVILES
 
-## 1. La posture professionnelle : Empathie et Neutralité
-Le parajuriste, qu'il travaille sur un campus universitaire ou dans une ONG, fait souvent face à la détresse. 
-* **Le Non-Jugement** : C'est la règle d'or. Face à une jeune fille ayant subi un avortement clandestin compliqué (illégal sauf conditions strictes de la loi de 2021 sur la SSR) ou une femme victime de viol, le parajuriste n'est pas un moralisateur. Il ne doit **jamais** dire : "Pourquoi tu as fait ça ?" ou "C'est de ta faute". 
-* **L'Empathie** : Comprendre la souffrance de l'autre sans se laisser submerger par ses propres émotions (la juste distance).
+C’est le « droit commun », celui qui régit les relations entre les personnes privées (famille, commerce, travail).
 
-## 2. L'Écoute Active (Méthode Carl Rogers)
-L'écoute active n'est pas passive. C'est un travail intellectuel consistant à :
-1.  **Questionnement ouvert** : Utiliser "Comment, Que s'est-il passé, Décrivez-moi..." au lieu de questions fermées "Avez-vous fait X ?".
-2.  **La Reformulation** : Répéter avec ses propres mots les faits essentiels (Ex: "Si je comprends bien, vous dites que votre employeur a refusé de vous payer depuis trois mois après votre licenciement, c'est bien cela ?"). Cela montre à l'usager qu'il est compris et valide les faits juridiques.
-3.  **Le Silence** : Savoir se taire. Le silence permet à l'usager de structurer sa pensée ou d'exprimer une émotion difficile.
+## I. Le droit des personnes et de la famille
+Au Benin, il est régi par le **Code des personnes et de la famille** (Loi 2002-07).
+• **Le nom et le domicile** : éléments d'identification de la personne.
+• **La capacité juridique** : Aptitude à avoir des droits et à les exercer (la majorité est fixée à 18 ans).
+• **Le mariage** : Il existe au Bénin le mariage civil (célébré à la mairie). La loi interdit désormais le mariage forcé et fixe l'âge minimum à 18 ans pour l'homme et la femme.
+• **Le divorce** : Dissolution du lien matrimonial par décision de justice.
 
-## 3. Conduire l'entretien (Les 4 phases)
-1.  **L'Accueil** : Mettre en confiance, présenter les règles (gratuité, confidentialité).
-2.  **L'Investigation** : Laisser parler, puis creuser pour obtenir les faits matériels (dates, lieux, témoins, preuves).
-3.  **L'Analyse** : Le parajuriste qualifie juridiquement les faits (s'agit-il d'un conflit civil, d'un délit pénal, d'un problème administratif ?).
-4.  **L'Orientation/Plan d'action** : Proposer des solutions à l'usager sans décider à sa place.
+## II. Le droit des obligations (Les contrats)
+Le contrat est un accord de volonté entre deux ou plusieurs personnes destiné à créer des obligations.
+**Conditions de validité d'un contrat** :
+1. Le consentement des parties (libre et éclairé).
+2. La capacité de contracter.
+3. Un contenu licite et certain.
+
+Si une partie ne respecte pas le contrat, elle engage sa **responsabilité civile contractuelle**.
+
+## III. La responsabilité civile délictuelle
+C’est l’obligation de réparer un dommage causé à autrui en dehors de tout contrat.
+**Exemple** : Vous cassez accidentellement la vitre d'un voisin. Vous devez réparer (payer les frais).
+**Trois éléments sont nécessaires** :
+1. Une faute ou un fait générateur.
+2. Un dommage (préjudice physique, moral ou matériel).
+3. Un lien de causalité entre la faute et le dommage.
+
+## IV. La procédure civile
+C’est le chemin à suivre pour faire trancher un litige civil par un juge.
+• **L’assignation** : Acte d’huissier de justice par lequel le demandeur appelle le défendeur devant le tribunal.
+• **Les débats** : Phase où les parties présentent leurs arguments et preuves.
+• **Le jugement** : Décision rendue par le juge.
+• **Les voies de recours** : L’appel (devant la Cour d'Appel) ou le pourvoi en cassation (devant la Cour Suprême).
     `,
     quiz: [
       {
         id: "q7_1",
-        question: "Lorsqu'une victime raconte une histoire difficile, quelle est la pire erreur que le parajuriste puisse faire ?",
-        options: ["Garder le silence pour la laisser pleurer", "La culpabiliser ou émettre un jugement moral sur son comportement", "Prendre des notes discrètement"],
-        correctAnswer: 1
-      },
-      {
-        id: "q7_2",
-        question: "Qu'est-ce que la reformulation dans un entretien ?",
-        options: ["Répéter exactement les mots de la victime comme un perroquet", "Résumer avec ses propres mots ce que l'usager vient de dire pour s'assurer d'avoir bien compris", "Donner son avis personnel sur l'affaire"],
+        question: "Quel est l'âge de la majorité civile au Bénin ?",
+        options: ["16 ans", "18 ans", "21 ans"],
         correctAnswer: 1
       }
     ],
@@ -332,96 +571,96 @@ L'écoute active n'est pas passive. C'est un travail intellectuel consistant à 
   },
   {
     id: 8,
-    title: "Documentation et Gestion des Preuves",
-    introduction: "Méthodologie stricte pour monter un dossier solide, préserver les preuves et protéger les données.",
+    title: "Le droit foncier au Bénin",
+    introduction: "Comprendre le régime foncier, la sécurisation des terres et le rôle du parajuriste en zone rurale.",
     objectives: [
-      "Rédiger une fiche de signalement ou d'entretien claire et juridiquement exploitable",
-      "Comprendre la chaîne de conservation des preuves (numériques, physiques, témoignages)",
-      "Appliquer le Code du Numérique sur la protection des données personnelles (APDP)",
-      "Mettre en place un système d'archivage sécurisé"
+      "Maîtriser les dispositions du Code foncier et domanial",
+      "Connaître les titres de propriété (ADC, Titre foncier)",
+      "Comprendre les étapes de sécurisation d'une terre",
+      "Identifier les institutions foncières (ANDF, tribunaux)"
     ],
-    keyNotions: ["Fiche de cas", "Preuve matérielle", "Données à caractère personnel", "Code du Numérique"],
+    keyNotions: ["Code foncier", "Attestation de Détention Coutumière", "Titre Foncier", "ANDF"],
     content: `
-# Module 8 : Méthodologie, Preuves et Traçabilité
+# MODULE 8. LE DROIT FONCIER AU BENIN
 
-## 1. L'art de la Documentation
-Les paroles s'envolent, les écrits restent. Un parajuriste inorganisé est inutile. Chaque interaction doit faire l'objet d'une **Fiche de Cas**.
-Celle-ci doit contenir de manière neutre :
-* L'identité complète (anonymisée par un code si besoin pour les bases de données informatiques).
-* La chronologie exacte des faits reprochés.
-* L'inventaire des pièces fournies (contrats, SMS imprimés, photos).
-* L'action entreprise (ex: "Orienté vers le commissariat du 2ème arrondissement le 12/04").
+Le foncier est une source majeure de conflits au Bénin. Depuis 2013, le Bénin dispose d'un **Code foncier et domanial** (modifié en 2017) qui unifie les règles.
 
-## 2. La Préservation de la Preuve
-Le droit fonctionne sur la preuve. Le parajuriste doit conseiller l'usager sur la sauvegarde des éléments à charge ou à décharge :
-* **VBG / Coups et blessures** : Ne pas laver les vêtements déchirés ou ensanglantés, ils constituent des preuves matérielles pour la police scientifique. Obtenir le certificat médical le plus tôt possible.
-* **Preuves numériques (Cybercriminalité/Harcèlement)** : Ne jamais supprimer les messages (WhatsApp, SMS, Facebook) ou les notes vocales de menaces. Faire des captures d'écran et, si possible, les faire constater par un huissier de justice avant toute chose.
+## I. Les deux domaines de l’État :
+• **Le domaine public** : Les biens inaliénables appartenant à tous (routes, rivages de mer, cours d'eau).
+• **Le domaine privé (de l'Etat ou des particuliers)** : Terres susceptibles d'être vendues ou louées.
 
-## 3. Sécurité et Protection des Données (Code du Numérique)
-Le Bénin possède un **Code du Numérique (2018)** très strict sur la protection des données à caractère personnel, veillé par l'APDP (Autorité de Protection des Données Personnelles).
-* Le parajuriste collecte des données extrêmement sensibles (statut sérologique, antécédents pénaux, situation matrimoniale).
-* Il est **interdit** de stocker ces fiches non-sécurisées sur un ordinateur public, de les envoyer via des canaux non cryptés, ou de laisser des dossiers papiers ouverts sur un bureau. Une faille de confidentialité ruine la réputation du parajuriste et l'expose légalement.
+## II. Les titres de propriété et de sécurisation :
+• **L’Attestation de Détention Coutumière (ADC)** : Acte délivré par le Maire constatant les droits exercés par une personne selon la coutume sur une terre rurale non immatriculée.
+• **L’Attestation de Recasement** : Document délivré après des travaux de lotissement en zone urbaine.
+• **Le Titre Foncier (TF)** : C'est le titre de propriété définitif, inattaquable et sacré. Tout propriétaire devrait tendre vers l'immatriculation de sa parcelle pour obtenir un Titre Foncier.
+
+## III. La vente de terre (La transaction foncière) :
+Au Bénin, pour qu’une vente de terre soit valable devant la loi, elle doit :
+1. Faire l'objet d'un **Procès-verbal de palabre** (pour les terres coutumières) ou se faire devant **notaire**.
+2. La signature d'une convention de vente certifiée par l'autorité locale.
+3. L'inscription à l'**Agence Nationale du Domaine et du Foncier (ANDF)**.
+
+**ATTENTION** : Les transactions foncières « sous seing privé » (simples papiers signés entre individus sans formalités) sont très risquées et favorisent la double vente.
+
+## IV. Rôle du parajuriste en matière foncière :
+• Sensibiliser sur l’importance des formalités légales.
+• Aider à la vérification de l'état réel de la terre à l'ANDF avant tout achat.
+• Orienter les victimes de spoliation ou de conflits de limites vers les instances de conciliation ou la justice.
     `,
     quiz: [
       {
         id: "q8_1",
-        question: "Un usager victime de menaces de mort par SMS vous demande conseil. Que lui dites-vous en premier ?",
-        options: ["Supprimez le numéro pour ne plus être embêté", "Conservez précieusement votre téléphone, faites des captures d'écran et allez faire un constat à la police", "Répondez-lui avec des insultes pour vous défendre"],
-        correctAnswer: 1
-      },
-      {
-        id: "q8_2",
-        question: "Au regard de la loi béninoise, est-il autorisé de partager les fiches détaillées des usagers dans un groupe WhatsApp pour avoir l'avis d'autres parajuristes ?",
-        options: ["Oui, si le groupe est réservé aux parajuristes", "Non, c'est une violation flagrante de la confidentialité et des données personnelles", "Seulement si l'usager est d'accord verbalement"],
-        correctAnswer: 1
+        question: "Quel est le document le plus solide garantissant la propriété inattaquable d'une terre au Bénin ?",
+        options: ["Le petit papier du chef de village", "L'Attestation de Détention Coutumière (ADC)", "Le Titre Foncier (TF)"],
+        correctAnswer: 2
       }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
   },
   {
     id: 9,
-    title: "Mobilisation et Plaidoyer Communautaire",
-    introduction: "Techniques pour transformer les constats individuels en réformes systémiques grâce à l'action collective.",
+    title: "Violences Basées sur le Genre (VBG) et Protection de la Femme et de l'Enfant",
+    introduction: "Comprendre les types de violences, le cadre légal de protection et les mécanismes de prise en charge.",
     objectives: [
-      "Cartographier les parties prenantes et leaders d'opinion locaux",
-      "Concevoir et animer une campagne de sensibilisation ciblée",
-      "Monter une stratégie de plaidoyer auprès des autorités locales (Mairies, Préfectures)",
-      "Utiliser les relais associatifs et estudiantins comme leviers de changement"
+      "Identifier les différentes formes de VBG au Bénin",
+      "Connaître les dispositions de la Loi sur les violences faites aux femmes",
+      "Maîtriser les droits de l'enfant et le Code de l'enfant",
+      "Savoir orienter les victimes vers les centres de prise en charge (CPS, Tribunal, etc.)"
     ],
-    keyNotions: ["Plaidoyer", "IEC/CCC", "Cartographie des acteurs", "Mobilisation des jeunes"],
+    keyNotions: ["VBG", "Viol", "Harcèlement", "Code de l'enfant", "CPS"],
     content: `
-# Module 9 : De l'Individu au Collectif - Le Plaidoyer
+# MODULE 9. LES VIOLENCES BASEES SUR LE GENRE (VBG) ET LA PROTECTION DE LA FEMME ET DE L'ENFANT
 
-## 1. La Cartographie des acteurs locaux
-Un parajuriste n'a pas de pouvoir coercitif. Sa force réside dans son réseau. Pour mener une action (ex: lutter contre la pollution d'une rivière ou les mariages précoces), il doit identifier :
-* **Les autorités politico-administratives** : Maires, Chefs d'Arrondissement (CA), Chefs de Quartier/Village (CQ/CV).
-* **Les autorités traditionnelles et religieuses** : Têtes couronnées, Imams, Pasteurs, Prêtres (très écoutés au Bénin).
-* **Les dynamiques associatives** : Les ONG de jeunesse, les fédérations d'étudiants, les groupements de femmes.
+## I. Les Violences Basées sur le Genre (VBG)
+Les VBG sont des actes nuisibles dirigés contre une personne en raison de son sexe. Au Bénin, elles sont réprimées par plusieurs lois, notamment la **Loi 2011-26 relative à la répression des violences faites aux femmes**.
 
-## 2. L'animation de stand et la Sensibilisation (IEC)
-L'Information, Éducation, Communication (IEC) demande de la préparation.
-* **Adaptation culturelle** : On ne parle pas de planification familiale ou de droits fonciers de la femme de la même manière au Nord et au Sud du Bénin. Le message doit respecter les codes culturels pour être accepté.
-* **Les outils** : Animations de stands dans les universités ou marchés, boîtes à images, théâtre-forum (où le public propose des solutions juridiques à un conflit joué par des acteurs), émissions sur les radios communautaires.
+### Les différentes formes de VBG :
+• **Violences physiques** : Coups et blessures, mutilations génitales féminines (excision).
+• **Violences sexuelles** : Viol, harcèlement sexuel, attouchements.
+• **Violences psychologiques** : Menaces, humiliations, injures, isolement.
+• **Violences économiques** : Privation de ressources, interdiction de travailler, spoliation des biens de la veuve.
 
-## 3. Le Plaidoyer : Exiger le changement
-Si le parajuriste constate un problème récurrent (ex: un commissariat local refuse systématiquement d'enregistrer les plaintes pour violences conjugales en disant "réglez ça en famille"), l'action individuelle ne suffit plus.
-Il faut monter un **plaidoyer** :
-1.  Rassembler les preuves (les statistiques anonymisées tirées des fiches de cas).
-2.  Aller en coalition (avec des ONG, des réseaux de jeunes).
-3.  Rencontrer le Commissaire Central ou le Procureur pour présenter le problème et exiger l'application stricte de la loi.
-Le plaidoyer vise à changer les politiques ou l'application des lois au niveau local ou national.
+## II. Le harcèlement sexuel
+C’est le fait d'imposer à une personne, de façon répétée, des propos ou comportements à connotation sexuelle qui portent atteinte à sa dignité. La loi béninoise punit sévèrement le harcèlement, surtout en milieu scolaire et professionnel.
+
+## III. La protection de l’enfant
+L’enfant est protégé par le **Code de l'enfant en République du Bénin**.
+• **Le mariage des enfants** : Il est strictement interdit avant 18 ans.
+• **Le travail des enfants** : L'exploitation des enfants est punie.
+• **L'éducation** : L'école est obligatoire jusqu'à 16 ans.
+
+## IV. La prise en charge des victimes
+Le parajuriste doit connaître le circuit de prise en charge :
+1. **Sécurité** : Commissariat de police ou Gendarmerie (porter plainte).
+2. **Médical** : Hôpital ou Centre de Santé (pour les soins et le certificat médical – gratuit en cas de viol).
+3. **Social** : Centre de Promotion Sociale (CPS) pour l'écoute et l'accompagnement psychologique.
+4. **Juridique** : Tribunal ou ONGs spécialisées.
     `,
     quiz: [
       {
         id: "q9_1",
-        question: "Quelle est la principale différence entre la sensibilisation et le plaidoyer ?",
-        options: ["Le plaidoyer coûte plus cher", "La sensibilisation vise à informer la population, le plaidoyer vise à influencer les décideurs pour changer une politique ou son application", "Il n'y a aucune différence, ce sont des synonymes"],
-        correctAnswer: 1
-      },
-      {
-        id: "q9_2",
-        question: "Pourquoi est-il stratégique d'impliquer les chefs religieux et traditionnels dans une campagne contre les mariages forcés ?",
-        options: ["Parce qu'ils ont le pouvoir d'emprisonner les coupables", "Parce qu'ils sont des leaders d'opinion dont la parole a un fort impact sur le changement de comportement des communautés", "Parce qu'ils peuvent financer la campagne"],
+        question: "Une femme est battue par son mari. Vers quel centre social public doit-elle s'orienter pour une écoute et un soutien ?",
+        options: ["La Mairie", "Le Centre de Promotion Sociale (CPS)", "Le marché"],
         correctAnswer: 1
       }
     ],
@@ -429,8 +668,37 @@ Le plaidoyer vise à changer les politiques ou l'application des lois au niveau 
   },
   {
     id: 10,
-    title: "Signalement, Veille et Data communautaire",
-    introduction: "Plateforme interactive et processus pour signaler les violations et contribuer à la justice prédictive.",
+    title: "Techniques d'entretien et cas de signalement",
+    introduction: "Acquérir les compétences pour mener un entretien with une victime et savoir comment signaler un cas.",
+    objectives: [
+      "Pratiquer l'écoute active et la reformulation",
+      "Accueillir une victime sans jugement (empathie)",
+      "Savoir remplir une fiche de signalement",
+      "Respecter la confidentialité et l'éthique du parajuriste"
+    ],
+    keyNotions: ["Écoute active", "Confidentialité", "Fiche de signalement", "Éthique"],
+    content: `
+# MODULE 10. TECHNIQUES D'ENTRETIEN ET CAS DE SIGNALEMENT
+
+Le parajuriste est souvent le premier interlocuteur d'une personne en détresse. Sa posture est déterminante.
+
+## I. Les principes de l'entretien :
+• **Le non-jugement (L’empathie)** : Ne jamais critiquer ou blamez la victime.
+• **L'écoute active** : Laisser la personne parler, ne pas l’interrompre brusquement.
+• **La reformulation** : Répéter ce qu'on a compris pour s'assurer de l'exactitude des faits (Ex : « Si je comprends bien, votre voisin vous empêche d’accéder à votre champ depuis lundi ? »).
+• **La confidentialité** : Le parajuriste est tenu au secret professionnel. On ne raconte pas les problèmes des gens sur la place publique.
+
+## II. Le signalement d'un cas :
+Signaler, c'est porter à la connaissance des autorités compétentes ou de HAI une situation de violation de droits.
+**Comment faire un bon signalement** :
+1. Noter les **Faits** (ce qui s'est passé).
+2. Noter le **Lieu** et la **Date**.
+3. Identifier les **Parties** (qui est la victime ? qui est l'auteur ?).
+4. Recueillir les **Preuves** éventuelles (témoins, documents, photos).
+
+## III. Utilisation de l'application HAI pour le signalement :
+L'onglet « Signalement » de cette application vous permet d'envoyer anonymement ou non des informations sur un cas de violation de droits (VBG, foncier, maltraitance enfant) directement aux équipes de HAI pour une intervention rapide.
+    `,
     isReporting: true,
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
   }
