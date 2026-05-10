@@ -227,17 +227,12 @@ Elle est la plus haute juridiction en matière administrative, judiciaire et des
 Elle exerce un contrôle de cassation sur les décisions rendues par les cours et tribunaux inférieurs en matière civile, commerciale, sociale et pénale.
 
 En tant que juge de droit commun de l'administration, elle contrôle la légalité des actes du pouvoir exécutif et des collectivités territoriales, avec compétence pour annuler des actes irréguliers.
-
-
-7. La Haute Cour de Justice
-
-La Haute Cour de Justice est composée des membres de la Cour Constitutionnelle à l’exception de son président, de six députés élus par l’Assemblée Nationale et du Président de la Cour Suprême. Elle élit en son sein son président. Elle est compétente pour juger le président de la république et les membres du gouvernement à raison de faits qualifiés de haute trahison, d’infraction commise dans l’exercice ou à l’occasion de l’exercice de leurs fonctions ainsi que pour juger leurs complices en cas de complot contre la sûreté de l’Etat.
     `,
     quiz: [
       {
         id: "q2_1",
-        question: "Quelle est la 'Loi Suprême' de l'État au Bénin ?",
-        options: ["Le Code Pénal", "La Constitution", "Le Code Foncier"],
+        question: "Quelle institution est la 'Loi Suprême de l'État' au Bénin ?",
+        options: ["Le Code Civil", "La Constitution", "Le Code Pénal"],
         correctAnswer: 1
       }
     ],
@@ -245,15 +240,15 @@ La Haute Cour de Justice est composée des membres de la Cour Constitutionnelle 
   },
   {
     id: 3,
-    title: "Introduction aux droits humains et mécanismes de protection",
-    introduction: "Analyse des droits universels et des voies de recours internes et internationales.",
+    title: "MODULE 3. INTRODUCTION AUX DROITS HUMAINS ET MECANISMES DE PROTECTION",
+    introduction: "Comprendre les droits universels, leurs sources internationales et nationales, ainsi que les mécanismes de protection.",
     objectives: [
-      "Définir les droits de l'homme et leurs sources",
-      "Distinguer les droits d'exercice individuel et collectif",
-      "Comprendre les droits catégoriels (femme, enfant, handicapés)",
-      "Identifier les organisations et voies de recours pour protéger les droits"
+      "Définir les droits de l'homme et leurs sources (DUDH, Chartes, Constitution)",
+      "Distinguer les droits d'exercice individuel (vie, intégrité, liberté)",
+      "Comprendre les droits d'exercice collectif et catégoriels (enfants, femmes)",
+      "Identifier les organisations de défense et les voies de recours"
     ],
-    keyNotions: ["DUDH", "Charte africaine", "Cour Constitutionnelle", "CBDH", "CPI"],
+    keyNotions: ["DUDH", "Charte africaine", "Constitution", "CIDE", "Voies de recours"],
     content: `
 # MODULE 3. INTRODUCTION AUX DROITS HUMAINS ET MECANISMES DE PROTECTION
 
@@ -262,57 +257,44 @@ Les droits de l'Homme sont une notion selon laquelle tout être humain possède 
 
 ## I. Les sources de droit de l’homme 
 ### 1. Les sources internationales
-- **La Déclaration universelle des droits de l'homme du 10 décembre 1948** : Adoptée par l’assemblée générale des Nations Unies. Elle exprime des positions de principe : « tous les êtres humains naissent libres et égaux en dignité et en droit ».
-- **Les Pactes internationaux** : Le pacte international relatif aux droits civils et politiques et le pacte international relatif aux droits économiques sociaux et culturels (1966).
-- **La Charte africaine des droits de l’homme et des peuples** : Adoptée en 1981, entrée en vigueur en 1986. Elle est originale par l'intégration de la notion de « devoir ».
+- **La Déclaration universelle des droits de l'homme du 10 décembre 1948** : Adoptée par l’assemblée générale des Nations Unies réunie le 10 décembre 1948 à Paris. Elle comporte trente (30) articles. Le premier article définit la base idéologique : « tous les êtres humains naissent libres et égaux en dignité et en droit ».
+- **Les Pactes internationaux** : Pacte international relatif aux droits civils et politiques et pacte international relatif aux droits économiques sociaux et culturels (16 décembre 1966).
+- **La Charte africaine des droits de l’homme et des peuples** : Adoptée en 1981, entrée en vigueur en 1986. Elle met l’accent sur le droit au développement et la notion de devoir.
 
 ### 2. La source nationale : la constitution
-Le titre II de la constitution béninoise est consacré aux droits de la personne humaine. Il consacre dans ses 34 articles des droits indivisibles : droits fondamentaux, droits civils et politiques, droits économiques, sociaux et culturels.
-• **Article 15** : Tout individu a droit à la vie, à la liberté, à la sécurité et à l’intégrité de sa personne.
-• **Article 17** : Toute personne accusée d’un acte délictueux est présumée innocente jusqu’à ce que sa culpabilité ait été légalement établie...
+Le titre II de la constitution béninoise est consacré aux droits de la personne humaine (34 articles).
+- **Article 15** : Tout individu a droit à la vie, à la liberté, à la sécurité et à l’intégrité de sa personne.
+- **Article 17** : Toute personne accusée d’un acte délictueux est présumée innocente jusqu’à ce que sa culpabilité ait été légalement établie...
 
 ## II. Les droits de l’homme en général
 ### 1. Les droits d’exercice individuel
-Considérés comme les droits qui protègent l’individu contre l’Etat.
-- **Le droit à la vie** (Article 15 Constitution, Article 3 DUDH).
-- **Le droit à l’intégrité physique** : Interdiction de la torture, des peines et traitements inhumains et dégradants (Convention de l'ONU de 1984).
-- **Le droit de ne pas être soumis à l’esclavage**, la servitude, le travail forcé et obligatoire.
-- **La liberté de circulation** (Article 10 Constitution).
-- **La liberté de religion** : Droit de pratiquer la religion choisie et de manifester son culte.
-- **Le droit au travail** : Droit de gagner sa vie par un travail choisi librement.
-- **Le droit à la sécurité sociale** : Garanties en cas de maladie, accident ou besoin familial.
-- **Le droit à l’éducation** : Article 13 du PIDESC. L'enseignement primaire doit être obligatoire et gratuit pour tous.
-- **Le droit à la santé** : Moyen nécessaire à la protection de la santé.
-- **La liberté d’expression** : Droit de rechercher, recevoir et répandre des informations ou idées.
+- **Le droit à la vie** : Affirmé par l'article 3 de la DUDH et l'article 6 du Pacte international.
+- **Le droit à l’intégrité physique** : Interdiction de la torture et des traitements inhumains (Convention de l'ONU de 1984).
+- **Interdiction de l'esclavage** : Convention de 1926 et l'article 8 du Pacte international.
+- **La liberté de circulation** : Garantie par l'article 10 de la Constitution.
+- **La liberté de religion** : Implique qu’un État ne peut pas imposer une religion.
+- **Le droit au travail** : Possibilité de gagner sa vie par un travail librement choisi.
+- **Le droit à la sécurité sociale** : Article 9 du Pacte.
+- **Le droit à l'éducation** : Article 13 du Pacte (enseignement primaire obligatoire et gratuit).
+- **Le droit à la santé** : Droit aux moyens nécessaires à la protection de sa santé.
+- **La liberté d’expression** : Article 19 du Pacte.
 
 ### 2. Les droits d’exercice collectif
-- **La liberté de presse** : Liberté de communiquer ses opinions sous forme orale ou écrite.
-- **La liberté de réunion** : Rencontre épisodique pacifique.
-- **La liberté d’association**
-- **Le droit à un environnement sain**
+- **La liberté de presse** : Communiquer ses opinions sous forme orale, écrite ou audio-visuelle.
+- **La liberté de réunion** : Rencontre pacifique dans un local clos ou à découvert.
 - **La liberté syndicale** : Droit de former des syndicats et de s’y affilier.
 
 ### 3. Les droits catégoriels 
 - **Les droits de l’enfant** : Convention Internationale des Droits de l’enfant (CIDE) de 1989.
-  * Droits à la survie, au développement, à la protection, à la participation, à l'identité.
-  * Au plan national : Loi n°2015-08 portant code de l’enfant en République du Bénin.
-- **Les droits de la femme et des handicapés** : Constitution béninoise (Article 26), Protocole de Maputo. Loi n° 2017-06 portant protection et promotion des droits des personnes handicapées.
+- **Les droits de la femme et des handicapés** : Égalité proclamée par l'article 26 de la Constitution.
 
 ## III. Système de protection des droits de l’homme
-### 1. Les organisations de défense des droits de l’homme
-Elles font la veille citoyenne et dénoncent les abus :
-- Amnesty International Benin
-- Human Rights Watch
-- Commission Béninoise des Droits de l’Homme (CBDH)
-- Prisonniers Sans Frontières, Caritas, etc.
+### 1. Les organisations de défense
+Amnesty International Benin, Human Rights Watch, Commission Béninoise des Droits de l’Homme (CBDH), Caritas, etc.
 
 ### 2. Les voies de recours
-- **Au plan interne : Cour constitutionnelle** : Elle peut être saisie pour violation des droits de la personne humaine et doit statuer dans les 15 jours.
-- **Au plan international** :
-  * Cour de justice de la CEDEAO
-  * Cour Africaine des Droits de l’homme
-  * Cour Pénale Internationale (CPI)
-  * Haut-Commissariat des Nations Unies aux droits de l’homme (HCDH)
+- **Plan interne** : Cour constitutionnelle (Article 120 de la Constitution).
+- **Plan international** : Cour Africaine des Droits de l’homme, Cour Pénale Internationale (CPI), etc.
     `,
     quiz: [
       {
@@ -320,63 +302,58 @@ Elles font la veille citoyenne et dénoncent les abus :
         question: "Quel article de la Constitution béninoise garantit le droit à la vie ?",
         options: ["Article 1", "Article 15", "Article 98"],
         correctAnswer: 1
+      },
+      {
+        id: "q3_2",
+        question: "La Déclaration universelle des droits de l'homme a été adoptée en quelle année ?",
+        options: ["1944", "1948", "1960"],
+        correctAnswer: 1
       }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   },
   {
     id: 4,
-    title: "L'engagement des communautés et le droit environnemental",
-    introduction: "Droit à l'information, à la participation et protection de l'environnement face aux projets de développement.",
+    title: "MODULE 4. L’ENGAGEMENT DES COMMUNAUTES ET LE DROIT ENVIRONNEMENTAL",
+    introduction: "Comprendre les droits des communautés face aux projets de développement et les mécanismes de protection de l'environnement.",
     objectives: [
-      "Comprendre les droits des communautés face aux projets de développement",
-      "Identifier les sources du droit environnemental au Bénin",
-      "Maîtriser les étapes de l'engagement communautaire",
-      "Connaître les mécanismes de financement et de protection des banques"
+      "Comprendre l'impact des projets de développement sur les communautés",
+      "Connaître les droits de participation et d'information",
+      "Maîtriser le droit à un environnement sain et durable",
+      "Identifier les garanties des banques de développement"
     ],
-    keyNotions: ["Loi environnementale", "Droit à l'information", "Participation publique", "Banque Mondiale"],
+    keyNotions: ["Projet de développement", "Droit à l'information", "Participation publique", "Banque Mondiale"],
     content: `
 # MODULE 4. L’ENGAGEMENT DES COMMUNAUTES ET LE DROIT ENVIRONNEMENTAL
 
 ## I. Les projets de développement et le droit d’engagement des communautés
-Les projets de développement peuvent être très importants pour le travail d'un parajuriste communautaire. Une collectivité peut être touchée par un projet de développement apporté par le gouvernement ou une autre institution (p. ex. une société par actions). Dans ce cas, les parajuristes peuvent aider leurs clients à comprendre leurs droits relatifs à ce projet. 
+Un projet de développement désigne l'installation ou la modernisation d'infrastructures (canaux, égouts, routes, forage de puits, barrages, mines). 
 
-Qu'entendons-nous par projet de développement ? 
-Un projet de développement en général désigne l'installation ou la modernisation d'infrastructures, par exemple la construction de canaux ou d'égouts, l'élargissement de routes, le forage de puits, etc. Ces projets peuvent être de très petite envergure ou à grande échelle (construction d'un barrage hydroélectrique). 
-
-Qui réalise les projets de développement ? 
-Les projets peuvent être réalisés par le gouvernement (l’Etat ou les collectivités territoriales), les Organisations Non-Gouvernementales (ONG), les entreprises privées ou les communautés elles-mêmes. Souvent, les projets gouvernementaux sont soutenus par des « partenaires au développement » (Banque mondiale, BAD, USAID, GIZ). 
-
-Il est très important que les parajuristes identifient tous ces partenaires parce que leur implication peut renforcer le droit de la communauté à participer au projet.
+Les projets peuvent être réalisés par le gouvernement, des ONG, des entreprises privées ou les communautés. Souvent, ils sont soutenus par des « partenaires au développement » (Banque mondiale, BAD, etc.). Il est crucial d'identifier ces partenaires car ils imposent souvent des normes de protection sociale et environnementale.
 
 ## II. Le droit de s’engager et de défendre son environnement face aux projets de développement
-Tout d'abord, un parajuriste qui s'engage with des projets de développement doit se rappeler certaines sources du droit : 
-• Constitution de la République du Bénin ;
-• Charte africaine des droits de l'homme et des peuples (CADHP) ; 
-• Pactes internationaux (PIDCP, PIDESC) ;
-• Convention de Kampala.
+Sources juridiques : Constitution du Bénin, Charte africaine des droits de l'homme et des peuples (CADHP), Pactes internationaux.
 
-De toutes ces sources, nous avons les règles suivantes : 
-• **Le droit à l'information** : Protégé par l'article 23 de la Constitution. Toute personne a droit à la liberté d'opinion et d'expression dans le respect de l'ordre public.
-• **Le droit à la participation du public** : Garanti par l'article 13 de la CADHP. Tous les citoyens ont le droit de participer librement à la direction des affaires publiques de leur pays.
-• **Le droit au développement** : Garanti par l'article 22 de la CADHP et l’article 9 de la Constitution. Tout être humain a droit au développement et au plein épanouissement de sa personne.
-• **Le droit à l'environnement** : Garanti par l'article 24 de la CADHP et l’article 27 de la Constitution. Toute personne a droit à un environnement sain, satisfaisant et durable et a le devoir de le défendre.
+### Les règles fondamentales :
+- **Le droit à l'information** : Article 23 de la Constitution.
+- **Le droit à la participation du public** : Article 13 de la CADHP.
+- **Le droit au développement** : Article 22 de la CADHP.
+- **Le droit à l'environnement** : Article 27 de la Constitution (droit à un environnement sain, satisfaisant et durable).
 
-**NOTEZ BIEN** : le droit à la propriété, à un procès équitable, à un niveau de vie adéquat (logement convenable) et l’interdiction des expulsions forcées peuvent également être affectés par les projets de développement ! 
+## III. Quelles sont les phases de l’engagement d’une communauté ?
+1. **Conception** : La communauté doit être informée dès le début.
+2. **Évaluation (EIES)** : Étude d'Impact Environnemental et Social pour identifier les risques.
+3. **Mise en œuvre** : Participation active pour éviter les abus.
+4. **Achèvement** : Vérification de la restauration des moyens de subsistance.
 
-### Quelles législations étatiques nous permettent d’exercer ces droits ? 
-• **L’article 23 de la Constitution** sur la liberté de l'information.
-• **La loi N°030-98 portant loi-cadre sur l’environnement** au Bénin : elle exige une évaluation des mesures de protection et des répercussions avant le début de tout projet.
-• **La loi N° 2016-06 portant loi-cadre sur l’aménagement du territoire** : favorise l'intégration des populations.
-
-### Financement et banques de développement : 
-Les banques multilatérales (BMD) comme la Banque Mondiale ont leurs propres règles internes qui imposent le respect de la participation publique, le traitement des griefs et la compensation des impacts négatifs (politique de réinstallation des personnes touchées). Les banques privées internationales adhèrent souvent aux **Principes de l’Équateur**.
+## IV. Les Banques Multilatérales de développement (BMD)
+Les banques comme la Banque Mondiale ont des **mécanismes de gestion des plaintes** (ex: le Panel d'inspection). Si un projet financé par elles cause un préjudice (expropriation sans compensation, pollution), les communautés peuvent saisir ces mécanismes indépendants.
     `,
     quiz: [
       {
         id: "q4_1",
-        question: "Quel article de la Constitution béninoise garantit le droit à un environnement sain ?",
-        options: ["Article 8", "Article 27", "Article 98"],
+        question: "Quel document obligatoire doit être réalisé avant le début d'un grand projet pour mesurer ses risques ?",
+        options: ["Un acte de vente", "Une Étude d'Impact Environnemental et Social (EIES)", "Un certificat de naissance"],
         correctAnswer: 1
       }
     ],
@@ -384,70 +361,53 @@ Les banques multilatérales (BMD) comme la Banque Mondiale ont leurs propres rè
   },
   {
     id: 5,
-    title: "Les modes alternatifs de règlements des conflits (MARC)",
-    introduction: "Maîtriser la médiation et la négociation pour résoudre les litiges à l'amiable.",
+    title: "MODULE 5. LES MODES ALTERNATIFS DE REGLEMENTS DES CONFLITS (MARC)",
+    introduction: "Maîtriser la médiation, la négociation et l'arbitrage pour résoudre les litiges sans passer par les tribunaux.",
     objectives: [
       "Distinguer la médiation, la négociation et l'arbitrage",
       "Maîtriser les étapes d'une négociation réussie",
-      "Comprendre le rôle du médiateur et les étapes de la médiation",
-      "Identifier les situations où la médiation est déconseillée"
+      "Comprendre le processus de médiation et le rôle du médiateur",
+      "Identifier les situations où les MARC sont déconseillés"
     ],
-    keyNotions: ["Médiation", "Négociation", "Arbitrage", "Accord à l'amiable"],
+    keyNotions: ["Médiation", "Négociation", "Arbitrage", "Compromis"],
     content: `
-# MODULE 5. LES MODES ALTERNATIFS DE REGLEMENTS DES CONFLITS / LITIGES
+# MODULE 5. LES MODES ALTERNATIFS DE REGLEMENTS DES CONFLITS (MARC)
 
-La plupart des personnes utilisent des méthodes alternatives de résolution des conflits (MARC) dans leur vie quotidienne. Quand ce type de compétence est utilisé dans un cadre plus formel (pour régler une affaire qui pourrait mener à des poursuites), nous les appelons MARC. Généralement, le recours aux MARC se fait de manière volontaire et devrait permettre la signature d’un accord écrit entre les parties.
+Généralement, le recours aux MARC se fait de manière volontaire et devrait permettre la signature d’un accord écrit entre les parties.
 
-Les trois principales méthodes sont : 
+## I. DÉFINITIONS ET DIFFÉRENCES
 1. **Médiation** – Une personne neutre (le médiateur) aide les deux parties à trouver un accord qui résout la dispute par un compromis.
-2. **Négociation** – Les parties échangent directement entre elles afin de trouver un accord sans tiers.
-3. **Arbitration** – Les parties présentent le cas à un comité d’experts (arbitres) et acceptent en avance d'appliquer leur décision.
+2. **Négociation** – Les parties échangent directement entre elles afin de trouver un accord.
+3. **Arbitrage** – Les parties présentent le cas à un tiers (arbitre) et acceptent en avance d'appliquer sa décision.
 
-## I. NEGOCIATION
-La négociation est un acte simple qui permet de trouver un terrain d’entente pour répondre à un besoin ou résoudre un problème. Il faut parfois faire des compromis ou des concessions pour trouver une solution.
+## II. LA NÉGOCIATION
+### Les étapes de la négociation :
+- **Préparation** : Comprendre le problème et les positions.
+- **Contact** : Présenter les faits à l'autre partie.
+- **Discussion** : Proposer des solutions.
+- **Accord** : Finaliser par écrit.
 
-### Étapes de la négociation :
-1. **Rencontrer le client** : Comprendre le problème et discuter de l'option négociation.
-2. **Préparer et planifier** : Comprendre la position du client et de l’autre partie.
-3. **Contact with l’autre partie** : Présenter les faits et essayer de négocier.
-4. **Retourner vers le client** : Discuter de la proposition faite par l’autre camp.
-5. **Finaliser l’accord** : Écrire immédiatement une lettre exposant l’accord et la faire signer.
+## III. LA MÉDIATION
+La médiation est un processus où un tiers impartial aide les parties à communiquer.
 
-## II. MEDIATION
-La médiation est un processus volontaire où des personnes se réunissent with l’aide d’un ‘médiateur’. Celui-ci est impartial et neutre. Il n’y a pas de gagnants et de perdants.
+### Quand utiliser la médiation ?
+- Pour maintenir une relation de voisinage ou familiale.
+- En cas de litiges locatifs ou commerciaux simples.
+- Pour gagner du temps et réduire les coûts.
 
-### La médiation est utile pour :
-• Maintenir une relation bénéfique pour les deux parties.
-• Litige trop cher pour une partie.
-• Garder les faits confidentiels.
-• Conflits locatifs, familiaux ou de voisinage.
+### Quand la médiation est-elle interdite ?
+- En cas de **crimes sérieux** (viol, meurtre, violences graves).
+- Lorsque l'ordre public est en jeu.
+- Lorsqu'une partie refuse le dialogue de mauvaise foi.
 
-### Il ne peut pas avoir de médiation quand :
-• Le conflit porte sur un crime sérieux (viol, meurtre).
-• La vie de personnes est en jeu.
-• Les droits fondamentaux sont violés.
-• Une partie refuse la solution commune.
-
-### Étapes pour une médiation réussie :
-1. **Préparation** : Organisation logistique.
-2. **Ouverture** : Règles de base (pas d'insultes, récit libre).
-3. **Récit** : Chaque partie raconte son histoire ; résumé des besoins.
-4. **Comprendre le problème** : Identification des intérêts sous-jacents.
-5. **Explorer les solutions** : Rechercher un terrain d'entente.
-6. **Accord** : Reformuler l'accord final et le signer.
-7. **Suivi post-résolution**.
-
-**Atténuer les déséquilibres de pouvoir** : Le médiateur doit corriger les déséquilibres (niveau d'éducation, intimidation) en posant des questions, en définissant l'ordre du jour ou en utilisant des caucus.
-
-### Rôle du parajuriste :
-1. **Défenseur** : Accompagne le client pendant la médiation et facilite le suivi.
-2. **Médiateur** : Sert de tiers neutre (attention : on ne peut pas être à la fois médiateur et défenseur dans le même cas).
+### Rôle du médiateur (le parajuriste) :
+Le médiateur doit être impartial, ne pas prendre parti, assurer la confidentialité et équilibrer le pouvoir entre les parties (ex: si l'une est plus instruite que l'autre).
     `,
     quiz: [
       {
         id: "q5_1",
-        question: "Dans quel type de conflit la médiation est-elle formellement déconseillée ?",
-        options: ["Conflit de voisinage", "Crime sérieux comme le viol ou le meurtre", "Problème de loyer"],
+        question: "Dans quel cas un parajuriste NE DOIT PAS tenter une médiation ?",
+        options: ["Un conflit entre deux voisins", "Un crime comme le viol", "Une dette non payée"],
         correctAnswer: 1
       }
     ],
@@ -455,115 +415,87 @@ La médiation est un processus volontaire où des personnes se réunissent with 
   },
   {
     id: 6,
-    title: "Le droit pénal et la procédure pénale",
-    introduction: "Comprendre les infractions, la garde à vue et le rôle des acteurs de la justice pénale.",
+    title: "MODULE 6. LE DROIT FONCIER ET LES DROITS HUMAINS",
+    introduction: "Comprendre le régime foncier au Bénin, la sécurisation des terres et le lien avec les droits humains.",
     objectives: [
-      "Distinguer les contraventions, les délits et les crimes",
-      "Connaître les droits du gardé à vue et les délais",
-      "Maîtriser les étapes de la procédure pénale",
-      "Identifier les différents acteurs de la chaîne pénale"
+      "Comprendre l'importance du droit foncier",
+      "Identifier les différents titres de propriété (TF, ADC)",
+      "Maitriser les étapes d'une transaction foncière sécurisée",
+      "Identifier les autorités compétentes (ANDF, Mairie)"
     ],
-    keyNotions: ["Infraction", "Garde à vue", "Procureur", "Juge d'instruction"],
+    keyNotions: ["Code Foncier", "Titre Foncier", "ADC", "ANDF", "Expropriation"],
     content: `
-# MODULE 6. LE DROIT PENAL ET LA PROCEDURE PENALE
+# MODULE 6. LE DROIT FONCIER ET LES DROITS HUMAINS
 
-## I. Le droit pénal
-Le droit pénal est l’ensemble des règles juridiques qui organisent la réaction de l’État vis-à-vis des délinquants et des comportements qui portent atteinte à l’intérêt général (ou infractions). 
+Le foncier est une source majeure de conflits au Bénin. Depuis 2013, le pays dispose d'un **Code foncier et domanial** (modifié en 2017) qui unifie les règles.
 
-### 1. L’infraction :
-C’est un comportement (acte ou omission) interdit par la loi et puni d'une peine. 
-On distingue trois catégories d'infractions selon leur gravité : 
-• **Le crime** (p. ex. le meurtre, le viol) : puni de réclusion ou de détention criminelle. 
-• **Le délit** (p. ex. le vol simple, l’escroquerie, les coups et blessures volontaires) : puni d’une peine d'emprisonnement et/ou d'amende. 
-• **Le contravention** : infraction la moins grave, punie simplement d'une amende. 
+## I. Les deux types de domaines
+- **Le domaine public** : Biens appartenant à l'État et à tous (routes, rivières, parcs). Ils sont inaliénables.
+- **Le domaine privé** : Terres appartenant à des particuliers ou à l'État, pouvant être vendues ou louées.
 
-### 2. Les éléments de l’infraction :
-Pour qu'il y ait une infraction, trois conditions doivent être réunies : 
-• **Élément légal** : l'acte doit être prévu et interdit par un texte de loi au moment des faits. 
-• **Élément matériel** : il doit y avoir un acte concret (on ne punit pas une pensée). 
-• **Élément moral** : l’auteur doit avoir agi with une certaine volonté ou conscience (l'intention coupable).
+## II. Les titres de sécurisation foncière
+- **L’Attestation de Détention Coutumière (ADC)** : Acte délivré par le Maire constatant les droits exercés selon la coutume.
+- **Le Titre Foncier (TF)** : C'est le titre de propriété définitif, inattaquable et sacré.
 
-## II. La procédure pénale
-La procédure pénale est l’ensemble des règles qui fixent comment l’infraction doit être recherchée, jugée et punie. 
+## III. La transaction foncière sécurisée
+Pour qu’une vente de terre soit valable au Bénin, il faut :
+1. Un **Procès-verbal de palabre** (en milieu rural).
+2. La signature d'une **convention de vente** certifiée par la mairie.
+3. L'inscription à l'**Agence Nationale du Domaine et du Foncier (ANDF)**.
 
-### 1. La plainte :
-C’est l'acte par lequel une victime informe la justice (Police, Gendarmerie ou Procureur) qu'une infraction a été commise.
+**NOTE** : Les ventes « sous seing privé » (simples papiers signés sans autorité) ne protègent pas l'acheteur contre une double vente.
 
-### 2. La garde à vue :
-C’est une mesure de privation de liberté décidée par un officier de police judiciaire (OPJ). 
-**Les règles clés (selon le Code de procédure pénale)** : 
-• Elle dure **48 heures maximum**. 
-• Elle peut être prolongée de 48h sur autorisation du Procureur. 
-• Le gardé à vue a le droit d'être examiné par un médecin, de faire prévenir un proche, de se taire et d’être assisté d’un avocat. 
-
-### 3. Les acteurs de la chaîne pénale :
-• **Le Procureur de la République** : Il reçoit les plaintes et décide de poursuivre ou non l’auteur (opportunité des poursuites). Il représente l’intérêt de la société. 
-• **Le Juge d’instruction** : Il intervient pour les affaires complexes ou les crimes. Il « instruit » le dossier (recherche les preuves à charge et à décharge). 
-• **Le Tribunal / La Cour** : C’est la juridiction qui juge l’affaire et rend la sentence. 
-• **L’avocat** : Il conseille et défend les droits de l’auteur ou de la victime. 
+## IV. Le droit face à l'expropriation
+L’État peut reprendre une terre pour cause de « nécessité publique » (ex: construire une route). Mais il doit **juste et préalablement indemniser** le propriétaire (Article 22 de la Constitution).
     `,
     quiz: [
       {
         id: "q6_1",
-        question: "Quelle est la durée maximale d'une garde à vue au Bénin (sans compter la prolongation) ?",
-        options: ["24 heures", "48 heures", "72 heures"],
-        correctAnswer: 1
+        question: "Quel est le titre de propriété le plus sécurisé au Bénin ?",
+        options: ["La simple facture", "L'Attestation de Détention Coutumière", "Le Titre Foncier"],
+        correctAnswer: 2
       }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
   },
   {
     id: 7,
-    title: "Le droit civil et les procédures civiles",
-    introduction: "Maîtriser les bases du droit des personnes, de la famille et des contrats.",
+    title: "MODULE 7. LE DROIT LOCATIF",
+    introduction: "Comprendre les règles du bail à usage d'habitation au Bénin.",
     objectives: [
-      "Comprendre les concepts de base du droit civil",
-      "Maîtriser les étapes d'un procès civil",
-      "Distinguer la responsabilité civile contractuelle et délictuelle",
-      "Connaître les modes de preuve en matière civile"
+      "Connaître les droits et devoirs du propriétaire et du locataire",
+      "Maîtriser les règles sur le cautionnement et le loyer",
+      "Comprendre la procédure de résiliation de bail",
+      "Identifier les recours en cas de litige locatif"
     ],
-    keyNotions: ["Capacité juridique", "Mariage", "Contrat", "Responsabilité civile"],
+    keyNotions: ["Contrat de bail", "Caution", "Préavis", "Expulsion"],
     content: `
-# MODULE 7. LE DROIT CIVIL ET LES PROCEDURES CIVILES
+# MODULE 7. LE DROIT LOCATIF
 
-C’est le « droit commun », celui qui régit les relations entre les personnes privées (famille, commerce, travail).
+Le bail à usage d'habitation est régi par la **Loi N° 2018-12**.
 
-## I. Le droit des personnes et de la famille
-Au Benin, il est régi par le **Code des personnes et de la famille** (Loi 2002-07).
-• **Le nom et le domicile** : éléments d'identification de la personne.
-• **La capacité juridique** : Aptitude à avoir des droits et à les exercer (la majorité est fixée à 18 ans).
-• **Le mariage** : Il existe au Bénin le mariage civil (célébré à la mairie). La loi interdit désormais le mariage forcé et fixe l'âge minimum à 18 ans pour l'homme et la femme.
-• **Le divorce** : Dissolution du lien matrimonial par décision de justice.
+## I. Obligations du Propriétaire (Bailleur)
+- Livrer un logement décent et en bon état.
+- Garantir la jouissance paisible (ne pas entrer chez le locataire sans permission).
+- Effectuer les grosses réparations (toiture, murs, etc.).
 
-## II. Le droit des obligations (Les contrats)
-Le contrat est un accord de volonté entre deux ou plusieurs personnes destiné à créer des obligations.
-**Conditions de validité d'un contrat** :
-1. Le consentement des parties (libre et éclairé).
-2. La capacité de contracter.
-3. Un contenu licite et certain.
+## II. Obligations du Locataire (Preneur)
+- Payer le loyer à la date convenue.
+- Utiliser le logement « en bon père de famille » (ne pas le dégrader).
+- Effectuer les menues réparations (entretien courant).
 
-Si une partie ne respecte pas le contrat, elle engage sa **responsabilité civile contractuelle**.
+## III. Cautionnement et Loyers
+La loi limite le cautionnement à **trois (03) mois de loyer**. Il est interdit de réclamer plus de trois mois de loyer d'avance.
 
-## III. La responsabilité civile délictuelle
-C’est l’obligation de réparer un dommage causé à autrui en dehors de tout contrat.
-**Exemple** : Vous cassez accidentellement la vitre d'un voisin. Vous devez réparer (payer les frais).
-**Trois éléments sont nécessaires** :
-1. Une faute ou un fait générateur.
-2. Un dommage (préjudice physique, moral ou matériel).
-3. Un lien de causalité entre la faute et le dommage.
-
-## IV. La procédure civile
-C’est le chemin à suivre pour faire trancher un litige civil par un juge.
-• **L’assignation** : Acte d’huissier de justice par lequel le demandeur appelle le défendeur devant le tribunal.
-• **Les débats** : Phase où les parties présentent leurs arguments et preuves.
-• **Le jugement** : Décision rendue par le juge.
-• **Les voies de recours** : L’appel (devant la Cour d'Appel) ou le pourvoi en cassation (devant la Cour Suprême).
+## IV. Fin du bail et Expulsion
+- **Le préavis** : Délai à respecter avant de quitter ou demander de quitter le logement (généralement 3 mois).
+- **L'expulsion** : Elle ne peut être faite que par décision de justice. Un propriétaire n'a pas le droit de jeter les affaires d'un locataire dehors ou de couper l'eau/électricité de force.
     `,
     quiz: [
       {
         id: "q7_1",
-        question: "Quel est l'âge de la majorité civile au Bénin ?",
-        options: ["16 ans", "18 ans", "21 ans"],
+        question: "Combien de mois de caution au maximum un propriétaire peut-il légalement demander au Bénin ?",
+        options: ["1 mois", "3 mois", "6 mois"],
         correctAnswer: 1
       }
     ],
@@ -571,47 +503,45 @@ C’est le chemin à suivre pour faire trancher un litige civil par un juge.
   },
   {
     id: 8,
-    title: "Le droit foncier au Bénin",
-    introduction: "Comprendre le régime foncier, la sécurisation des terres et le rôle du parajuriste en zone rurale.",
+    title: "MODULE 8. LE DROIT DES PERSONNES ET DE LA FAMILLE",
+    introduction: "Comprendre les règles régissant l'identification des personnes, le mariage, le divorce et les successions au Bénin.",
     objectives: [
-      "Maîtriser les dispositions du Code foncier et domanial",
-      "Connaître les titres de propriété (ADC, Titre foncier)",
-      "Comprendre les étapes de sécurisation d'une terre",
-      "Identifier les institutions foncières (ANDF, tribunaux)"
+      "Comprendre l'identification de la personne (nom, domicile, capacité)",
+      "Connaître les conditions de validité du mariage civil",
+      "Identifier les causes et types de divorce",
+      "Maîtriser les principes de base des successions"
     ],
-    keyNotions: ["Code foncier", "Attestation de Détention Coutumière", "Titre Foncier", "ANDF"],
+    keyNotions: ["Code de la Famille", "Mariage Civil", "Divorce", "Succession", "Majorité"],
     content: `
-# MODULE 8. LE DROIT FONCIER AU BENIN
+# MODULE 8. LE DROIT DES PERSONNES ET DE LA FAMILLE
 
-Le foncier est une source majeure de conflits au Bénin. Depuis 2013, le Bénin dispose d'un **Code foncier et domanial** (modifié en 2017) qui unifie les règles.
+Le droit des personnes et de la famille au Bénin est régi par le **Code des personnes et de la famille** (Loi n° 2002-07).
 
-## I. Les deux domaines de l’État :
-• **Le domaine public** : Les biens inaliénables appartenant à tous (routes, rivages de mer, cours d'eau).
-• **Le domaine privé (de l'Etat ou des particuliers)** : Terres susceptibles d'être vendues ou louées.
+## I. L’identification de la personne physique
+- **Le nom et prénoms** : Éléments obligatoires d'identification.
+- **La capacité juridique** : Aptitude à exercer ses droits. Au Bénin, la majorité est fixée à **18 ans**.
+- **Le domicile** : Lieu où une personne a son principal établissement.
 
-## II. Les titres de propriété et de sécurisation :
-• **L’Attestation de Détention Coutumière (ADC)** : Acte délivré par le Maire constatant les droits exercés par une personne selon la coutume sur une terre rurale non immatriculée.
-• **L’Attestation de Recasement** : Document délivré après des travaux de lotissement en zone urbaine.
-• **Le Titre Foncier (TF)** : C'est le titre de propriété définitif, inattaquable et sacré. Tout propriétaire devrait tendre vers l'immatriculation de sa parcelle pour obtenir un Titre Foncier.
+## II. Le mariage
+Le mariage est l'union d'un homme et d'une femme.
+- **Conditions de validité** : Consentement libre, âge minimum (18 ans), absence de lien de parenté proche.
+- **Le mariage civil** : Seul le mariage célébré devant l'officier de l'état civil (Maire) a une valeur juridique légale en cas de litige.
+- **Interdiction de la polygamie** : Le Code consacre le principe de la monogamie (sauf exceptions transitoires).
 
-## III. La vente de terre (La transaction foncière) :
-Au Bénin, pour qu’une vente de terre soit valable devant la loi, elle doit :
-1. Faire l'objet d'un **Procès-verbal de palabre** (pour les terres coutumières) ou se faire devant **notaire**.
-2. La signature d'une convention de vente certifiée par l'autorité locale.
-3. L'inscription à l'**Agence Nationale du Domaine et du Foncier (ANDF)**.
+## III. Le divorce
+Le divorce est la rupture du lien matrimonial du vivant des époux par décision de justice.
+- **Types de divorce** : Divorce par consentement mutuel ou divorce pour faute (ex: adultère, excès, sévices).
 
-**ATTENTION** : Les transactions foncières « sous seing privé » (simples papiers signés entre individus sans formalités) sont très risquées et favorisent la double vente.
-
-## IV. Rôle du parajuriste en matière foncière :
-• Sensibiliser sur l’importance des formalités légales.
-• Aider à la vérification de l'état réel de la terre à l'ANDF avant tout achat.
-• Orienter les victimes de spoliation ou de conflits de limites vers les instances de conciliation ou la justice.
+## IV. Les successions (Héritage)
+Les successions sont ouvertes par le décès d'une personne.
+- **Principe d'équité** : Le Code a supprimé les discriminations entre les enfants (garçons et filles héritent désormais de la même manière).
+- **Le conjoint survivant** : La veuve a désormais des droits clairs sur l'héritage de son mari, contrairement à certaines pratiques coutumières.
     `,
     quiz: [
       {
         id: "q8_1",
-        question: "Quel est le document le plus solide garantissant la propriété inattaquable d'une terre au Bénin ?",
-        options: ["Le petit papier du chef de village", "L'Attestation de Détention Coutumière (ADC)", "Le Titre Foncier (TF)"],
+        question: "Selon le Code des personnes et de la famille au Bénin, lequel de ces mariages a une valeur juridique complète devant les tribunaux ?",
+        options: ["Le mariage religieux seul", "Le mariage coutumier seul", "Le mariage civil célébré à la mairie"],
         correctAnswer: 2
       }
     ],
@@ -619,48 +549,43 @@ Au Bénin, pour qu’une vente de terre soit valable devant la loi, elle doit :
   },
   {
     id: 9,
-    title: "Violences Basées sur le Genre (VBG) et Protection de la Femme et de l'Enfant",
-    introduction: "Comprendre les types de violences, le cadre légal de protection et les mécanismes de prise en charge.",
+    title: "MODULE 9. LE DROIT A LA SANTE ET LE DROIT DE LA SANTE",
+    introduction: "Comprendre la santé comme un droit humain fondamental et les obligations des prestataires.",
     objectives: [
-      "Identifier les différentes formes de VBG au Bénin",
-      "Connaître les dispositions de la Loi sur les violences faites aux femmes",
-      "Maîtriser les droits de l'enfant et le Code de l'enfant",
-      "Savoir orienter les victimes vers les centres de prise en charge (CPS, Tribunal, etc.)"
+      "Définir le droit à la santé et ses sources",
+      "Connaître les obligations de l'État en matière de santé",
+      "Identifier les droits des patients (consentement, secret médical)",
+      "Comprendre la responsabilité médicale en cas de faute"
     ],
-    keyNotions: ["VBG", "Viol", "Harcèlement", "Code de l'enfant", "CPS"],
+    keyNotions: ["Droit à la santé", "Secret médical", "Consentement éclairé", "Faute médicale"],
     content: `
-# MODULE 9. LES VIOLENCES BASEES SUR LE GENRE (VBG) ET LA PROTECTION DE LA FEMME ET DE L'ENFANT
+# MODULE 9. LE DROIT A LA SANTE ET LE DROIT DE LA SANTE
 
-## I. Les Violences Basées sur le Genre (VBG)
-Les VBG sont des actes nuisibles dirigés contre une personne en raison de son sexe. Au Bénin, elles sont réprimées par plusieurs lois, notamment la **Loi 2011-26 relative à la répression des violences faites aux femmes**.
+Le droit à la santé n’est pas le droit d’être en bonne santé, mais le « droit de jouir du meilleur état de santé physique et mentale possible ».
 
-### Les différentes formes de VBG :
-• **Violences physiques** : Coups et blessures, mutilations génitales féminines (excision).
-• **Violences sexuelles** : Viol, harcèlement sexuel, attouchements.
-• **Violences psychologiques** : Menaces, humiliations, injures, isolement.
-• **Violences économiques** : Privation de ressources, interdiction de travailler, spoliation des biens de la veuve.
+## I. Sources du droit à la santé
+- **Internationales** : Constitution de l'OMS, PIDESC (Article 12).
+- **Nationales** : Constitution du Bénin (Article 8), Code de déontologie médicale.
 
-## II. Le harcèlement sexuel
-C’est le fait d'imposer à une personne, de façon répétée, des propos ou comportements à connotation sexuelle qui portent atteinte à sa dignité. La loi béninoise punit sévèrement le harcèlement, surtout en milieu scolaire et professionnel.
+## II. Les obligations de l’État et des prestataires
+- **Disponibilité** : Suffisamment d'établissements et de médicaments.
+- **Accessibilité** : Sans discrimination et à un coût abordable.
+- **Acceptabilité** : Respect de l'éthique médicale et de la culture.
+- **Qualité** : Soins médicalement et scientifiquement appropriés.
 
-## III. La protection de l’enfant
-L’enfant est protégé par le **Code de l'enfant en République du Bénin**.
-• **Le mariage des enfants** : Il est strictement interdit avant 18 ans.
-• **Le travail des enfants** : L'exploitation des enfants est punie.
-• **L'éducation** : L'école est obligatoire jusqu'à 16 ans.
+## III. Les droits des patients
+- **Le droit à l'information** : Le patient doit connaître son état.
+- **Le consentement éclairé** : Aucun acte médical ne peut être pratiqué sans le consentement libre du patient.
+- **Le secret médical** : Les informations de santé sont confidentielles (sauf exceptions légales comme les maladies contagieuses obligatoires).
 
-## IV. La prise en charge des victimes
-Le parajuriste doit connaître le circuit de prise en charge :
-1. **Sécurité** : Commissariat de police ou Gendarmerie (porter plainte).
-2. **Médical** : Hôpital ou Centre de Santé (pour les soins et le certificat médical – gratuit en cas de viol).
-3. **Social** : Centre de Promotion Sociale (CPS) pour l'écoute et l'accompagnement psychologique.
-4. **Juridique** : Tribunal ou ONGs spécialisées.
+## IV. La responsabilité médicale
+En cas de faute (erreur de diagnostic grave, négligence, opération ratée), le patient peut engager la responsabilité du médecin ou de l'hôpital devant les tribunaux pour obtenir réparation.
     `,
     quiz: [
       {
         id: "q9_1",
-        question: "Une femme est battue par son mari. Vers quel centre social public doit-elle s'orienter pour une écoute et un soutien ?",
-        options: ["La Mairie", "Le Centre de Promotion Sociale (CPS)", "Le marché"],
+        question: "Un médecin peut-il légalement divulguer votre dossier médical à un voisin sans votre accord ?",
+        options: ["Oui", "Non, c'est une violation du secret médical", "Seulement s'il est payé"],
         correctAnswer: 1
       }
     ],
@@ -668,37 +593,48 @@ Le parajuriste doit connaître le circuit de prise en charge :
   },
   {
     id: 10,
-    title: "Techniques d'entretien et cas de signalement",
-    introduction: "Acquérir les compétences pour mener un entretien with une victime et savoir comment signaler un cas.",
+    title: "MODULE 10. LE DROIT ET LES VIOLENCES BASEES SUR LE GENRE (VBG)",
+    introduction: "Comprendre les types de violences, le cadre légal et les techniques de d'entretien et d'accompagnement.",
     objectives: [
-      "Pratiquer l'écoute active et la reformulation",
-      "Accueillir une victime sans jugement (empathie)",
-      "Savoir remplir une fiche de signalement",
-      "Respecter la confidentialité et l'éthique du parajuriste"
+      "Identifier les formes de VBG (physiques, sexuelles, économiques)",
+      "Connaître les lois de protection (Loi de 2011)",
+      "Maîtriser les principes de l'entretien (empathie, non-jugement)",
+      "Connaître le circuit de prise en charge des victimes"
     ],
-    keyNotions: ["Écoute active", "Confidentialité", "Fiche de signalement", "Éthique"],
+    keyNotions: ["VBG", "Harcèlement", "Écoute active", "Confidentialité", "Circuit de prise en charge"],
     content: `
-# MODULE 10. TECHNIQUES D'ENTRETIEN ET CAS DE SIGNALEMENT
+# MODULE 10. LE DROIT ET LES VIOLENCES BASEES SUR LE GENRE (VBG)
 
-Le parajuriste est souvent le premier interlocuteur d'une personne en détresse. Sa posture est déterminante.
+## I. Les différentes formes de VBG
+- **Violences physiques** : Coups, blessures, mutilations génitales féminines.
+- **Violences sexuelles** : Viol, harcèlement sexuel, attouchements sans consentement.
+- **Violences psychologiques** : Menaces, humiliations fréquentes.
+- **Violences économiques** : Privation de ressources, spoliation des biens.
 
-## I. Les principes de l'entretien :
-• **Le non-jugement (L’empathie)** : Ne jamais critiquer ou blamez la victime.
-• **L'écoute active** : Laisser la personne parler, ne pas l’interrompre brusquement.
-• **La reformulation** : Répéter ce qu'on a compris pour s'assurer de l'exactitude des faits (Ex : « Si je comprends bien, votre voisin vous empêche d’accéder à votre champ depuis lundi ? »).
-• **La confidentialité** : Le parajuriste est tenu au secret professionnel. On ne raconte pas les problèmes des gens sur la place publique.
+## II. Le harcèlement sexuel
+Puni par la **Loi n° 2011-26**, il peut être commis par des propos, gestes ou comportements à connotation sexuelle non désirés.
 
-## II. Le signalement d'un cas :
-Signaler, c'est porter à la connaissance des autorités compétentes ou de HAI une situation de violation de droits.
-**Comment faire un bon signalement** :
-1. Noter les **Faits** (ce qui s'est passé).
-2. Noter le **Lieu** et la **Date**.
-3. Identifier les **Parties** (qui est la victime ? qui est l'auteur ?).
-4. Recueillir les **Preuves** éventuelles (témoins, documents, photos).
+## III. Circuit de prise en charge d'une victime
+1. **Sécurisation** (Police/Gendarmerie).
+2. **Soins médicaux** (Certificat médical gratuit en cas de viol).
+3. **Soutien psychosocial** (Centre de Promotion Sociale - CPS).
+4. **Action judiciaire** (Poursuite de l'auteur).
 
-## III. Utilisation de l'application HAI pour le signalement :
-L'onglet « Signalement » de cette application vous permet d'envoyer anonymement ou non des informations sur un cas de violation de droits (VBG, foncier, maltraitance enfant) directement aux équipes de HAI pour une intervention rapide.
+## IV. Principes de bases pour menez un entretien
+Le parajuriste doit adopter une posture rassurante :
+- **Confidentialité** : Ne jamais divulguer ce qui a été dit.
+- **Non-jugement** : Accueillir la victime telle qu'elle est, sans poser de questions accusatrices (ex: « pourquoi étiez-vous dehors ? »).
+- **Empathie** : Montrer qu'on comprend la douleur de la personne.
+- **Écoute active** : Laisser la victime parler à son rythme et reformuler ses propos pour s'assurer d'avoir bien compris.
     `,
+    quiz: [
+      {
+        id: "q10_1",
+        question: "Quelle est la première chose à assurer lorsqu'on reçoit une victime de VBG ?",
+        options: ["Prendre une photo de ses blessures", "Assurer la confidentialité et l'écoute sans jugement", "Appeler tous les voisins"],
+        correctAnswer: 1
+      }
+    ],
     isReporting: true,
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
   }
