@@ -47,11 +47,13 @@ import {
   Database as DatabaseIcon,
   Activity,
   Languages,
-  ShieldCheck
+  ShieldCheck,
+  AlertTriangle,
+  LocateFixed
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 // Fix Leaflet marker icon issue
@@ -187,7 +189,7 @@ const AuthScreen = ({
           {mode === 'login' 
             ? 'Connectez-vous pour retrouver votre progression.' 
             : mode === 'register'
-            ? 'Inscrivez-vous pour commencer votre formation de parajuriste.'
+            ? 'Inscrivez-vous pour commencer votre cours en ligne (MOOC) sur le parajuralisme.'
             : 'Entrez votre email ou numéro de téléphone pour recevoir un lien de réinitialisation.'}
         </p>
       </div>
@@ -636,12 +638,12 @@ const DocumentsScreen = ({ onBack, documents }: { onBack: () => void, documents:
 
 const ReportingScreen = ({ 
   user, 
-  module, 
+  modules, 
   onBack, 
   onComplete 
 }: { 
   user: any, 
-  module: Module, 
+  modules: Module[], 
   onBack: () => void,
   onComplete: () => void 
 }) => {
@@ -658,7 +660,7 @@ const ReportingScreen = ({
     type: '',
     description: '',
     location: '',
-    date: '',
+    date: new Date().toISOString().split('T')[0],
     anonymous: false,
     audioBlob: null,
     attachments: [],
@@ -666,19 +668,45 @@ const ReportingScreen = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("La géolocalisation n'est pas supportée par votre navigateur.");
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setReportData(prev => ({
+          ...prev,
+          coordinates: [position.coords.latitude, position.coords.longitude]
+        }));
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        alert("Impossible de récupérer votre position. Veuillez l'indiquer sur la carte.");
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true }
+    );
+  };
 
   const handleReportSubmit = async () => {
     if (!reportData.type || !reportData.description) {
-      alert("Veuillez remplir les champs obligatoires.");
+      alert("Veuillez remplir les champs obligatoires (Type et Description).");
       return;
     }
 
     setIsSubmitting(true);
     try {
+      const reportingModule = modules.find(m => m.isReporting) || modules[modules.length - 1];
       const formData = new FormData();
       formData.append('id', Math.random().toString(36).substr(2, 9));
       formData.append('userId', user.phone || user.email);
-      formData.append('moduleId', module.id.toString());
+      formData.append('moduleId', reportingModule.id.toString());
       formData.append('type', reportData.type);
       formData.append('description', reportData.description);
       formData.append('location', JSON.stringify({
@@ -704,6 +732,16 @@ const ReportingScreen = ({
 
       if (response.ok) {
         alert("Signalement envoyé avec succès !");
+        setReportData({
+          type: '',
+          description: '',
+          location: '',
+          date: new Date().toISOString().split('T')[0],
+          anonymous: false,
+          audioBlob: null,
+          attachments: [],
+          coordinates: null
+        });
         onComplete();
       } else {
         throw new Error("Failed to submit report");
@@ -722,72 +760,107 @@ const ReportingScreen = ({
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft size={20} />
         </Button>
-        <div className="flex items-center gap-2 text-emerald-600">
-          <MessageSquare size={20} />
-          <h2 className="font-bold">Cas de Signalement</h2>
+        <div className="flex items-center gap-2 text-red-600">
+          <AlertTriangle size={20} />
+          <h2 className="font-bold">Signalement de Cas</h2>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 pb-24">
+      <div className="flex-1 overflow-y-auto p-6 pb-32">
         <div className="space-y-6">
-          <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-            <p className="text-sm text-emerald-800">Remplissez ce formulaire pour signaler un cas communautaire. Votre signalement sera traité par HAI.</p>
-          </div>
+          <Card className="bg-red-50 border-red-100 p-4">
+            <div className="flex gap-3">
+              <div className="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                <ShieldCheck size={18} />
+              </div>
+              <p className="text-xs text-red-800 leading-relaxed font-medium">
+                Utilisez cet espace pour signaler des violations de droits ou des situations d'urgence. 
+                Vos informations sont sécurisées et traitées avec confidentialité.
+              </p>
+            </div>
+          </Card>
 
           <Select 
-            label="Type de problème" 
+            label="Nature de l'incident" 
             options={[
-              { value: 'justice', label: 'Justice' },
-              { value: 'sante', label: 'Santé' },
-              { value: 'foncier', label: 'Foncier' },
-              { value: 'enfance', label: 'Enfance' },
-              { value: 'vbg', label: 'VBG' },
-              { value: 'autre', label: 'Autre' }
+              { value: '', label: 'Choisir une catégorie...' },
+              { value: 'vbg', label: 'Violences Basées sur le Genre (VBG)' },
+              { value: 'justice', label: 'Déni de Justice / Corruption' },
+              { value: 'sante', label: 'Violation Droit à la Santé' },
+              { value: 'foncier', label: 'Conflit Foncier' },
+              { value: 'enfance', label: 'Protection de l\'Enfant' },
+              { value: 'autre', label: 'Autre cas communautaire' }
             ]}
             value={reportData.type}
             onChange={e => setReportData({...reportData, type: e.target.value})}
+            required
           />
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Description du cas</label>
+            <div className="flex justify-between items-center ml-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description détaillée</label>
+              <span className={cn("text-[10px] font-bold", reportData.description.length > 0 ? "text-emerald-500" : "text-slate-300")}>
+                {reportData.description.length} caractères
+              </span>
+            </div>
             <textarea 
-              className="w-full p-4 bg-white border border-slate-200 rounded-xl min-h-[120px] focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-              placeholder="Décrivez la situation en détail..."
+              className="w-full p-4 bg-white border border-slate-200 rounded-2xl min-h-[140px] text-sm focus:outline-none focus:ring-2 focus:ring-red-500/10 focus:border-red-500 transition-all shadow-sm"
+              placeholder="Expliquez ce qui s'est passé, qui est impliqué, etc."
               value={reportData.description}
               onChange={e => setReportData({...reportData, description: e.target.value})}
+              required
             />
           </div>
 
           <div className="space-y-3">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Enregistrement audio (Optionnel)</label>
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Témoignage Audio</label>
             <AudioRecorder onRecordingComplete={(blob) => setReportData({...reportData, audioBlob: blob})} />
             {reportData.audioBlob && (
-              <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-                <CheckCircle2 size={12} /> Audio enregistré avec succès
-              </p>
+              <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                <CheckCircle2 size={16} className="text-emerald-500" />
+                <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Message vocal prêt à l'envoi</p>
+                <button 
+                  onClick={() => setReportData({...reportData, audioBlob: null})}
+                  className="ml-auto text-red-500"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
             )}
           </div>
 
-          <div className="space-y-3">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Localisation précise (Map)</label>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center ml-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Localisation GPS</label>
+              <button 
+                onClick={getCurrentLocation}
+                disabled={isLocating}
+                className="flex items-center gap-1.5 text-[10px] font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors"
+              >
+                <LocateFixed size={12} />
+                {isLocating ? "Localisation..." : "Ma position actuelle"}
+              </button>
+            </div>
             <LocationPicker 
               initialLocation={reportData.coordinates} 
               onLocationSelect={(lat, lng) => setReportData({...reportData, coordinates: [lat, lng]})} 
             />
             <Input 
-              label="Adresse ou repères" 
-              placeholder="Quartier, ville, point de repère..." 
+              label="Repères géographiques (Enceinte, bâtiment, etc.)" 
+              placeholder="Ex: Près de l'église, quartier Akpakpa..." 
               value={reportData.location}
               onChange={e => setReportData({...reportData, location: e.target.value})}
             />
           </div>
 
           <div className="space-y-3">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Pièces jointes (Images, PDF)</label>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="flex flex-col items-center justify-center p-4 bg-white border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 hover:bg-emerald-50 transition-all">
-                <Paperclip size={20} className="text-slate-400 mb-1" />
-                <span className="text-[10px] font-bold text-slate-500">Ajouter des fichiers</span>
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Fichiers & Multimédia</label>
+            <div className="grid grid-cols-2 gap-4">
+              <label className="flex flex-col items-center justify-center p-6 bg-white border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-red-300 hover:bg-red-50 transition-all group">
+                <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 group-hover:bg-red-100 group-hover:text-red-500 transition-colors mb-2">
+                  <Camera size={20} />
+                </div>
+                <span className="text-[10px] font-bold text-slate-500 group-hover:text-red-600">Ajouter photos/PDF</span>
                 <input 
                   type="file" 
                   multiple 
@@ -803,46 +876,65 @@ const ReportingScreen = ({
                   }}
                 />
               </label>
-              <div className="space-y-1">
-                {reportData.attachments.map((file, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-lg text-[10px]">
-                    <span className="truncate max-w-[80px]">{file.name}</span>
-                    <button onClick={() => setReportData({
-                      ...reportData,
-                      attachments: reportData.attachments.filter((_, idx) => idx !== i)
-                    })}>
-                      <X size={12} className="text-red-400" />
-                    </button>
+              <div className="space-y-2">
+                {reportData.attachments.length > 0 ? (
+                  reportData.attachments.map((file, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl text-[10px] shadow-sm">
+                      <div className="flex items-center gap-2 truncate">
+                        <ImageIcon size={12} className="text-slate-400 shrink-0" />
+                        <span className="truncate max-w-[80px] font-medium">{file.name}</span>
+                      </div>
+                      <button 
+                        className="p-1 hover:bg-red-50 rounded-full text-red-500"
+                        onClick={() => setReportData({
+                          ...reportData,
+                          attachments: reportData.attachments.filter((_, idx) => idx !== i)
+                        })}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-full flex items-center justify-center p-4 border-2 border-dashed border-slate-100 rounded-2xl">
+                    <p className="text-[10px] text-slate-300 font-medium text-center italic leading-tight">
+                      Aucun fichier sélectionné
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
 
-          <Input 
-            label="Date de l'incident" 
-            type="date" 
-            value={reportData.date}
-            onChange={e => setReportData({...reportData, date: e.target.value})}
-          />
-
-          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100">
-            <input 
-              type="checkbox" 
-              id="anon" 
-              className="w-5 h-5 accent-emerald-500"
-              checked={reportData.anonymous}
-              onChange={e => setReportData({...reportData, anonymous: e.target.checked})}
+          <div className="grid grid-cols-2 gap-4">
+            <Input 
+              label="Date de l'incident" 
+              type="date" 
+              value={reportData.date}
+              onChange={e => setReportData({...reportData, date: e.target.value})}
             />
-            <label htmlFor="anon" className="text-sm font-medium text-slate-600">Soumettre anonymement</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Anonymat</label>
+              <button 
+                onClick={() => setReportData({...reportData, anonymous: !reportData.anonymous})}
+                className={cn(
+                  "w-full flex items-center justify-between p-3 border rounded-xl transition-all",
+                  reportData.anonymous ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-200"
+                )}
+              >
+                <span className="text-xs font-bold">{reportData.anonymous ? "Anonyme" : "Identifié"}</span>
+                {reportData.anonymous ? <ShieldCheck size={16} className="text-emerald-400" /> : <UserIcon size={16} />}
+              </button>
+            </div>
           </div>
 
           <Button 
-            className="w-full h-14 text-lg shadow-lg shadow-emerald-500/20" 
+            className="w-full h-16 text-lg font-bold shadow-xl shadow-red-500/20 bg-red-600 hover:bg-red-700 rounded-2xl" 
             onClick={handleReportSubmit}
             disabled={isSubmitting}
+            isLoading={isSubmitting}
           >
-            {isSubmitting ? "Envoi en cours..." : "Envoyer le signalement"}
+            {isSubmitting ? "Envoi en cours..." : "Transmettre le Signalement"}
           </Button>
         </div>
       </div>
@@ -1229,13 +1321,13 @@ const FinalExamScreen = ({
         </h3>
         <p className="text-slate-500 mb-8 max-w-xs">
           {score >= 80 
-            ? "Vous avez réussi l'examen final. Votre attestation est maintenant disponible."
+            ? "Vous avez réussi l'examen final. Votre certificat est maintenant disponible."
             : "Vous n'avez pas atteint le score minimum de 80%. Révisez les modules et réessayez plus tard."}
         </p>
         <div className="w-full max-w-xs space-y-3">
           {score >= 80 && (
             <Button className="w-full py-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center gap-2" onClick={onDownloadCertificate}>
-              <Download size={20} /> Télécharger mon attestation
+              <Download size={20} /> Télécharger mon certificat
             </Button>
           )}
           <Button variant="ghost" className="w-full py-6 rounded-2xl" onClick={onBack}>
@@ -1412,7 +1504,7 @@ const Dashboard = ({
                       className="bg-white text-emerald-600 hover:bg-emerald-50 h-7 text-[10px] font-bold py-0"
                       onClick={onDownloadCertificate}
                     >
-                      <Download size={12} className="mr-1" /> Télécharger l'attestation
+                      <Download size={12} className="mr-1" /> Télécharger le certificat
                     </Button>
                   ) : (
                     <Button 
@@ -1567,6 +1659,12 @@ const Dashboard = ({
 const LocationPicker = ({ onLocationSelect, initialLocation }: { onLocationSelect: (lat: number, lng: number) => void, initialLocation: [number, number] | null }) => {
   const [position, setPosition] = useState<[number, number] | null>(initialLocation);
 
+  useEffect(() => {
+    if (initialLocation) {
+      setPosition(initialLocation);
+    }
+  }, [initialLocation]);
+
   const MapEvents = () => {
     useMapEvents({
       click(e) {
@@ -1577,13 +1675,33 @@ const LocationPicker = ({ onLocationSelect, initialLocation }: { onLocationSelec
     return null;
   };
 
+  const ChangeView = ({ center }: { center: [number, number] }) => {
+    const map = useMap();
+    useEffect(() => {
+      map.setView(center, map.getZoom());
+    }, [center, map]);
+    return null;
+  };
+
   return (
-    <div className="h-[200px] w-full rounded-xl overflow-hidden border border-slate-200">
+    <div className="h-[200px] w-full rounded-2xl overflow-hidden border border-slate-200 shadow-inner group transition-all focus-within:border-red-400">
       <MapContainer center={position || [6.3654, 2.4333]} zoom={13} style={{ height: '100%', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MapEvents />
-        {position && <Marker position={position} />}
+        {position && (
+          <>
+            <ChangeView center={position} />
+            <Marker position={position} />
+          </>
+        )}
       </MapContainer>
+      {!position && (
+        <div className="absolute inset-0 bg-slate-900/10 pointer-events-none flex items-center justify-center">
+          <p className="text-[10px] font-bold text-slate-600 bg-white/90 px-3 py-1.5 rounded-full shadow-sm">
+            Cliquez sur la carte pour marquer le lieu
+          </p>
+        </div>
+      )}
     </div>
   );
 };
@@ -1620,7 +1738,7 @@ const AudioRecorder = ({ onRecordingComplete }: { onRecordingComplete: (blob: Bl
       }, 1000);
     } catch (err) {
       console.error("Failed to start recording", err);
-      alert("Impossible d'accéder au microphone.");
+      alert("L'accès au microphone est nécessaire pour l'enregistrement vocal.");
     }
   };
 
@@ -1639,24 +1757,44 @@ const AudioRecorder = ({ onRecordingComplete }: { onRecordingComplete: (blob: Bl
   };
 
   return (
-    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-      <button 
-        onClick={isRecording ? stopRecording : startRecording}
-        className={cn(
-          "w-12 h-12 rounded-full flex items-center justify-center transition-all",
-          isRecording ? "bg-red-500 text-white animate-pulse" : "bg-emerald-500 text-white"
-        )}
-      >
-        {isRecording ? <Pause size={24} /> : <Mic size={24} />}
-      </button>
-      <div className="flex-1">
-        <p className="text-sm font-bold text-slate-700">
-          {isRecording ? "Enregistrement en cours..." : "Enregistrement audio"}
-        </p>
-        <p className="text-xs text-slate-500">
-          {isRecording ? formatTime(recordingTime) : "Cliquez pour commencer"}
-        </p>
-      </div>
+    <div className="w-full">
+      {!isRecording ? (
+        <button 
+          onClick={startRecording}
+          className="w-full group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-red-300 hover:bg-red-50 transition-all shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center group-hover:bg-red-100 group-hover:text-red-600 transition-colors">
+              <Mic size={20} />
+            </div>
+            <div className="text-left">
+              <p className="text-xs font-bold text-slate-700">Enregistrer un témoignage</p>
+              <p className="text-[10px] text-slate-400 font-medium">Appuyez pour commencer</p>
+            </div>
+          </div>
+          <div className="w-8 h-8 flex items-center justify-center text-slate-300 group-hover:text-red-400 transition-colors">
+            <div className="w-2 h-2 bg-slate-300 rounded-full group-hover:bg-red-400" />
+          </div>
+        </button>
+      ) : (
+        <button 
+          onClick={stopRecording}
+          className="w-full flex items-center justify-between p-4 bg-red-600 border border-red-500 rounded-2xl animate-pulse shadow-lg shadow-red-500/30"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 bg-white rounded-full animate-ping" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs font-bold text-white">Enregistrement en cours...</p>
+              <p className="text-[10px] text-red-100 font-bold tracking-widest">{formatTime(recordingTime)}</p>
+            </div>
+          </div>
+          <div className="p-2 bg-white/20 rounded-full text-white">
+            <Pause size={16} />
+          </div>
+        </button>
+      )}
     </div>
   );
 };
@@ -1774,7 +1912,7 @@ const ModuleDetail = ({
     doc.setFontSize(20);
     doc.text(module.title, 20, 20);
     doc.setFontSize(12);
-    doc.text(`Formation Parajuriste - Module ${module.id}`, 20, 30);
+    doc.text(`MOOC Droit & Parajuralisme - Module ${module.id}`, 20, 30);
     
     let y = 50;
     if (module.introduction) {
@@ -2907,7 +3045,7 @@ const AdminDashboard = ({
                   )}
                 </div>
                 <div className="flex-1 space-y-2">
-                  <p className="text-xs text-slate-500">Logo de l'organisation (utilisé pour les attestations)</p>
+                  <p className="text-xs text-slate-500">Logo de l'organisation (utilisé pour les certificats)</p>
                   <input type="file" accept="image/*" onChange={handleLogoUpload} className="text-xs" />
                 </div>
               </div>
@@ -3765,11 +3903,11 @@ const SettingsScreen = ({
             {user.preferredLanguage === 'fr' ? (
               isFullyCompleted ? (
                 <Button className="w-full gap-2" onClick={onDownloadCertificate}>
-                  <Download size={18} /> Télécharger l'attestation
+                  <Download size={18} /> Télécharger le certificat
                 </Button>
               ) : (
                 <p className="text-[10px] text-slate-400 text-center italic">
-                  L'attestation sera disponible une fois tous les modules validés.
+                  Le certificat sera disponible une fois tous les modules validés.
                 </p>
               )
             ) : (
@@ -3779,7 +3917,7 @@ const SettingsScreen = ({
                     Félicitations ! Vous avez écouté tous les modules.
                   </p>
                   <p className="text-[10px] text-orange-700 leading-relaxed mb-4">
-                    Veuillez passer au siège de {settings.organizationName} pour l'examen final afin d'obtenir votre attestation physique.
+                    Veuillez passer au siège de {settings.organizationName} pour l'examen final afin d'obtenir votre certificat physique.
                   </p>
                   <Button variant="outline" size="sm" className="w-full border-orange-200 text-orange-700">
                     Contacter HAI sur WhatsApp
@@ -3964,7 +4102,7 @@ export default function App() {
     doc.setTextColor(15, 23, 42);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(38);
-    doc.text('ATTESTATION DE RÉUSSITE', pageWidth/2, 65, { align: 'center' });
+    doc.text("CERTIFICAT D'ACHÈVEMENT", pageWidth/2, 65, { align: 'center' });
     
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(16);
@@ -3988,19 +4126,28 @@ export default function App() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(16);
     doc.setTextColor(71, 85, 105);
-    const contentText = 'Pour avoir complété avec succès le programme de formation intensive de';
+    const contentText = 'Pour avoir suivi avec succès le cours en ligne (MOOC) de';
     doc.text(contentText, pageWidth/2, 118, { align: 'center' });
     
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(24);
     doc.setTextColor(15, 23, 42);
-    doc.text('PARAJURISTE COMMUNAUTAIRE', pageWidth/2, 132, { align: 'center' });
+    doc.text('DROIT ET PARAJURALISME AU BÉNIN', pageWidth/2, 132, { align: 'center' });
+
+    // Disclaimer
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139);
+    const disclaimerText = "Ce certificat certifie le suivi avec succès du cours en ligne mais";
+    const disclaimerText2 = "ne confère pas au détenteur le droit de se réclamer parajuriste.";
+    doc.text(disclaimerText, pageWidth/2, 142, { align: 'center' });
+    doc.text(disclaimerText2, pageWidth/2, 147, { align: 'center' });
 
     // Organization info
-    doc.setFont('helvetica', 'italic');
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`Propulsé par ${settings.organizationName}`, pageWidth/2, 142, { align: 'center' });
+    doc.setTextColor(71, 85, 105);
+    doc.text(`Propulsé par ${settings.organizationName}`, pageWidth/2, 158, { align: 'center' });
     
     // Footer - Info Left
     const date = new Date().toLocaleDateString('fr-FR');
@@ -4009,7 +4156,7 @@ export default function App() {
     doc.setTextColor(148, 163, 184);
     doc.text(`Délivrée le : ${date}`, 25, 185);
     doc.text(`Identifiant de vérification : ${Math.random().toString(36).substr(2, 12).toUpperCase()}`, 25, 190);
-    doc.text('Ce document certifie la maîtrise des 10 modules de base du parajuralisme au Bénin.', 25, 195);
+    doc.text("Ce document certifie qu'il a suivi avec succès le cours en ligne (MOOC).", 25, 195);
     
     // Footer - Signature Right
     const sigX = 225;
@@ -4037,10 +4184,10 @@ export default function App() {
     doc.setFontSize(12);
     doc.text(settings.directorName || 'Directeur HAI', sigX, 195, { align: 'center' });
 
-    doc.save(`Attestation_HAI_${user.fullName.replace(/\s/g, '_')}.pdf`);
+    doc.save(`Certificat_HAI_${user.fullName.replace(/\s/g, '_')}.pdf`);
   };
 
-  const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'assistant' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
+  const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'reporting' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   const [showIntro, setShowIntro] = useState(false);
 
@@ -4190,24 +4337,20 @@ export default function App() {
           </motion.div>
         )}
 
-        {currentScreen === 'assistant' && (
+        {currentScreen === 'reporting' && (
           <motion.div 
-            key="assistant"
+            key="reporting"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed inset-0 z-50 bg-slate-50 max-w-2xl mx-auto shadow-2xl overflow-hidden"
           >
-            <ModuleDetail 
-              module={modules.find(m => m.id === 10) || modules[modules.length - 1]}
+            <ReportingScreen 
               user={user}
-              progress={progress}
-              isSyncing={isSyncing}
+              modules={modules}
               onBack={() => setCurrentScreen('main')}
-              onComplete={(score) => {
-                const module10Id = modules.find(m => m.id === 10)?.id || 10;
-                completeModule(module10Id, score);
+              onComplete={() => {
                 setCurrentScreen('main');
               }}
             />
@@ -4306,21 +4449,21 @@ export default function App() {
       </AnimatePresence>
 
       {/* Bottom Navigation (Mini) */}
-      {['main', 'assistant'].includes(currentScreen) && (
+      {['main', 'reporting'].includes(currentScreen) && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-[calc(672px-3rem)] bg-slate-900 text-white rounded-2xl p-2 flex justify-around items-center shadow-xl z-20">
-          <button className={cn("p-3 transition-colors", currentScreen === 'main' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('main')}>
+          <button className={cn("p-3 transition-colors", currentScreen === 'main' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('main')} title="Cours">
             <BookOpen size={24} />
           </button>
-          <button className={cn("p-3 transition-colors", currentScreen === 'glossary' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('glossary')}>
+          <button className={cn("p-3 transition-colors", currentScreen === 'glossary' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('glossary')} title="Glossaire">
             <Library size={24} />
           </button>
-          <button className={cn("p-3 transition-colors", currentScreen === 'assistant' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('assistant')}>
-            <MessageSquare size={24} />
+          <button className={cn("p-3 transition-colors", currentScreen === 'reporting' ? "text-red-400 scale-110" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('reporting')} title="Signalement">
+            <AlertTriangle size={24} />
           </button>
-          <button className={cn("p-3 transition-colors", currentScreen === 'documents' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('documents')}>
+          <button className={cn("p-3 transition-colors", currentScreen === 'documents' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('documents')} title="Modèles">
             <FileText size={24} />
           </button>
-          <button className={cn("p-3 transition-colors", currentScreen === 'settings' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('settings')}>
+          <button className={cn("p-3 transition-colors", currentScreen === 'settings' ? "text-emerald-400" : "text-slate-400 hover:text-white")} onClick={() => setCurrentScreen('settings')} title="Mon Profil">
             <UserIcon size={24} />
           </button>
         </div>
