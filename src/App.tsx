@@ -52,6 +52,7 @@ import {
   LocateFixed
 } from 'lucide-react';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { jsPDF } from 'jspdf';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -2059,7 +2060,7 @@ const ModuleDetail = ({
                 )}
                 
                 <div className="markdown-body">
-                  <Markdown>{module.content || ''}</Markdown>
+                  <Markdown remarkPlugins={[remarkGfm]}>{module.content || ''}</Markdown>
                 </div>
 
                 {module.attachments && module.attachments.length > 0 && (
@@ -3163,7 +3164,7 @@ const AdminDashboard = ({
             <div className="grid gap-4">
               {Array.isArray(allUsers) && allUsers.length > 0 ? (
                 allUsers.map(u => {
-                const userProgress = (allProgress[u.phone] || {}) as UserProgress;
+                const userProgress = (allProgress[u.phone || ""] || {}) as UserProgress;
                 const completedModules = Array.isArray(userProgress.completedModules) ? userProgress.completedModules : [];
                 const progressPercent = modules.length > 0 ? Math.round((completedModules.length / modules.length) * 100) : 0;
                 const lastActivity = userProgress.lastActivity;
@@ -3239,7 +3240,7 @@ const AdminDashboard = ({
                       {!u.isAdmin && (
                         <Button variant="ghost" size="icon" className="text-red-500" onClick={() => {
                           if (confirm(`Voulez-vous vraiment supprimer l'utilisateur ${u.fullName} ?`)) {
-                            onDeleteUser(u.phone);
+                            onDeleteUser(u.phone || "");
                           }
                         }}>
                           <Trash2 size={18} />

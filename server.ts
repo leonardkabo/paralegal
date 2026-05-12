@@ -145,8 +145,11 @@ if (settingsCount.count === 0) {
 
 // Seed modules if empty or reset for 10 modules
 const moduleCount = db.prepare("SELECT COUNT(*) as count FROM modules").get() as any;
-if (moduleCount.count < 10) {
+const dbVersion = db.prepare("SELECT value FROM settings WHERE key = 'db_version'").get() as any;
+
+if (moduleCount.count < 10 || !dbVersion || dbVersion.value !== '1.1') {
   db.prepare("DELETE FROM modules").run();
+  db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run("db_version", "1.1");
   const initialModules = [
       // MODULE 1: INTRODUCTION AU PARAJURISME ET EMPOWERMENT JURIDIQUE
   {
@@ -398,15 +401,11 @@ COUR SUPRÊME (Cotonou)
 
 ## 1.2 Les trois niveaux d'obligation de l'État
 
-**1. Respecter** : Ne pas entraver l'accès aux soins (pas de fermeture arbitraire de centres de santé)
-
-**2. Protéger** : Empêcher des tiers de nuire (régulation des pratiques médicales charlatanesques)
-
-**3. Réaliser** : Prendre des mesures positives pour garantir l'accès :
-- Construction d'infrastructures sanitaires
-- Formation du personnel médical
-- Subvention des médicaments essentiels
-- Couverture maladie universelle (AMU)
+| Niveau | Définition et exemples |
+| :--- | :--- |
+| **1. Respecter** | Ne pas entraver l'accès aux soins (pas de fermeture arbitraire de centres de santé) |
+| **2. Protéger** | Empêcher des tiers de nuire (régulation des pratiques médicales charlatanesques) |
+| **3. Réaliser** | Prendre des mesures positives : construction d'infrastructures, formation, subventions, AMU |
 
 ---
 
@@ -1140,14 +1139,20 @@ C'est le principe cardinal : dans toute décision concernant un enfant, son int�
 # CHAPITRE 2 : LES FORMES DE MALTRAITANCE ET D'EXPLOITATION
 
 ## 2.1 Maltraitances physiques et psychologiques
-- **Châtiments corporels** : Interdits dans tous les milieux (famille, école, centres d'apprentissage).
-- **Négligence** : Privation de nourriture, de soins ou d'affection.
-- **Violences morales** : Insultes, humiliations, menaces.
+
+| Type de Maltraitance | Description et contexte |
+| :--- | :--- |
+| **Châtiments corporels** | Interdits dans tous les milieux (famille, école, centres d'apprentissage). |
+| **Négligence** | Privation de nourriture, de soins ou d'affection. |
+| **Violences morales** | Insultes, humiliations, menaces. |
 
 ## 2.2 Exploitation économique (Travail des enfants)
-- **Âge minimum** : 14 ans pour les travaux légers, 16 ans pour le travail régulier.
-- **Pires formes de travail** : Esclavage, traite, prostitution, travaux dangereux (mines, carrières).
-- **Vidomégon** : Pratique de placement d'enfants détournée en exploitation domestique.
+
+| Aspect | Règle ou définition |
+| :--- | :--- |
+| **Âge minimum** | 14 ans pour les travaux légers, 16 ans pour le travail régulier. |
+| **Pires formes** | Esclavage, traite, prostitution, travaux dangereux (mines, carrières). |
+| **Vidomégon** | Pratique de placement d'enfants détournée en exploitation domestique. |
 
 ## 2.3 Exploitation sexuelle et mariage forcé
 - **Mariage d'enfants** : Interdit avant 18 ans. Les auteurs et complices encourent des peines de prison.
