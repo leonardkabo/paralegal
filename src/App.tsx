@@ -93,6 +93,52 @@ import { ProgressBar } from './components/ProgressBar';
 import { useAppState } from './hooks/useAppState';
 import { cn } from './lib/utils';
 
+// Helper for reverse geocoding
+const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
+  try {
+    // Adding a timeout and cleaner logging
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+        headers: {
+            'Accept-Language': 'fr' // Prefer French results
+        }
+    });
+    const data = await response.json();
+    if (data && data.address) {
+      const a = data.address;
+      const parts = [];
+      
+      // Building a descriptive location string
+      const landmark = a.tourism || a.amenity || a.historic || a.building || a.shop || a.office;
+      const road = a.road || a.pedestrian || a.path;
+      const neighborhood = a.neighbourhood || a.suburb || a.quarter || a.village;
+      const city = a.city || a.town || a.municipality;
+
+      if (landmark) {
+        parts.push(landmark);
+      }
+      
+      if (road) {
+        parts.push(road);
+      }
+
+      if (neighborhood) {
+        parts.push(neighborhood);
+      }
+
+      if (city) {
+        parts.push(city);
+      }
+      
+      const formatted = parts.slice(0, 3).join(', '); // Keep it concise
+      return formatted ? `Près de ${formatted}` : data.display_name;
+    }
+    return data.display_name || '';
+  } catch (err) {
+    console.error("Geocoding error:", err);
+    return '';
+  }
+};
+
 // --- Components ---
 
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -679,11 +725,19 @@ const ReportingScreen = ({
 
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
         setReportData(prev => ({
           ...prev,
-          coordinates: [position.coords.latitude, position.coords.longitude]
+          coordinates: [lat, lng]
         }));
+        
+        const address = await reverseGeocode(lat, lng);
+        if (address) {
+          setReportData(prev => ({ ...prev, location: address }));
+        }
+        
         setIsLocating(false);
       },
       (error) => {
@@ -844,7 +898,13 @@ const ReportingScreen = ({
             </div>
             <LocationPicker 
               initialLocation={reportData.coordinates} 
-              onLocationSelect={(lat, lng) => setReportData({...reportData, coordinates: [lat, lng]})} 
+              onLocationSelect={async (lat, lng) => {
+                setReportData(prev => ({...prev, coordinates: [lat, lng]}));
+                const address = await reverseGeocode(lat, lng);
+                if (address) {
+                  setReportData(prev => ({...prev, location: address}));
+                }
+              }} 
             />
             <Input 
               label="Repères géographiques (Enceinte, bâtiment, etc.)" 
@@ -2329,7 +2389,13 @@ const ModuleDetail = ({
                   <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Localisation précise (Map)</label>
                   <LocationPicker 
                     initialLocation={reportData.coordinates} 
-                    onLocationSelect={(lat, lng) => setReportData({...reportData, coordinates: [lat, lng]})} 
+                    onLocationSelect={async (lat, lng) => {
+                      setReportData(prev => ({...prev, coordinates: [lat, lng]}));
+                      const address = await reverseGeocode(lat, lng);
+                      if (address) {
+                        setReportData(prev => ({...prev, location: address}));
+                      }
+                    }} 
                   />
                   <Input 
                     label="Adresse ou repères" 
@@ -2423,8 +2489,19 @@ const ModuleDetail = ({
                   <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Localisation (Map)</label>
                   <LocationPicker 
                     initialLocation={reportData.coordinates} 
-                    onLocationSelect={(lat, lng) => setReportData({...reportData, coordinates: [lat, lng]})} 
+                    onLocationSelect={async (lat, lng) => {
+                      setReportData(prev => ({...prev, coordinates: [lat, lng]}));
+                      const address = await reverseGeocode(lat, lng);
+                      if (address) {
+                        setReportData(prev => ({...prev, location: address}));
+                      }
+                    }} 
                   />
+                  {reportData.location && (
+                    <div className="p-3 bg-red-50 rounded-xl border border-red-100 italic text-[10px] text-red-700 font-medium">
+                      Position : {reportData.location}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-3">
