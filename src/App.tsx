@@ -2006,40 +2006,44 @@ const ModuleDetail = ({
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
             {/* Common Header Info */}
             <div className="space-y-6">
-              <div className="flex flex-wrap gap-2">
-                {module.estimatedDuration && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-                    <Clock size={12} />
-                    {module.estimatedDuration} minutes
-                  </div>
-                )}
-                {module.difficultyLevel && (
-                  <div className={cn(
-                    "text-[10px] font-bold px-3 py-1.5 rounded-full",
-                    module.difficultyLevel === 'Débutant' ? "bg-emerald-50 text-emerald-600" :
-                    module.difficultyLevel === 'Intermédiaire' ? "bg-blue-50 text-blue-600" :
-                    "bg-orange-50 text-orange-600"
-                  )}>
-                    Niveau {module.difficultyLevel}
-                  </div>
-                )}
-              </div>
+              {user.preferredLanguage === 'fr' && (
+                <div className="flex flex-wrap gap-2">
+                  {module.estimatedDuration && (
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                      <Clock size={12} />
+                      {module.estimatedDuration} minutes
+                    </div>
+                  )}
+                  {module.difficultyLevel && (
+                    <div className={cn(
+                      "text-[10px] font-bold px-3 py-1.5 rounded-full",
+                      module.difficultyLevel === 'Débutant' ? "bg-emerald-50 text-emerald-600" :
+                      module.difficultyLevel === 'Intermédiaire' ? "bg-blue-50 text-blue-600" :
+                      "bg-orange-50 text-orange-600"
+                    )}>
+                      Niveau {module.difficultyLevel}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Objectives Banner */}
-              <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <Award size={18} className="text-emerald-600" />
-                  <h3 className="text-emerald-900 font-bold text-sm">Objectifs pédagogiques</h3>
+              {user.preferredLanguage === 'fr' && (
+                <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Award size={18} className="text-emerald-600" />
+                    <h3 className="text-emerald-900 font-bold text-sm">Objectifs pédagogiques</h3>
+                  </div>
+                  <ul className="space-y-2">
+                    {module.objectives?.map((obj, i) => (
+                      <li key={i} className="text-xs text-emerald-800 flex gap-2 items-start">
+                        <CheckCircle2 size={14} className="text-emerald-400 mt-0.5 shrink-0" /> 
+                        <span className="leading-tight font-medium">{obj}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-2">
-                  {module.objectives?.map((obj, i) => (
-                    <li key={i} className="text-xs text-emerald-800 flex gap-2 items-start">
-                      <CheckCircle2 size={14} className="text-emerald-400 mt-0.5 shrink-0" /> 
-                      <span className="leading-tight font-medium">{obj}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              )}
 
               {/* Fon Specific Audio Player Section */}
               {user.preferredLanguage !== 'fr' && module.audioUrl && (
@@ -2102,7 +2106,7 @@ const ModuleDetail = ({
 
               {/* Common Learning Content */}
               <div className="space-y-8">
-                {module.keyNotions && module.keyNotions.length > 0 && (
+                {user.preferredLanguage === 'fr' && module.keyNotions && module.keyNotions.length > 0 && (
                   <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex gap-4">
                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-500 shrink-0 shadow-sm border border-blue-50">
                       <Sparkles size={20} />
@@ -2135,18 +2139,22 @@ const ModuleDetail = ({
                   </div>
                 )}
                 
-                <div className="markdown-body p-2">
-                  <Markdown remarkPlugins={[remarkGfm]}>{module.content || ''}</Markdown>
-                </div>
+                {user.preferredLanguage === 'fr' && (
+                  <div className="markdown-body p-2">
+                    <Markdown remarkPlugins={[remarkGfm]}>{module.content || ''}</Markdown>
+                  </div>
+                )}
 
-                {module.attachments && module.attachments.length > 0 && (
+                {module.attachments && (user.preferredLanguage === 'fr' ? module.attachments.length > 0 : module.attachments.some(a => ['image', 'video'].includes(a.type))) && (
                   <div className="space-y-4 pt-8 border-t border-slate-100">
                     <div className="flex items-center gap-2 mb-2">
                       <Library size={18} className="text-slate-400" />
                       <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Matériel complémentaire</h4>
                     </div>
                     <div className="grid gap-3">
-                      {module.attachments.map(att => (
+                      {module.attachments
+                        .filter(att => user.preferredLanguage === 'fr' || ['image', 'video'].includes(att.type))
+                        .map(att => (
                         <a 
                           key={att.id} 
                           href={att.url} 
@@ -2156,7 +2164,7 @@ const ModuleDetail = ({
                         >
                           <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
-                              {att.type === 'audio' ? <Volume2 size={24} /> : att.type === 'video' ? <Video size={24} /> : <FileText size={24} />}
+                              {att.type === 'audio' ? <Volume2 size={24} /> : att.type === 'video' ? <Video size={24} /> : att.type === 'image' ? <ImageIcon size={24} /> : <FileText size={24} />}
                             </div>
                             <div>
                                 <span className="block text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{att.name}</span>
@@ -2175,7 +2183,7 @@ const ModuleDetail = ({
                 )}
 
                 <div className="pt-8 flex flex-col gap-3">
-                  {module.quiz && module.quiz.length > 0 && (
+                  {user.preferredLanguage === 'fr' && module.quiz && module.quiz.length > 0 && (
                     <Button className="w-full h-16 text-lg font-bold shadow-xl shadow-emerald-500/20 rounded-2xl" onClick={() => setView('quiz')}>
                       Passer au Quiz d'évaluation
                     </Button>
@@ -2185,7 +2193,7 @@ const ModuleDetail = ({
                       Effectuer un Signalement
                     </Button>
                   )}
-                  {(!module.quiz || module.quiz.length === 0) && !module.isReporting && (
+                  {(user.preferredLanguage !== 'fr' || (!module.quiz || module.quiz.length === 0)) && !module.isReporting && (
                     <Button className="w-full h-16 text-lg font-bold text-white bg-slate-900 hover:bg-black rounded-2xl" onClick={() => onComplete()}>
                       Marquer comme terminé
                     </Button>
