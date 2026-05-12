@@ -20,19 +20,22 @@ body {
 
 /* Table Styles */
 .markdown-body table {
-  @apply w-full border-collapse mb-6 overflow-hidden rounded-xl border border-slate-200 shadow-sm;
+  @apply w-full border-collapse mb-6 overflow-hidden rounded-xl border-2 border-slate-200 shadow-md bg-white;
 }
 .markdown-body th {
-  @apply bg-slate-100 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200;
+  @apply bg-slate-100 px-4 py-3 text-left text-xs font-black uppercase tracking-widest text-slate-700 border-b-2 border-slate-200 border-r last:border-r-0;
 }
 .markdown-body td {
-  @apply px-4 py-3 text-sm text-slate-700 border-b border-slate-100;
+  @apply px-4 py-3 text-sm text-slate-800 border-b border-slate-100 border-r last:border-r-0 font-medium;
 }
 .markdown-body tr:last-child td {
   @apply border-b-0;
 }
 .markdown-body tr:nth-child(even) {
-  @apply bg-slate-50/50;
+  @apply bg-slate-50/80;
+}
+.markdown-body tr:hover td {
+  @apply bg-emerald-50/30 transition-colors;
 }
 .markdown-body blockquote {
   @apply border-l-4 border-emerald-500 pl-4 py-1 my-4 italic text-slate-700 bg-emerald-50/30 rounded-r-md;

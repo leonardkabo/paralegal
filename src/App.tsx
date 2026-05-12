@@ -2003,159 +2003,196 @@ const ModuleDetail = ({
 
       <div className="flex-1 overflow-y-auto p-6 pb-24">
         {view === 'content' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            {user.preferredLanguage === 'fr' ? (
-              <div className="space-y-6">
-                <div className="flex flex-wrap gap-2">
-                  {module.estimatedDuration && (
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-                      <Clock size={12} />
-                      {module.estimatedDuration} minutes
-                    </div>
-                  )}
-                  {module.difficultyLevel && (
-                    <div className={cn(
-                      "text-[10px] font-bold px-3 py-1.5 rounded-full",
-                      module.difficultyLevel === 'Débutant' ? "bg-emerald-50 text-emerald-600" :
-                      module.difficultyLevel === 'Intermédiaire' ? "bg-blue-50 text-blue-600" :
-                      "bg-orange-50 text-orange-600"
-                    )}>
-                      Niveau {module.difficultyLevel}
-                    </div>
-                  )}
-                </div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+            {/* Common Header Info */}
+            <div className="space-y-6">
+              <div className="flex flex-wrap gap-2">
+                {module.estimatedDuration && (
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                    <Clock size={12} />
+                    {module.estimatedDuration} minutes
+                  </div>
+                )}
+                {module.difficultyLevel && (
+                  <div className={cn(
+                    "text-[10px] font-bold px-3 py-1.5 rounded-full",
+                    module.difficultyLevel === 'Débutant' ? "bg-emerald-50 text-emerald-600" :
+                    module.difficultyLevel === 'Intermédiaire' ? "bg-blue-50 text-blue-600" :
+                    "bg-orange-50 text-orange-600"
+                  )}>
+                    Niveau {module.difficultyLevel}
+                  </div>
+                )}
+              </div>
 
-                <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-                  <h3 className="text-emerald-800 font-bold text-sm mb-2">Objectifs pédagogiques</h3>
-                  <ul className="space-y-1">
-                    {module.objectives?.map((obj, i) => (
-                      <li key={i} className="text-xs text-emerald-700 flex gap-2">
-                        <span className="text-emerald-400">•</span> {obj}
-                      </li>
-                    ))}
-                  </ul>
+              {/* Objectives Banner */}
+              <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <Award size={18} className="text-emerald-600" />
+                  <h3 className="text-emerald-900 font-bold text-sm">Objectifs pédagogiques</h3>
                 </div>
+                <ul className="space-y-2">
+                  {module.objectives?.map((obj, i) => (
+                    <li key={i} className="text-xs text-emerald-800 flex gap-2 items-start">
+                      <CheckCircle2 size={14} className="text-emerald-400 mt-0.5 shrink-0" /> 
+                      <span className="leading-tight font-medium">{obj}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
+              {/* Fon Specific Audio Player Section */}
+              {user.preferredLanguage !== 'fr' && module.audioUrl && (
+                <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100 shadow-lg shadow-orange-200/20 space-y-6 relative overflow-hidden group">
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl group-hover:bg-orange-200/40 transition-all duration-500" />
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shrink-0 shadow-inner">
+                      {audioPlaying ? <div className="flex gap-0.5 items-end h-6">
+                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_0.6s_infinite]" style={{height: '60%'}} />
+                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_0.8s_infinite]" style={{height: '100%'}} />
+                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_0.5s_infinite]" style={{height: '40%'}} />
+                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_1s_infinite]" style={{height: '80%'}} />
+                      </div> : <Volume2 size={24} />}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-orange-950">Traduction Parallèle (Fon)</h4>
+                      <p className="text-[10px] text-orange-700 font-medium italic">Écoutez la version audio pour mieux comprendre</p>
+                    </div>
+                  </div>
+
+                  <audio 
+                    ref={audioRef} 
+                    src={module.audioUrl} 
+                    onEnded={handleAudioEnded}
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
+                    className="hidden"
+                  />
+
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Button 
+                        className="w-12 h-12 rounded-xl shadow-md bg-orange-600 hover:bg-orange-700 shrink-0"
+                        onClick={toggleAudio}
+                      >
+                        {audioPlaying ? <Pause size={20} /> : <Play size={20} />}
+                      </Button>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-1.5 w-full bg-orange-200/50 rounded-full overflow-hidden cursor-pointer" onClick={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const x = e.clientX - rect.left;
+                          const ratio = x / rect.width;
+                          if (audioRef.current) audioRef.current.currentTime = ratio * audioDuration;
+                        }}>
+                          <div 
+                            className="h-full bg-orange-500 transition-all duration-300" 
+                            style={{ width: `${(audioCurrentTime / audioDuration) * 100}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-[10px] font-bold text-orange-700/60 tabular-nums">
+                          <span>{formatTime(audioCurrentTime)}</span>
+                          <span>-{formatTime(audioDuration - audioCurrentTime)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Common Learning Content */}
+              <div className="space-y-8">
                 {module.keyNotions && module.keyNotions.length > 0 && (
-                  <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-                    <h3 className="text-blue-800 font-bold text-sm mb-2">Notions clés</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {module.keyNotions.map((notion, i) => (
-                        <span key={i} className="text-[10px] font-bold bg-white text-blue-600 px-2 py-1 rounded-lg border border-blue-100">
-                          {notion}
-                        </span>
-                      ))}
+                  <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex gap-4">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-500 shrink-0 shadow-sm border border-blue-50">
+                      <Sparkles size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-blue-900 font-bold text-xs mb-2 uppercase tracking-wider">Concept clés à retenir</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {module.keyNotions.map((notion, i) => (
+                          <span key={i} className="text-[10px] font-bold bg-white text-blue-700 px-3 py-1.5 rounded-full border border-blue-100 shadow-sm">
+                            {notion}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {module.videoUrl && (
-                  <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-lg">
-                    <video 
-                      src={module.videoUrl} 
-                      controls 
-                      className="w-full h-full"
-                    />
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                      <Video size={14} /> Tutoriel Vidéo
+                    </h3>
+                    <div className="aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                      <video 
+                        src={module.videoUrl} 
+                        controls 
+                        className="w-full h-full"
+                      />
+                    </div>
                   </div>
                 )}
                 
-                <div className="markdown-body">
+                <div className="markdown-body p-2">
                   <Markdown remarkPlugins={[remarkGfm]}>{module.content || ''}</Markdown>
                 </div>
 
                 {module.attachments && module.attachments.length > 0 && (
-                  <div className="space-y-3 pt-4 border-t border-slate-100">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Documents à télécharger</h4>
-                    <div className="grid gap-2">
+                  <div className="space-y-4 pt-8 border-t border-slate-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Library size={18} className="text-slate-400" />
+                      <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Matériel complémentaire</h4>
+                    </div>
+                    <div className="grid gap-3">
                       {module.attachments.map(att => (
                         <a 
                           key={att.id} 
                           href={att.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all group"
+                          className="flex items-center justify-between p-5 bg-white rounded-3xl border border-slate-100 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group lg:hover:-translate-y-1"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm">
-                              {att.type === 'audio' ? <Volume2 size={20} /> : att.type === 'video' ? <Video size={20} /> : <FileText size={20} />}
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
+                              {att.type === 'audio' ? <Volume2 size={24} /> : att.type === 'video' ? <Video size={24} /> : <FileText size={24} />}
                             </div>
-                            <span className="text-sm font-medium text-slate-700">{att.name}</span>
+                            <div>
+                                <span className="block text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{att.name}</span>
+                                <span className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter truncate max-w-[150px]">
+                                    {att.type.toUpperCase()} • {att.url.startsWith('http') ? 'LIEN DISTANT' : 'FICHIER SERVEUR'}
+                                </span>
+                            </div>
                           </div>
-                          <Download size={18} className="text-slate-300 group-hover:text-emerald-500" />
+                          <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all">
+                            <Download size={18} />
+                          </div>
                         </a>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {module.quiz && module.quiz.length > 0 && (
-                  <Button className="w-full" onClick={() => setView('quiz')}>
-                    Passer au Quiz
-                  </Button>
-                )}
-                {module.isReporting && (
-                  <Button className="w-full" onClick={() => setView('reporting')}>
-                    Passer au Signalement
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center space-y-8">
-                <div className="w-32 h-32 bg-orange-50 rounded-full flex items-center justify-center relative">
-                  <div className={cn(
-                    "absolute inset-0 bg-orange-200 rounded-full opacity-20",
-                    audioPlaying && "animate-ping"
-                  )} />
-                  <Mic size={48} className="text-orange-500 relative z-10" />
-                </div>
-                
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Écouter le module</h3>
-                  <p className="text-slate-500 text-sm px-8">
-                    Écoutez l'intégralité de l'audio pour valider ce module.
-                  </p>
-                </div>
-
-                <audio 
-                  ref={audioRef} 
-                  src={module.audioUrl} 
-                  onEnded={handleAudioEnded}
-                  onTimeUpdate={handleTimeUpdate}
-                  onLoadedMetadata={handleLoadedMetadata}
-                  className="hidden"
-                />
-
-                <div className="w-full max-w-xs space-y-2">
-                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-emerald-500 transition-all duration-300" 
-                      style={{ width: `${(audioCurrentTime / audioDuration) * 100}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    <span>{formatTime(audioCurrentTime)}</span>
-                    <span>-{formatTime(audioDuration - audioCurrentTime)}</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="w-16 h-16 rounded-2xl"
-                    onClick={() => {}}
-                  >
-                    <Download size={24} />
-                  </Button>
-                  <Button 
-                    className="w-24 h-24 rounded-3xl shadow-xl shadow-emerald-200"
-                    onClick={toggleAudio}
-                  >
-                    {audioPlaying ? <Pause size={32} /> : <Play size={32} />}
-                  </Button>
+                <div className="pt-8 flex flex-col gap-3">
+                  {module.quiz && module.quiz.length > 0 && (
+                    <Button className="w-full h-16 text-lg font-bold shadow-xl shadow-emerald-500/20 rounded-2xl" onClick={() => setView('quiz')}>
+                      Passer au Quiz d'évaluation
+                    </Button>
+                  )}
+                  {module.isReporting && (
+                    <Button variant="outline" className="w-full h-16 text-lg font-bold border-red-200 text-red-600 hover:bg-red-50 rounded-2xl border-2" onClick={() => setView('reporting')}>
+                      Effectuer un Signalement
+                    </Button>
+                  )}
+                  {(!module.quiz || module.quiz.length === 0) && !module.isReporting && (
+                    <Button className="w-full h-16 text-lg font-bold text-white bg-slate-900 hover:bg-black rounded-2xl" onClick={() => onComplete()}>
+                      Marquer comme terminé
+                    </Button>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </motion.div>
         )}
 
@@ -3662,32 +3699,80 @@ const AdminDashboard = ({
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Médias & Fichiers</h4>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500">Audio (Fon)</label>
-                      <input type="file" accept="audio/*" onChange={e => handleModuleFileUpload(e, 'audio')} className="text-[10px] w-full" />
-                      {editingModule.audioUrl && <p className="text-[10px] text-emerald-600 truncate">{editingModule.audioUrl}</p>}
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio Translation (Fon)</label>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <input type="file" accept="audio/*" onChange={e => handleModuleFileUpload(e, 'audio')} className="text-[10px] flex-1" />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                            <Globe size={12} />
+                          </div>
+                          <input 
+                            className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-emerald-500 outline-none"
+                            placeholder="Ou coller un lien URL audio..."
+                            value={editingModule.audioUrl || ''}
+                            onChange={e => setEditingModule({...editingModule, audioUrl: e.target.value})}
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500">Vidéo (Cours)</label>
-                      <input type="file" accept="video/*" onChange={e => handleModuleFileUpload(e, 'video')} className="text-[10px] w-full" />
-                      {editingModule.videoUrl && <p className="text-[10px] text-emerald-600 truncate">{editingModule.videoUrl}</p>}
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vidéo du cours (URL/Upload)</label>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <input type="file" accept="video/*" onChange={e => handleModuleFileUpload(e, 'video')} className="text-[10px] flex-1" />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                            <Video size={12} />
+                          </div>
+                          <input 
+                            className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-emerald-500 outline-none"
+                            placeholder="Ou coller un lien URL vidéo..."
+                            value={editingModule.videoUrl || ''}
+                            onChange={e => setEditingModule({...editingModule, videoUrl: e.target.value})}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500">Documents PDF</label>
-                    <input type="file" accept=".pdf" onChange={e => handleModuleFileUpload(e, 'pdf')} className="text-[10px] w-full" />
+                  <div className="space-y-3 pt-4">
+                    <div className="flex justify-between items-center">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Documents & Fichiers joint (PDF/Image)</label>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const url = prompt("Veuillez entrer l'URL du fichier :");
+                          if (url) {
+                            const name = prompt("Nom du fichier :", "Document externe") || "Document externe";
+                            const type = url.match(/\.(mp3|wav|ogg)$/i) ? 'audio' : url.match(/\.(mp4|webm)$/i) ? 'video' : 'pdf';
+                            const newAtt: Attachment = { id: Date.now().toString(), name, url, type };
+                            setEditingModule({...editingModule, attachments: [...(editingModule.attachments || []), newAtt]});
+                          }
+                        }}
+                        className="text-[10px] font-bold text-emerald-600 flex items-center gap-1 hover:underline"
+                      >
+                        <Plus size={10} /> Ajouter via URL
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                      <Paperclip size={14} className="text-slate-400 ml-1" />
+                      <input type="file" accept=".pdf,image/*" onChange={e => handleModuleFileUpload(e, 'pdf')} className="text-[10px] flex-1 bg-transparent border-none outline-none" />
+                    </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {editingModule.attachments?.map(att => (
-                        <div key={att.id} className="flex items-center gap-2 bg-slate-100 px-2 py-1 rounded text-[10px]">
-                          {att.type === 'audio' ? <Volume2 size={10} /> : att.type === 'video' ? <Video size={10} /> : <FileText size={10} />}
-                          <span className="truncate max-w-[100px]">{att.name}</span>
+                        <div key={att.id} className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-[10px] shadow-sm group">
+                          {att.type === 'audio' ? <Volume2 size={12} className="text-blue-500" /> : att.type === 'video' ? <Video size={12} className="text-slate-500" /> : <FileText size={12} className="text-emerald-500" />}
+                          <span className="truncate max-w-[120px] font-medium">{att.name}</span>
                           <button 
                             type="button"
                             onClick={() => handleDeleteAttachment(att.id)} 
-                            className="text-red-500 hover:text-red-700"
+                            className="text-slate-300 hover:text-red-500 transition-colors"
                           >
-                            ×
+                            <X size={14} />
                           </button>
                         </div>
                       ))}
