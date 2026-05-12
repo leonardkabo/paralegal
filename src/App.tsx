@@ -1821,7 +1821,14 @@ const ModuleDetail = ({
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [audioFinished, setAudioFinished] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    setAudioFinished(false);
+    setAudioCurrentTime(0);
+    setAudioPlaying(false);
+  }, [module.id]);
 
   // Reporting form state
   const [reportData, setReportData] = useState<{
@@ -1969,7 +1976,7 @@ const ModuleDetail = ({
 
   const handleAudioEnded = () => {
     setAudioPlaying(false);
-    onComplete();
+    setAudioFinished(true);
   };
 
   return (
@@ -2194,8 +2201,22 @@ const ModuleDetail = ({
                     </Button>
                   )}
                   {(user.preferredLanguage !== 'fr' || (!module.quiz || module.quiz.length === 0)) && !module.isReporting && (
-                    <Button className="w-full h-16 text-lg font-bold text-white bg-slate-900 hover:bg-black rounded-2xl" onClick={() => onComplete()}>
-                      Marquer comme terminé
+                    <Button 
+                      className={cn(
+                        "w-full h-16 text-lg font-bold text-white rounded-2xl transition-all shadow-xl",
+                        user.preferredLanguage !== 'fr' && !audioFinished 
+                          ? "bg-slate-300 cursor-not-allowed shadow-none" 
+                          : "bg-slate-900 hover:bg-black shadow-slate-900/20"
+                      )} 
+                      onClick={() => {
+                        if (user.preferredLanguage !== 'fr' && !audioFinished) return;
+                        onComplete();
+                      }}
+                      disabled={user.preferredLanguage !== 'fr' && !audioFinished}
+                    >
+                      {user.preferredLanguage !== 'fr' && !audioFinished 
+                        ? "Veuillez terminer l'écoute" 
+                        : "Marquer comme terminé"}
                     </Button>
                   )}
                 </div>
