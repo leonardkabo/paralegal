@@ -208,8 +208,26 @@ export function useAppState() {
       try {
         // Seed Modules
         const modSnap = await getDocs(collection(db, 'modules'));
-        if (modSnap.empty) {
-          console.log("Firebase: Initialisation des modules...");
+        const currentModules = modSnap.docs.map(doc => doc.data() as Module);
+        
+        // Check if we need to seed or update
+        const needsUpdate = modSnap.empty || currentModules.some(cm => {
+          const matchingCodeMod = MODULES.find(m => m.id === cm.id);
+          if (!matchingCodeMod) return false;
+          
+          // Update if question count differs
+          if (matchingCodeMod.quiz.length !== cm.quiz.length) return true;
+          
+          // Update if labels are missing (check first option of first question as proxy)
+          const firstOpt = cm.quiz[0]?.options[0];
+          const codeFirstOpt = matchingCodeMod.quiz[0]?.options[0];
+          if (firstOpt && codeFirstOpt && firstOpt !== codeFirstOpt) return true;
+          
+          return false;
+        });
+
+        if (needsUpdate) {
+          console.log("Firebase: Initialisation ou mise à jour des modules...");
           const batch = writeBatch(db);
           MODULES.forEach(m => batch.set(doc(db, 'modules', m.id.toString()), m));
           await batch.commit();

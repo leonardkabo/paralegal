@@ -90,16 +90,16 @@ Toutes les personnes accompagnées ont des droits qui doivent être respectés p
 Il est énormément important que le parajuriste respecte toujours les droits de la personne accompagnée.
     `,
     quiz: [
-      { id: "m1_q1", question: "Le parajuriste communautaire est principalement :", options: ["Un magistrat", "Un acteur d’accompagnement juridique de proximité", "Un officier militaire"], correctAnswer: 1 },
-      { id: "m1_q2", question: "Le parajuriste est-il un avocat ?", options: ["Oui, dans tous les cas", "Non, car il n’exerce pas les fonctions d’avocat", "Oui, automatiquement après une formation"], correctAnswer: 1 },
-      { id: "m1_q3", question: "Parmi les compétences du parajuriste figure :", options: ["L’écoute des personnes", "Le prononcé des sanctions pénales", "Le conseil et l’orientation des personnes"], correctAnswer: [0, 2] },
-      { id: "m1_q4", question: "La déontologie du parajuriste repose notamment sur :", options: ["La confidentialité et l’impartialité", "La violence et la contrainte", "La publicité des informations personnelles"], correctAnswer: 0 },
-      { id: "m1_q5", question: "Le secret professionnel signifie :", options: ["La divulgation libre des informations reçues", "La protection des informations confiées par les usagers", "L’interdiction d’écouter les victimes"], correctAnswer: 1 },
-      { id: "m1_q6", question: "Le consentement correspond :", options: ["À l’accord libre et éclairé d’une personne", "À une sanction administrative", "À une décision imposée sans explication"], correctAnswer: 0 },
-      { id: "m1_q7", question: "Parmi les méthodes de travail du parajuriste, on retrouve :", options: ["La sensibilisation et la médiation", "L’emprisonnement des auteurs d’infractions", "Le jugement des litiges"], correctAnswer: 0 },
-      { id: "m1_q8", question: "Le parajuriste peut-il dénoncer des cas de violence ou de violation des droits ?", options: ["Oui, dans le respect des procédures et de la protection des victimes", "Non, jamais", "Oui, sans tenir compte du consentement de la victime"], correctAnswer: 0 },
-      { id: "m1_q9", question: "La prise de déclaration d’une personne accompagnée suppose notamment :", options: ["L’écoute empathique de la personne", "La prise de note des faits rapporté par la personne", "La diffusion publique des informations reçues"], correctAnswer: [0, 1] },
-      { id: "m1_q10", question: "Le parajuriste peut-il accompagner toute une communauté ?", options: ["Oui, notamment par des actions de sensibilisation collective", "Non, il agit uniquement pour une seule personne", "Oui, uniquement avec une autorisation judiciaire préalable"], correctAnswer: 0 }
+      { id: "m1_q1", question: "Le parajuriste communautaire est principalement :", options: ["a) Un magistrat", "b) Un acteur d’accompagnement juridique de proximité", "c) Un officier militaire"], correctAnswer: 1 },
+      { id: "m1_q2", question: "Le parajuriste est-il un avocat ?", options: ["d) Oui, dans tous les cas", "e) Non, car il n’exerce pas les fonctions d’avocat", "f) Oui, automatiquement après une formation"], correctAnswer: 1 },
+      { id: "m1_q3", question: "Parmi les compétences du parajuriste figure :", options: ["g) L’écoute des personnes", "h) Le prononcé des sanctions pénales", "i) Le conseil et l’orientation des personnes"], correctAnswer: [0, 2] },
+      { id: "m1_q4", question: "La déontologie du parajuriste repose notamment sur :", options: ["j) La confidentialité et l’impartialité", "k) La violence et la contrainte", "l) La publicité des informations personnelles"], correctAnswer: 0 },
+      { id: "m1_q5", question: "Le secret professionnel signifie :", options: ["m) La divulgation libre des informations reçues", "n) La protection des informations confiées par les usagers", "o) L’interdiction d’écouter les victimes"], correctAnswer: 1 },
+      { id: "m1_q6", question: "Le consentement correspond :", options: ["p) À l’accord libre et éclairé d’une personne", "q) À une sanction administrative", "r) À une décision imposée sans explication"], correctAnswer: 0 },
+      { id: "m1_q7", question: "Parmi les méthodes de travail du parajuriste, on retrouve :", options: ["s) La sensibilisation et la médiation", "t) L’emprisonnement des auteurs d’infractions", "u) Le jugement des litiges"], correctAnswer: 0 },
+      { id: "m1_q8", question: "Le parajuriste peut-il dénoncer des cas de violence ou de violation des droits ?", options: ["v) Oui, dans le respect des procédures et de la protection des victimes", "w) Non, jamais", "x) Oui, sans tenir compte du consentement de la victime"], correctAnswer: 0 },
+      { id: "m1_q9", question: "La prise de déclaration d’une personne accompagnée suppose notamment :", options: ["y) L’écoute empathique de la personne", "z) La prise de note des faits rapporté par la personne", "aa) La diffusion publique des informations reçues"], correctAnswer: [0, 1] },
+      { id: "m1_q10", question: "Le parajuriste peut-il accompagner toute une communauté ?", options: ["bb) Oui, notamment par des actions de sensibilisation collective", "cc) Non, il agit uniquement pour une seule personne", "dd) Oui, uniquement avec une autorisation judiciaire préalable"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
   },
@@ -227,16 +227,16 @@ Elle exerce un contrôle de cassation sur les décisions rendues par les cours e
 En tant que juge de droit commun de l'administration, elle contrôle la légalité des actes du pouvoir exécutif et des collectivités territoriales, avec compétence pour annuler des actes irréguliers.
     `,
     quiz: [
-      { id: "m2_q1", question: "Le droit peut être défini comme :", options: ["Un ensemble de règles organisant la vie en société", "Une opinion personnelle", "Une règle morale uniquement"], correctAnswer: 0 },
-      { id: "m2_q2", question: "Les règles religieuses sont-elles une source du droit au Bénin ?", options: ["Oui, dans tous les cas", "Non", "Oui, automatiquement dans tous les tribunaux"], correctAnswer: 1 },
-      { id: "m2_q3", question: "Parmi les sources du droit au Bénin figure :", options: ["La Constitution", "Les rumeurs publiques", "Les décisions familiales privées"], correctAnswer: 0 },
-      { id: "m2_q4", question: "La parole des autorités constitue-t-elle une source du droit ?", options: ["Oui, même sans texte officiel", "Non, sauf lorsqu’elle est consacrée dans un acte juridique reconnu", "Oui, uniquement à l’oral"], correctAnswer: 1 },
-      { id: "m2_q5", question: "Quelle institution vote les lois au Bénin ?", options: ["L’Assemblée nationale", "La police républicaine", "La Cour constitutionnelle"], correctAnswer: 0 },
-      { id: "m2_q6", question: "Parmi les institutions judiciaires du Bénin, on peut citer :", options: ["Les tribunaux", "Les partis politiques", "Les cours"], correctAnswer: [0, 2] },
-      { id: "m2_q7", question: "La mission principale de la Cour constitutionnelle est :", options: ["De contrôler la conformité des lois à la Constitution", "De juger tous les conflits familiaux", "D’organiser les élections communales"], correctAnswer: 0 },
-      { id: "m2_q8", question: "La police peut-elle juger les personnes ?", options: ["Oui, dans toutes les affaires", "Non, le jugement relève des juridictions compétentes", "Oui, en cas de conflit familial"], correctAnswer: 1 },
-      { id: "m2_q9", question: "La CRIET peut connaître notamment des affaires liées :", options: ["Au terrorisme et aux infractions économiques", "Aux cérémonies traditionnelles", "Aux violences sexuelles sur les mineurs"], correctAnswer: 0 },
-      { id: "m2_q10", question: "Qui peut porter plainte au commissariat ?", options: ["Toute personne victime ou témoin d’une infraction", "Uniquement les autorités administratives", "Exclusivement les avocats"], correctAnswer: 0 }
+      { id: "m2_q1", question: "Le droit peut être défini comme :", options: ["a. Un ensemble de règles organisant la vie en société", "b. Une opinion personnelle", "c. Une règle morale uniquement"], correctAnswer: 0 },
+      { id: "m2_q2", question: "Les règles religieuses sont-elles une source du droit au Bénin ?", options: ["a. Oui, dans tous les cas", "b. Non", "c. Oui, automatiquement dans tous les tribunaux"], correctAnswer: 1 },
+      { id: "m2_q3", question: "Parmi les sources du droit au Bénin figure :", options: ["a. La Constitution", "b. Les rumeurs publiques", "c. Les décisions familiales privées"], correctAnswer: 0 },
+      { id: "m2_q4", question: "La parole des autorités constitue-t-elle une source du droit ?", options: ["a. Oui, même sans texte officiel", "b. Non, sauf lorsqu’elle est consacrée dans un acte juridique reconnu", "c. Oui, uniquement à l’oral"], correctAnswer: 1 },
+      { id: "m2_q5", question: "Quelle institution vote les lois au Bénin ?", options: ["a. L’Assemblée nationale", "b. La police républicaine", "c. La Cour constitutionnelle"], correctAnswer: 0 },
+      { id: "m2_q6", question: "Parmi les institutions judiciaires du Bénin, on peut citer :", options: ["a. Les tribunaux", "b. Les partis politiques", "c. Les cours"], correctAnswer: [0, 2] },
+      { id: "m2_q7", question: "La mission principale de la Cour constitutionnelle est :", options: ["a. De contrôler la conformité des lois à la Constitution", "b. De juger tous les conflits familiaux", "c. D’organiser les élections communales"], correctAnswer: 0 },
+      { id: "m2_q8", question: "La police peut-elle juger les personnes ?", options: ["a. Oui, dans toutes les affaires", "b. Non, le jugement relève des juridictions compétentes", "c. Oui, en cas de conflit familial"], correctAnswer: 1 },
+      { id: "m2_q9", question: "La CRIET peut connaître notamment des affaires liées :", options: ["a. Au terrorisme et aux infractions économiques", "b. Aux cérémonies traditionnelles", "c. Aux violences sexuelles sur les mineurs"], correctAnswer: 0 },
+      { id: "m2_q10", question: "Qui peut porter plainte au commissariat ?", options: ["a. Toute personne victime ou témoin d’une infraction", "b. Uniquement les autorités administratives", "c. Exclusivement les avocats"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
   },
@@ -299,16 +299,16 @@ Amnesty International Benin, Human Rights Watch, Commission Béninoise des Droit
 - **Plan international** : Cour Africaine des Droits de l’homme, Cour Pénale Internationale (CPI), etc.
     `,
     quiz: [
-      { id: "m3_q1", question: "Les droits de l’homme sont :", options: ["Des privilèges réservés à certaines catégories de personnes", "Des droits fondamentaux reconnus à toute personne humaine", "Des règles applicables uniquement aux autorités publiques"], correctAnswer: 1 },
-      { id: "m3_q2", question: "Parmi les droits exercés individuellement, on peut citer :", options: ["Le droit à la vie et à la liberté", "Le droit de vote", "Le droit à la santé"], correctAnswer: [0, 1, 2] },
-      { id: "m3_q3", question: "Parmi les droits exercés collectivement figure :", options: ["La liberté d’association", "La liberté de réunion", "Le droit à l’identité personnelle"], correctAnswer: [0, 1] },
-      { id: "m3_q4", question: "La liberté d’expression signifie :", options: ["Le droit d’exprimer librement ses opinions dans le respect de la loi", "Le droit d’insulter sans limite", "L’interdiction de critiquer les autorités publiques"], correctAnswer: 0 },
-      { id: "m3_q5", question: "Les traitements inhumains et dégradants désignent :", options: ["Des actes portant gravement atteinte à la dignité humaine", "Des sanctions scolaires ordinaires", "Des obligations administratives"], correctAnswer: 0 },
-      { id: "m3_q6", question: "La Cour constitutionnelle du Bénin est-elle protectrice des droits humains ?", options: ["Oui, car elle veille au respect des droits fondamentaux garantis par la Constitution", "Non, car elle ne traite que des questions électorales", "Non, car seule la police protège les droits humains"], correctAnswer: 0 },
-      { id: "m3_q7", question: "La Cour constitutionnelle du Bénin peut-elle accorder des dommages et intérêts aux victimes ?", options: ["Oui, dans toutes les affaires civiles", "Non, sa mission principale est de constater les violations constitutionnelles", "Oui, automatiquement après chaque recours"], correctAnswer: 1 },
-      { id: "m3_q8", question: "Parmi les instruments africains de protection des droits humains figure :", options: ["La Charte africaine des droits de l’homme et des peuples", "Le règlement intérieur des communes", "Le code de commerce"], correctAnswer: 0 },
-      { id: "m3_q9", question: "La mission de la Cour africaine des droits de l’homme et des peuples est :", options: ["De protéger les droits humains sur le continent africain", "D’organiser les élections nationales", "De gérer les conflits fonciers locaux uniquement"], correctAnswer: 0 },
-      { id: "m3_q10", question: "Parmi les juridictions africaines protégeant les droits humains, on peut citer :", options: ["La Cour de justice de la CEDEAO", "Les commissariats de police", "Les collectivités territoriales"], correctAnswer: 0 }
+      { id: "m3_q1", question: "Les droits de l’homme sont :", options: ["a. Des privilèges réservés à certaines catégories de personnes", "b. Des droits fondamentaux reconnus à toute personne humaine", "c. Des règles applicables uniquement aux autorités publiques"], correctAnswer: 1 },
+      { id: "m3_q2", question: "Parmi les droits exercés individuellement, on peut citer :", options: ["a. Le droit à la vie et à la liberté", "b. Le droit de vote", "c. Le droit à la santé"], correctAnswer: [0, 1, 2] },
+      { id: "m3_q3", question: "Parmi les droits exercés collectivement figure :", options: ["a. La liberté d’association", "b. La liberté de réunion", "c. Le droit à l’identité personnelle"], correctAnswer: [0, 1] },
+      { id: "m3_q4", question: "La liberté d’expression signifie :", options: ["a. Le droit d’exprimer librement ses opinions dans le respect de la loi", "b. Le droit d’insulter sans limite", "c. L’interdiction de critiquer les autorités publiques"], correctAnswer: 0 },
+      { id: "m3_q5", question: "Les traitements inhumains et dégradants désignent :", options: ["a. Des actes portant gravement atteinte à la dignité humaine", "b. Des sanctions scolaires ordinaires", "c. Des obligations administratives"], correctAnswer: 0 },
+      { id: "m3_q6", question: "La Cour constitutionnelle du Bénin est-elle protectrice des droits humains ?", options: ["a. Oui, car elle veille au respect des droits fondamentaux garantis par la Constitution", "b. Non, car elle ne traite que des questions électorales", "c. Non, car seule la police protège les droits humains"], correctAnswer: 0 },
+      { id: "m3_q7", question: "La Cour constitutionnelle du Bénin peut-elle accorder des dommages et intérêts aux victimes ?", options: ["a. Oui, dans toutes les affaires civiles", "b. Non, sa mission principale est de constater les violations constitutionnelles", "c. Oui, automatiquement après chaque recours"], correctAnswer: 1 },
+      { id: "m3_q8", question: "Parmi les instruments africains de protection des droits humains figure :", options: ["a. La Charte africaine des droits de l’homme et des peuples", "b. Le règlement intérieur des communes", "c. Le code de commerce"], correctAnswer: 0 },
+      { id: "m3_q9", question: "La mission de la Cour africaine des droits de l’homme et des peuples est :", options: ["a. De protéger les droits humains sur le continent africain", "b. D’organiser les élections nationales", "c. De gérer les conflits fonciers locaux uniquement"], correctAnswer: 0 },
+      { id: "m3_q10", question: "Parmi les juridictions africaines protégeant les droits humains, on peut citer :", options: ["a. La Cour de justice de la CEDEAO", "b. Les commissariats de police", "c. Les collectivités territoriales"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   },
@@ -350,16 +350,16 @@ Sources juridiques : Constitution du Bénin, Charte africaine des droits de l'ho
 Les banques comme la Banque Mondiale ont des **mécanismes de gestion des plaintes** (ex: le Panel d'inspection). Si un projet financé par elles cause un préjudice (expropriation sans compensation, pollution), les communautés peuvent saisir ces mécanismes indépendants.
     `,
     quiz: [
-      { id: "m4_q1", question: "Quel est l’objectif principal de la participation communautaire dans la gouvernance environnementale ?", options: ["Renforcer la légitimité et l’efficacité des politiques environnementales", "Réduire le rôle de l’État", "Favoriser exclusivement les entreprises privées"], correctAnswer: 0 },
-      { id: "m4_q2", question: "Le principe selon lequel les populations doivent avoir accès aux informations relatives à l’environnement renvoie au :", options: ["Principe de solidarité", "Principe de transparence environnementale", "Principe de spécialité"], correctAnswer: 1 },
-      { id: "m4_q3", question: "Quelle institution locale peut jouer un rôle important dans la protection de l’environnement au niveau communautaire ?", options: ["Les collectivités territoriales", "Les agences de publicité", "Les entreprises étrangères uniquement"], correctAnswer: 0 },
-      { id: "m4_q4", question: "Le droit environnemental repose notamment sur le principe de :", options: ["Prévention", "Secret administratif", "Neutralité écologique"], correctAnswer: 0 },
-      { id: "m4_q5", question: "Qu’entend-on par « justice environnementale » ?", options: ["La protection exclusive des forêts", "L’égalité dans la répartition des bénéfices et des charges environnementales", "L’interdiction de toute activité industrielle"], correctAnswer: 1 },
-      { id: "m4_q6", question: "Une consultation publique préalable à un projet minier constitue :", options: ["Une mesure facultative sans effet", "Un mécanisme de participation citoyenne", "Une sanction administrative"], correctAnswer: 1 },
-      { id: "m4_q7", question: "Le principe « pollueur-payeur » signifie que :", options: ["L’État doit financer toutes les réparations", "Les victimes doivent supporter les coûts des dommages", "L’auteur de la pollution doit assumer les coûts des dommages causés"], correctAnswer: 2 },
-      { id: "m4_q8", question: "Parmi les acteurs suivants, lequel est considéré comme un acteur non étatique de la gouvernance environnementale ?", options: ["Une organisation communautaire", "Le ministère de l’environnement", "La cour constitutionnelle"], correctAnswer: 0 },
-      { id: "m4_q9", question: "La sensibilisation communautaire en matière environnementale vise principalement à :", options: ["Limiter la liberté d’expression", "Encourager les comportements favorables à la protection de l’environnement", "Supprimer les activités agricoles"], correctAnswer: 1 },
-      { id: "m4_q10", question: "Quel document est généralement exigé avant la réalisation d’un projet susceptible d’avoir un impact sur l’environnement ?", options: ["Une étude d’impact environnemental", "Une autorisation fiscale", "Un règlement intérieur"], correctAnswer: 0 }
+      { id: "m4_q1", question: "Quel est l’objectif principal de la participation communautaire dans la gouvernance environnementale ?", options: ["a. Renforcer la légitimité et l’efficacité des politiques environnementales", "b. Réduire le rôle de l’État", "c. Favoriser exclusivement les entreprises privées"], correctAnswer: 0 },
+      { id: "m4_q2", question: "Le principe selon lequel les populations doivent avoir accès aux informations relatives à l’environnement renvoie au :", options: ["a. Principe de solidarité", "b. Principe de transparence environnementale", "c. Principe de spécialité"], correctAnswer: 1 },
+      { id: "m4_q3", question: "Quelle institution locale peut jouer un rôle important dans la protection de l’environnement au niveau communautaire ?", options: ["a. Les collectivités territoriales", "b. Les agences de publicité", "c. Les entreprises étrangères uniquement"], correctAnswer: 0 },
+      { id: "m4_q4", question: "Le droit environnemental repose notamment sur le principe de :", options: ["a. Prévention", "b. Secret administratif", "c. Neutralité écologique"], correctAnswer: 0 },
+      { id: "m4_q5", question: "Qu’entend-on par « justice environnementale » ?", options: ["a. La protection exclusive des forêts", "b. L’égalité dans la répartition des bénéfices et des charges environnementales", "c. L’interdiction de toute activité industrielle"], correctAnswer: 1 },
+      { id: "m4_q6", question: "Une consultation publique préalable à un projet minier constitue :", options: ["a. Une mesure facultative sans effet", "b. Un mécanisme de participation citoyenne", "c. Une sanction administrative"], correctAnswer: 1 },
+      { id: "m4_q7", question: "Le principe « pollueur-payeur » signifie que :", options: ["a. L’État doit financer toutes les réparations", "b. Les victimes doivent supporter les coûts des dommages", "c. L’auteur de la pollution doit assumer les coûts des dommages causés"], correctAnswer: 2 },
+      { id: "m4_q8", question: "Parmi les acteurs suivants, lequel est considéré comme un acteur non étatique de la gouvernance environnementale ?", options: ["a. Une organisation communautaire", "b. Le ministère de l’environnement", "c. La cour constitutionnelle"], correctAnswer: 0 },
+      { id: "m4_q9", question: "La sensibilisation communautaire en matière environnementale vise principalement à :", options: ["a. Limiter la liberté d’expression", "b. Encourager les comportements favorables à la protection de l’environnement", "c. Supprimer les activités agricoles"], correctAnswer: 1 },
+      { id: "m4_q10", question: "Quel document est généralement exigé avant la réalisation d’un projet susceptible d’avoir un impact sur l’environnement ?", options: ["a. Une étude d’impact environnemental", "b. Une autorisation fiscale", "c. Un règlement intérieur"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
   },
@@ -408,16 +408,16 @@ La médiation est un processus où un tiers impartial aide les parties à commun
 Le médiateur doit être impartial, ne pas prendre parti, assurer la confidentialité et équilibrer le pouvoir entre les parties (ex: si l'une est plus instruite que l'autre).
     `,
     quiz: [
-      { id: "m5_q1", question: "Les modes alternatifs de règlement des conflits visent principalement à :", options: ["Supprimer les tribunaux", "Résoudre les différends de manière consensuelle", "Renforcer les sanctions pénales"], correctAnswer: 1 },
-      { id: "m5_q2", question: "La médiation implique :", options: ["Un tiers neutre facilitant le dialogue", "Une décision imposée par un juge", "Une absence de discussion entre les parties"], correctAnswer: 0 },
-      { id: "m5_q3", question: "Dans la conciliation, le conciliateur :", options: ["Prononce une sanction", "Facilite un accord amiable", "Défend une seule partie"], correctAnswer: 1 },
-      { id: "m5_q4", question: "L’arbitrage se distingue de la médiation parce que :", options: ["Il aboutit à une décision rendue par un arbitre", "Il exclut toute règle de droit", "Il est toujours gratuit"], correctAnswer: 0 },
-      { id: "m5_q5", question: "Quel est un avantage majeur des MARC ?", options: ["La longueur des procédures", "La rapidité du règlement des litiges", "La publicité obligatoire des débats"], correctAnswer: 1 },
-      { id: "m5_q6", question: "La confidentialité constitue :", options: ["Un avantage fréquent des MARC", "Une sanction judiciaire", "Une obligation propre aux procès publics"], correctAnswer: 0 },
-      { id: "m5_q7", question: "En médiation, les parties conservent généralement :", options: ["Le pouvoir de décider de l’issue du conflit", "Le pouvoir de modifier la loi", "Le pouvoir de sanctionner pénalement"], correctAnswer: 0 },
-      { id: "m5_q8", question: "Les MARC sont particulièrement adaptés :", options: ["Aux relations nécessitant le maintien du dialogue", "Aux infractions criminelles graves uniquement", "Aux litiges impossibles à négocier"], correctAnswer: 0 },
-      { id: "m5_q9", question: "Une clause compromissoire prévoit :", options: ["Le recours à l’arbitrage en cas de litige", "Une médiation familiale obligatoire", "Une sanction administrative automatique"], correctAnswer: 0 },
-      { id: "m5_q10", question: "Les MARC permettent souvent :", options: ["D’augmenter les coûts de procédure", "De réduire les délais et les coûts des litiges", "D’empêcher toute négociation"], correctAnswer: 1 }
+      { id: "m5_q1", question: "Les modes alternatifs de règlement des conflits visent principalement à :", options: ["a. Supprimer les tribunaux", "b. Résoudre les différends de manière consensuelle", "c. Renforcer les sanctions pénales"], correctAnswer: 1 },
+      { id: "m5_q2", question: "La médiation implique :", options: ["a. Un tiers neutre facilitant le dialogue", "b. Une décision imposée par un juge", "c. Une absence de discussion entre les parties"], correctAnswer: 0 },
+      { id: "m5_q3", question: "Dans la conciliation, le conciliateur :", options: ["a. Prononce une sanction", "b. Facilite un accord amiable", "c. Défend une seule partie"], correctAnswer: 1 },
+      { id: "m5_q4", question: "L’arbitrage se distingue de la médiation parce que :", options: ["a. Il aboutit à une décision rendue par un arbitre", "b. Il exclut toute règle de droit", "c. Il est toujours gratuit"], correctAnswer: 0 },
+      { id: "m5_q5", question: "Quel est un avantage majeur des MARC ?", options: ["a. La longueur des procédures", "b. La rapidité du règlement des litiges", "c. La publicité obligatoire des débats"], correctAnswer: 1 },
+      { id: "m5_q6", question: "La confidentialité constitue :", options: ["a. Un avantage fréquent des MARC", "b. Une sanction judiciaire", "c. Une obligation propre aux procès publics"], correctAnswer: 0 },
+      { id: "m5_q7", question: "En médiation, les parties conservent généralement :", options: ["a. Le pouvoir de décider de l’issue du conflit", "b. Le pouvoir de modifier la loi", "c. Le pouvoir de sanctionner pénalement"], correctAnswer: 0 },
+      { id: "m5_q8", question: "Les MARC sont particulièrement adaptés :", options: ["a. Aux relations nécessitant le maintien du dialogue", "b. Aux infractions criminelles graves uniquement", "c. Aux litiges impossibles à négocier"], correctAnswer: 0 },
+      { id: "m5_q9", question: "Une clause compromissoire prévoit :", options: ["a. Le recours à l’arbitrage en cas de litige", "b. Une médiation familiale obligatoire", "c. Une sanction administrative automatique"], correctAnswer: 0 },
+      { id: "m5_q10", question: "Les MARC permettent souvent :", options: ["a. D’augmenter les coûts de procédure", "b. De réduire les délais et les coûts des litiges", "c. D’empêcher toute négociation"], correctAnswer: 1 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"
   },
@@ -457,16 +457,16 @@ Pour qu’une vente de terre soit valable au Bénin, il faut :
 L’État peut reprendre une terre pour cause de « nécessité publique » (ex: construire une route). Mais il doit **juste et préalablement indemniser** le propriétaire (Article 22 de la Constitution).
     `,
     quiz: [
-      { id: "m6_q1", question: "En droit béninois, le droit foncier concerne principalement :", options: ["Les relations commerciales", "La propriété et l’usage des terres", "Les infractions pénales"], correctAnswer: 1 },
-      { id: "m6_q2", question: "Le certificat foncier permet notamment :", options: ["D’attester des droits sur une parcelle", "De dissoudre une société", "D’autoriser un mariage"], correctAnswer: 0 },
-      { id: "m6_q3", question: "Les conflits fonciers portent souvent sur :", options: ["Les successions et les limites de propriété", "Les contrats de travail", "Les infractions routières"], correctAnswer: 0 },
-      { id: "m6_q4", question: "Le droit au logement est considéré comme :", options: ["Un droit humain fondamental", "Un privilège administratif", "Une simple faveur de l’État"], correctAnswer: 0 },
-      { id: "m6_q5", question: "L’expropriation pour cause d’utilité publique suppose généralement :", options: ["Une indemnisation préalable", "Une sanction pénale", "Une décision familiale"], correctAnswer: 0 },
-      { id: "m6_q6", question: "En matière foncière, les collectivités locales peuvent :", options: ["Participer à la gestion du domaine foncier", "Rendre des décisions pénales définitives", "Modifier la Constitution"], correctAnswer: 0 },
-      { id: "m6_q7", question: "Les droits coutumiers sur la terre :", options: ["Sont totalement interdits au Bénin", "Peuvent être reconnus dans certaines conditions", "Remplacent toujours le droit écrit"], correctAnswer: 1 },
-      { id: "m6_q8", question: "Un litige foncier peut être porté devant :", options: ["Les juridictions compétentes", "Les établissements scolaires", "Les services de santé"], correctAnswer: 0 },
-      { id: "m6_q9", question: "La sécurisation foncière vise notamment à :", options: ["Prévenir les conflits liés à la terre", "Supprimer les titres de propriété", "Interdire l’agriculture"], correctAnswer: 0 },
-      { id: "m6_q10", question: "Le respect des droits humains en matière foncière implique :", options: ["La protection contre les expulsions arbitraires", "L’interdiction de toute vente de terrain", "La suppression des droits successoraux"], correctAnswer: 0 }
+      { id: "m6_q1", question: "En droit béninois, le droit foncier concerne principalement :", options: ["a. Les relations commerciales", "b. La propriété et l’usage des terres", "c. Les infractions pénales"], correctAnswer: 1 },
+      { id: "m6_q2", question: "Le certificat foncier permet notamment :", options: ["a. D’attester des droits sur une parcelle", "b. De dissoudre une société", "c. D’autoriser un mariage"], correctAnswer: 0 },
+      { id: "m6_q3", question: "Les conflits fonciers portent souvent sur :", options: ["a. Les successions et les limites de propriété", "b. Les contrats de travail", "c. Les infractions routières"], correctAnswer: 0 },
+      { id: "m6_q4", question: "Le droit au logement est considéré comme :", options: ["a. Un droit humain fondamental", "b. Un privilège administratif", "c. Une simple faveur de l’État"], correctAnswer: 0 },
+      { id: "m6_q5", question: "L’expropriation pour cause d’utilité publique suppose généralement :", options: ["a. Une indemnisation préalable", "b. Une sanction pénale", "c. Une décision familiale"], correctAnswer: 0 },
+      { id: "m6_q6", question: "En matière foncière, les collectivités locales peuvent :", options: ["a. Participer à la gestion du domaine foncier", "b. Rendre des décisions pénales définitives", "c. Modifier la Constitution"], correctAnswer: 0 },
+      { id: "m6_q7", question: "Les droits coutumiers sur la terre :", options: ["a. Sont totalement interdits au Bénin", "b. Peuvent être reconnus dans certaines conditions", "c. Remplacent toujours le droit écrit"], correctAnswer: 1 },
+      { id: "m6_q8", question: "Un litige foncier peut être porté devant :", options: ["a. Les juridictions compétentes", "b. Les établissements scolaires", "c. Les services de santé"], correctAnswer: 0 },
+      { id: "m6_q9", question: "La sécurisation foncière vise notamment à :", options: ["a. Prévenir les conflits liés à la terre", "b. Supprimer les titres de propriété", "c. Interdire l’agriculture"], correctAnswer: 0 },
+      { id: "m6_q10", question: "Le respect des droits humains en matière foncière implique :", options: ["a. La protection contre les expulsions arbitraires", "b. L’interdiction de toute vente de terrain", "c. La suppression des droits successoraux"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
   },
@@ -504,16 +504,16 @@ La loi limite le cautionnement à **trois (03) mois de loyer**. Il est interdit 
 - **L'expulsion** : Elle ne peut être faite que par décision de justice. Un propriétaire n'a pas le droit de jeter les affaires d'un locataire dehors ou de couper l'eau/électricité de force.
     `,
     quiz: [
-      { id: "m7_q1", question: "Le contrat de bail crée principalement :", options: ["Une relation entre bailleur et locataire", "Une relation familiale", "Une sanction pénale"], correctAnswer: 0 },
-      { id: "m7_q2", question: "Le bailleur est tenu de :", options: ["Fournir un logement décent", "Modifier la nationalité du locataire", "Assurer gratuitement tous les travaux personnels du locataire"], correctAnswer: 0 },
-      { id: "m7_q3", question: "Le locataire doit principalement :", options: ["Payer le loyer convenu", "Exercer une activité politique", "Rendre des décisions judiciaires"], correctAnswer: 0 },
-      { id: "m7_q4", question: "L’état des lieux sert à :", options: ["Constater l’état du logement", "Prononcer une expulsion", "Modifier le contrat de mariage"], correctAnswer: 0 },
-      { id: "m7_q5", question: "En cas de non-paiement du loyer, le bailleur peut :", options: ["Engager une procédure légale", "Expulser immédiatement sans procédure", "Enlever la porte du logement du locataire"], correctAnswer: 0 },
-      { id: "m7_q6", question: "Le dépôt de garantie a pour objectif :", options: ["De couvrir certains risques liés au bail", "De remplacer le loyer", "D’annuler le contrat automatiquement"], correctAnswer: 0 },
-      { id: "m7_q7", question: "Le locataire bénéficie du droit :", options: ["À la jouissance paisible du logement", "À la propriété automatique du logement", "À l’annulation unilatérale de toute obligation"], correctAnswer: 0 },
-      { id: "m7_q8", question: "Le bail peut prendre fin :", options: ["Par expiration de la durée convenue", "Seulement par décision pénale", "Uniquement par décès du bailleur"], correctAnswer: 0 },
-      { id: "m7_q9", question: "Les litiges locatifs peuvent être réglés :", options: ["Devant le tribunal compétent", "Exclusivement à la mairie", "Par la police uniquement"], correctAnswer: 0 },
-      { id: "m7_q10", question: "Le droit locatif vise notamment à :", options: ["Encadrer les rapports entre bailleur et locataire", "Organiser les élections", "Réglementer les sociétés commerciales"], correctAnswer: 0 }
+      { id: "m7_q1", question: "Le contrat de bail crée principalement :", options: ["a. Une relation entre bailleur et locataire", "b. Une relation familiale", "c. Une sanction pénale"], correctAnswer: 0 },
+      { id: "m7_q2", question: "Le bailleur est tenu de :", options: ["a. Pourvoir un logement décent", "b. Modifier la nationalité du locataire", "c. Assurer gratuitement tous les travaux personnels du locataire"], correctAnswer: 0 },
+      { id: "m7_q3", question: "Le locataire doit principalement :", options: ["a. Payer le loyer convenu", "b. Exercer une activité politique", "c. Rendre des décisions judiciaires"], correctAnswer: 0 },
+      { id: "m7_q4", question: "L’état des lieux sert à :", options: ["a. Constater l’état du logement", "b. Prononcer une expulsion", "c. Modifier le contrat de mariage"], correctAnswer: 0 },
+      { id: "m7_q5", question: "En cas de non-paiement du loyer, le bailleur peut :", options: ["a. Engager une procédure légale", "b. Expulser immédiatement sans procédure", "c. Enlever la porte du logement du locataire"], correctAnswer: 0 },
+      { id: "m7_q6", question: "Le dépôt de garantie a pour objectif :", options: ["a. De couvrir certains risques liés au bail", "b. De remplacer le loyer", "c. D’annuler le contrat automatiquement"], correctAnswer: 0 },
+      { id: "m7_q7", question: "Le locataire bénéficie du droit :", options: ["a. À la jouissance paisible du logement", "b. À la propriété automatique du logement", "c. À l’annulation unilatérale de toute obligation"], correctAnswer: 0 },
+      { id: "m7_q8", question: "Le bail peut prendre fin :", options: ["a. Par expiration de la durée convenue", "b. Seulement par décision pénale", "c. Uniquement par décès du bailleur"], correctAnswer: 0 },
+      { id: "m7_q9", question: "Les litiges locatifs peuvent être réglés :", options: ["a. Devant le tribunal compétent", "b. Exclusivement à la mairie", "c. Par la police uniquement"], correctAnswer: 0 },
+      { id: "m7_q10", question: "Le droit locatif vise notamment à :", options: ["a. Encadrer les rapports entre bailleur et locataire", "b. Organiser les élections", "c. Réglementer les sociétés commerciales"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"
   },
@@ -554,16 +554,16 @@ Les successions sont ouvertes par le décès d'une personne.
 - **Le conjoint survivant** : La veuve a désormais des droits clairs sur l'héritage de son mari, contrairement à certaines pratiques coutumières.
     `,
     quiz: [
-      { id: "m8_q1", question: "Les droits de la personnalité protègent notamment :", options: ["La dignité et la vie privée", "Les recettes fiscales", "Les activités commerciales uniquement"], correctAnswer: 0 },
-      { id: "m8_q2", question: "Le droit au nom constitue :", options: ["Un droit de la personnalité", "Une sanction administrative", "Un droit commercial"], correctAnswer: 0 },
-      { id: "m8_q3", question: "En droit béninois, le mariage suppose notamment :", options: ["Le consentement des époux", "Une autorisation policière obligatoire", "Une décision familiale préalable dans tous les cas"], correctAnswer: 0 },
-      { id: "m8_q4", question: "La filiation permet :", options: ["D’établir le lien juridique entre un enfant et ses parents", "De conclure un contrat commercial", "D’obtenir automatiquement un titre foncier"], correctAnswer: 0 },
-      { id: "m8_q5", question: "L’autorité parentale vise principalement :", options: ["La protection et l’éducation de l’enfant", "La gestion des affaires politiques", "L’organisation des élections"], correctAnswer: 0 },
-      { id: "m8_q6", question: "Le divorce entraîne :", options: ["La dissolution du mariage", "La perte automatique de la nationalité", "Un abandon obligatoire en enfants"], correctAnswer: 0 },
-      { id: "m8_q7", question: "Le droit à l’image protège une personne contre :", options: ["L’utilisation non autorisée de son image", "Les litiges fonciers", "Les obligations fiscales"], correctAnswer: 0 },
-      { id: "m8_q8", question: "La protection de l’enfant constitue :", options: ["Une obligation juridique et sociale", "Une simple faculté des parents", "Une mission exclusivement policière"], correctAnswer: 0 },
-      { id: "m8_q9", question: "Les violences familiales peuvent entraîner :", options: ["Des sanctions prévues par la loi", "Une récompense administrative", "Une suppression automatique de la filiation"], correctAnswer: 0 },
-      { id: "m8_q10", question: "Le droit de la famille encadre principalement :", options: ["Les relations familiales et personnelles", "Les échanges commerciaux internationaux", "Les règles douanières"], correctAnswer: 0 }
+      { id: "m8_q1", question: "Les droits de la personnalité protègent notamment :", options: ["a. La dignité et la vie privée", "b. Les recettes fiscales", "c. Les activités commerciales uniquement"], correctAnswer: 0 },
+      { id: "m8_q2", question: "Le droit au nom constitue :", options: ["a. Un droit de la personnalité", "b. Une sanction administrative", "c. Un droit commercial"], correctAnswer: 0 },
+      { id: "m8_q3", question: "En droit béninois, le mariage suppose notamment :", options: ["a. Le consentement des époux", "b. Une autorisation policière obligatoire", "c. Une décision familiale préalable dans tous les cas"], correctAnswer: 0 },
+      { id: "m8_q4", question: "La filiation permet :", options: ["a. D’établir le lien juridique entre un enfant et ses parents", "b. De conclure un contrat commercial", "c. D’obtenir automatiquement un titre foncier"], correctAnswer: 0 },
+      { id: "m8_q5", question: "L’autorité parentale vise principalement :", options: ["a. La protection et l’éducation de l’enfant", "b. La gestion des affaires politiques", "c. L’organisation des élections"], correctAnswer: 0 },
+      { id: "m8_q6", question: "Le divorce entraîne :", options: ["a. La dissolution du mariage", "b. La perte automatique de la nationalité", "c. Un abandon obligatoire en enfants"], correctAnswer: 0 },
+      { id: "m8_q7", question: "Le droit à l’image protège une personne contre :", options: ["a. L’utilisation non autorisée de son image", "b. Les litiges fonciers", "c. Les obligations fiscales"], correctAnswer: 0 },
+      { id: "m8_q8", question: "La protection de l’enfant constitue :", options: ["a. Une obligation juridique et sociale", "b. Une simple faculté des parents", "c. Une mission exclusivement policière"], correctAnswer: 0 },
+      { id: "m8_q9", question: "Les violences familiales peuvent entraîner :", options: ["a. Des sanctions prévues par la loi", "b. Une récompense administrative", "c. Une suppression automatique de la filiation"], correctAnswer: 0 },
+      { id: "m8_q10", question: "Le droit de la famille encadre principalement :", options: ["a. Les relations familiales et personnelles", "b. Les échanges commerciaux internationaux", "c. Les règles douanières"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
   },
@@ -602,16 +602,16 @@ Le droit à la santé n’est pas le droit d’être en bonne santé, mais le «
 En cas de faute (erreur de diagnostic grave, négligence, opération ratée), le patient peut engager la responsabilité du médecin ou de l'hôpital devant les tribunaux pour obtenir réparation.
     `,
     quiz: [
-      { id: "m9_q1", question: "Le droit à la santé est reconnu comme :", options: ["Un droit fondamental", "Un privilège réservé aux fonctionnaires", "Une faveur administrative"], correctAnswer: 0 },
-      { id: "m9_q2", question: "Le droit de la santé encadre notamment :", options: ["Les relations entre patients et professionnels de santé", "Les élections politiques", "Les contrats commerciaux internationaux"], correctAnswer: 0 },
-      { id: "m9_q3", question: "Le consentement du patient signifie que :", options: ["Le patient accepte librement les soins proposés", "Les soins peuvent être imposés sans information", "Le médecin décide seul dans tous les cas"], correctAnswer: 0 },
-      { id: "m9_q4", question: "Le secret médical oblige le professionnel de santé à :", options: ["Préserver la confidentialité des informations du patient", "Divulguer toutes les informations au public", "Transmettre systématiquement les dossiers médicaux aux voisins"], correctAnswer: 0 },
-      { id: "m9_q5", question: "L’accès aux soins renvoie à :", options: ["La possibilité pour les populations de bénéficier des services de santé", "L’interdiction des centres de santé privés", "La suppression des pharmacies"], correctAnswer: 0 },
-      { id: "m9_q6", question: "Une faute médicale peut engager :", options: ["La responsabilité du professionnel de santé", "La dissolution automatique de l’hôpital", "Une sanction électorale"], correctAnswer: 0 },
-      { id: "m9_q7", question: "Les campagnes de vaccination participent à :", options: ["La protection de la santé publique", "La gestion foncière", "La réglementation bancaire"], correctAnswer: 0 },
-      { id: "m9_q8", question: "Le patient bénéficie du droit :", options: ["À l’information sur son état de santé", "À la suppression de son dossier judiciaire", "À l’annulation des lois sanitaires"], correctAnswer: 0 },
-      { id: "m9_q9", question: "Le droit de la santé vise également :", options: ["La protection de la santé publique", "La gestion des élections", "Le contrôle des frontières"], correctAnswer: 0 },
-      { id: "m9_q10", question: "Les établissements de santé doivent :", options: ["Respecter les normes sanitaires", "Exercer des fonctions judiciaires", "Traiter convenablement les patients"], correctAnswer: [0, 2] }
+      { id: "m9_q1", question: "Le droit à la santé est reconnu comme :", options: ["a. Un droit fondamental", "b. Un privilège réservé aux fonctionnaires", "c. Une faveur administrative"], correctAnswer: 0 },
+      { id: "m9_q2", question: "Le droit de la santé encadre notamment :", options: ["a. Les relations entre patients et professionnels de santé", "b. Les élections politiques", "c. Les contrats commerciaux internationaux"], correctAnswer: 0 },
+      { id: "m9_q3", question: "Le consentement du patient signifie que :", options: ["a. Le patient accepte librement les soins proposés", "b. Les soins peuvent être imposés sans information", "c. Le médecin décide seul dans tous les cas"], correctAnswer: 0 },
+      { id: "m9_q4", question: "Le secret médical oblige le professionnel de santé à :", options: ["a. Préserver la confidentialité des informations du patient", "b. Divulguer toutes les informations au public", "c. Transmettre systématiquement les dossiers médicaux aux voisins"], correctAnswer: 0 },
+      { id: "m9_q5", question: "L’accès aux soins renvoie à :", options: ["a. La possibilité pour les populations de bénéficier des services de santé", "b. L’interdiction des centres de santé privés", "c. La suppression des pharmacies"], correctAnswer: 0 },
+      { id: "m9_q6", question: "Une faute médicale peut engager :", options: ["a. La responsabilité du professionnel de santé", "b. La dissolution automatique de l’hôpital", "c. Une sanction électorale"], correctAnswer: 0 },
+      { id: "m9_q7", question: "Les campagnes de vaccination participent à :", options: ["a. La protection de la santé publique", "b. La gestion foncière", "c. La réglementation bancaire"], correctAnswer: 0 },
+      { id: "m9_q8", question: "Le patient bénéficie du droit :", options: ["a. À l’information sur son état de santé", "b. À la suppression de son dossier judiciaire", "c. À l’annulation des lois sanitaires"], correctAnswer: 0 },
+      { id: "m9_q9", question: "Le droit de la santé vise également :", options: ["a. La protection de la santé publique", "b. La gestion des élections", "c. Le contrôle des frontières"], correctAnswer: 0 },
+      { id: "m9_q10", question: "Les établissements de santé doivent :", options: ["a. Respecter les normes sanitaires", "b. Exercer des fonctions judiciaires", "c. Traiter convenablement les patients"], correctAnswer: [0, 2] }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3"
   },
@@ -652,16 +652,16 @@ Le parajuriste doit adopter une posture rassurante :
 - **Écoute active** : Laisser la victime parler à son rythme et reformuler ses propos pour s'assurer d'avoir bien compris.
     `,
     quiz: [
-      { id: "m10_q1", question: "Les violences basées sur le genre désignent :", options: ["Des violences fondées sur le sexe ou le genre", "Des infractions routières", "Des litiges commerciaux"], correctAnswer: 0 },
-      { id: "m10_q2", question: "Les violences conjugales peuvent être :", options: ["Physiques, psychologiques ou économiques", "Exclusivement physiques", "Seulement verbales"], correctAnswer: 0 },
-      { id: "m10_q3", question: "Le droit béninois sanctionne :", options: ["Certaines formes de violences basées sur le genre", "Les droits fondamentaux", "Les campagnes de sensibilisation"], correctAnswer: 0 },
-      { id: "m10_q4", question: "Une victime de violence peut :", options: ["Saisir les autorités compétentes", "Être privée automatiquement de ses droits civils", "Être empêchée de porter plainte"], correctAnswer: 0 },
-      { id: "m10_q5", question: "La protection des victimes implique notamment :", options: ["L’assistance et l’accompagnement", "La divulgation publique obligatoire de leur identité", "La suppression de leur droit à la justice"], correctAnswer: 0 },
-      { id: "m10_q6", question: "Les violences psychologiques peuvent inclure :", options: ["Les menaces et humiliations", "Les contrats de vente", "Les obligations fiscales"], correctAnswer: 0 },
-      { id: "m10_q7", question: "La sensibilisation contre les violences basées sur le genre vise à :", options: ["Prévenir les violences et promouvoir l’égalité", "Encourager les discriminations", "Limiter l’accès à la justice"], correctAnswer: 0 },
-      { id: "m10_q8", question: "Les enfants peuvent également être victimes :", options: ["De violences basées sur le genre", "Exclusivement de litiges fonciers", "D’infractions douanières uniquement"], correctAnswer: 0 },
-      { id: "m10_q9", question: "Les auteurs de violences peuvent faire l’objet :", options: ["De poursuites et sanctions prévues par la loi", "D’une récompense administrative", "D’une immunité automatique"], correctAnswer: 0 },
-      { id: "m10_q10", question: "La lutte contre les violences basées sur le genre nécessite :", options: ["Une action des autorités et de la société", "L’intervention exclusive des familles", "Le renforcement des mécanismes judiciaires"], correctAnswer: [0, 2] }
+      { id: "m10_q1", question: "Les violences basées sur le genre désignent :", options: ["a. Des violences fondées sur le sexe ou le genre", "b. Des infractions routières", "c. Des litiges commerciaux"], correctAnswer: 0 },
+      { id: "m10_q2", question: "Les violences conjugales peuvent être :", options: ["a. Physiques, psychologiques ou économiques", "b. Exclusivement physiques", "c. Seulement verbales"], correctAnswer: 0 },
+      { id: "m10_q3", question: "Le droit béninois sanctionne :", options: ["a. Certaines formes de violences basées sur le genre", "b. Les droits fondamentaux", "c. Les campagnes de sensibilisation"], correctAnswer: 0 },
+      { id: "m10_q4", question: "Une victime de violence peut :", options: ["a. Saisir les autorités compétentes", "b. Être privée automatiquement de ses droits civils", "c. Être empêchée de porter plainte"], correctAnswer: 0 },
+      { id: "m10_q5", question: "La protection des victimes implique notamment :", options: ["a. L’assistance et l’accompagnement", "b. La divulgation publique obligatoire de leur identité", "c. La suppression de leur droit à la justice"], correctAnswer: 0 },
+      { id: "m10_q6", question: "Les violences psychologiques peuvent inclure :", options: ["a. Les menaces et humiliations", "b. Les contrats de vente", "c. Les obligations fiscales"], correctAnswer: 0 },
+      { id: "m10_q7", question: "La sensibilisation contre les violences basées sur le genre vise à :", options: ["a. Prévenir les violences et promouvoir l’égalité", "b. Encourager les discriminations", "c. Limiter l’accès à la justice"], correctAnswer: 0 },
+      { id: "m10_q8", question: "Les enfants peuvent également être victimes :", options: ["a. De violences basées sur le genre", "b. Exclusivement de litiges fonciers", "c. D’infractions douanières uniquement"], correctAnswer: 0 },
+      { id: "m10_q9", question: "Les auteurs de violences peuvent faire l’objet :", options: ["a. De poursuites et sanctions prévues par la loi", "b. D’une récompense administrative", "c. D’une immunité automatique"], correctAnswer: 0 },
+      { id: "m10_q10", question: "La lutte contre les violences basées sur le genre nécessite :", options: ["a. Une action des autorités et de la société", "b. L’intervention exclusive des familles", "c. Le renforcement des mécanismes judiciaires"], correctAnswer: [0, 2] }
     ],
     isReporting: true,
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
