@@ -156,11 +156,13 @@ export function useAppState() {
         }
 
         if (userData) {
-          setUser(userData);
-          localStorage.setItem('paralegal_user', JSON.stringify(userData));
+          const userId = identifier!;
+          // Ensure user has an ID field reflecting the document ID
+          const finalUserData = { ...userData, id: userId };
+          setUser(finalUserData);
+          localStorage.setItem('paralegal_user', JSON.stringify(finalUserData));
 
           // Subscribe to real-time progress
-          const userId = userData.phone || userData.email || identifier!;
           const unsubscribeProgress = onSnapshot(doc(db, 'progress', userId), (progressSnap) => {
             if (progressSnap.exists()) {
               const data = progressSnap.data() as UserProgress;
@@ -309,7 +311,12 @@ export function useAppState() {
       console.log("Firebase: Sauvegarde automatique de la progression...");
       setIsSyncing(true);
       try {
-        const progressRef = doc(db, 'progress', user.phone);
+        const userId = user.phone || user.email || (user as any).id;
+        if (!userId) {
+          console.error("Impossible de trouver un identifiant pour l'utilisateur");
+          return;
+        }
+        const progressRef = doc(db, 'progress', userId);
         
         // Sanitize data to avoid Firestore "undefined" error
         const sanitizedProgress = {
@@ -606,10 +613,10 @@ export function useAppState() {
     });
   };
 
-  const deleteUser = async (phone: string) => {
+  const deleteUser = async (userId: string) => {
     try {
-      await deleteDoc(doc(db, 'users', phone));
-      await deleteDoc(doc(db, 'progress', phone));
+      await deleteDoc(doc(db, 'users', userId));
+      await deleteDoc(doc(db, 'progress', userId));
       return true;
     } catch (err) {
       console.error(err);
@@ -619,9 +626,12 @@ export function useAppState() {
 
   const saveUser = async (userData: any) => {
     try {
-      const isNew = !(await getDoc(doc(db, 'users', userData.phone))).exists();
+      const userId = userData.id || userData.phone || userData.email;
+      if (!userId) throw new Error("ID utilisateur manquant");
       
-      await setDoc(doc(db, 'users', userData.phone), userData, { merge: true });
+      const isNew = !(await getDoc(doc(db, 'users', userId))).exists();
+      
+      await setDoc(doc(db, 'users', userId), userData, { merge: true });
 
       if (isNew) {
         // Initialize progress for new users created by admin
@@ -633,7 +643,7 @@ export function useAppState() {
           lastActivity: 'Compte créé par l\'administrateur',
           lastUpdated: new Date().toISOString()
         };
-        await setDoc(doc(db, 'progress', userData.phone), initialProgress);
+        await setDoc(doc(db, 'progress', userId), initialProgress);
       }
       
       return true;
@@ -772,7 +782,7 @@ export function useAppState() {
     if (user?.isAdmin) {
       // Real-time users for admin
       const unsubscribeUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
-        setUsers(snapshot.docs.map(doc => doc.data() as User));
+        setUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User & { id: string })));
       }, (err) => handleFirestoreError(err, OperationType.LIST, 'users'));
 
       // Real-time progress for all users (for admin dashboard)

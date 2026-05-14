@@ -2748,6 +2748,7 @@ const AdminDashboard = ({
   const [selectedUserProgress, setSelectedUserProgress] = useState<any | null>(null);
   const [showUserForm, setShowUserForm] = useState(false);
   const [newUser, setNewUser] = useState({
+    id: '',
     fullName: '',
     phone: '',
     email: '',
@@ -2762,6 +2763,7 @@ const AdminDashboard = ({
   useEffect(() => {
     if (editingUser) {
       setNewUser({
+        id: editingUser.id || '',
         fullName: editingUser.fullName || '',
         phone: editingUser.phone || '',
         email: editingUser.email || '',
@@ -2775,6 +2777,7 @@ const AdminDashboard = ({
       setShowUserForm(true);
     } else {
       setNewUser({
+        id: '',
         fullName: '',
         phone: '',
         email: '',
@@ -3428,7 +3431,7 @@ const AdminDashboard = ({
             <div className="grid gap-4">
               {Array.isArray(allUsers) && allUsers.length > 0 ? (
                 allUsers.map(u => {
-                const userProgress = (allProgress[u.phone || ""] || {}) as UserProgress;
+                const userProgress = (allProgress[(u as any).id || u.phone || ""] || {}) as UserProgress;
                 const completedModules = Array.isArray(userProgress.completedModules) ? userProgress.completedModules : [];
                 const progressPercent = modules.length > 0 ? Math.round((completedModules.length / modules.length) * 100) : 0;
                 const lastActivity = userProgress.lastActivity;
@@ -3436,7 +3439,7 @@ const AdminDashboard = ({
                 const lastUpdated = userProgress.lastUpdated;
 
                 return (
-                  <Card key={u.phone} className="p-4 flex justify-between items-center bg-white shadow-sm border-slate-100">
+                  <Card key={(u as any).id || u.phone} className="p-4 flex justify-between items-center bg-white shadow-sm border-slate-100">
                     <div className="flex-1 min-w-0 mr-4">
                       <div className="flex items-center gap-2">
                         {!u.isAdmin && (
@@ -3457,9 +3460,13 @@ const AdminDashboard = ({
                         )}
                         <div className="min-w-0">
                           <p className="font-bold text-sm truncate">{u.fullName}</p>
-                          {lastActivity && (
+                          {lastActivity ? (
                             <p className="text-[8px] text-emerald-600 font-medium truncate italic -mt-0.5">
                               {lastActivity}
+                            </p>
+                          ) : (
+                            <p className="text-[8px] text-slate-400 font-medium truncate italic -mt-0.5">
+                              Aucune activité récente
                             </p>
                           )}
                         </div>
@@ -3468,16 +3475,12 @@ const AdminDashboard = ({
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[10px] text-slate-500 truncate">{u.phone} • {u.location}</p>
+                        <p className="text-[10px] text-slate-500 truncate">{u.phone || u.email || 'Pas de contact'} • {u.location}</p>
                         {lastUpdated ? (
                           <span className="text-[8px] text-slate-300 font-medium whitespace-nowrap">
                             • Mis à jour: {new Date(lastUpdated).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                           </span>
-                        ) : (
-                          <span className="text-[8px] text-slate-300 font-medium italic">
-                            • Aucune activité
-                          </span>
-                        )}
+                        ) : null}
                       </div>
                       
                       {!u.isAdmin && (
@@ -3504,7 +3507,7 @@ const AdminDashboard = ({
                       {!u.isAdmin && (
                         <Button variant="ghost" size="icon" className="text-red-500" onClick={() => {
                           if (confirm(`Voulez-vous vraiment supprimer l'utilisateur ${u.fullName} ?`)) {
-                            onDeleteUser(u.phone || "");
+                            onDeleteUser((u as any).id || u.phone || "");
                           }
                         }}>
                           <Trash2 size={18} />
