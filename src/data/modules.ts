@@ -389,16 +389,16 @@ Pour qu’une vente de terre soit valable et sécurisée au Bénin, il faut imp�
 L’État peut reprendre une terre pour cause de « nécessité publique » (ex: construction d'une route, d'un hôpital). Cependant, il doit obligatoirement verser une **juste et préalable indemnisation** au propriétaire (Article 22 de la Constitution).
     `,
     quiz: [
-      { id: "m6_q1", question: "En droit béninois, le droit foncier concerne principalement :", options: ["a. Les relations commerciales", "b. La propriété et l’usage des terres", "c. Les infractions pénales"], correctAnswer: 1 },
-      { id: "m6_q2", question: "Le certificat foncier permet notamment :", options: ["a. D’attester des droits sur une parcelle", "b. De dissoudre une société", "c. D’autoriser un mariage"], correctAnswer: 0 },
-      { id: "m6_q3", question: "Les conflits fonciers portent souvent sur :", options: ["a. Les successions et les limites de propriété", "b. Les contrats de travail", "c. Les infractions routières"], correctAnswer: 0 },
-      { id: "m6_q4", question: "Le droit au logement est considéré comme :", options: ["a. Un droit humain fondamental", "b. Un privilège administratif", "c. Une simple faveur de l’État"], correctAnswer: 0 },
-      { id: "m6_q5", question: "L’expropriation pour cause d’utilité publique suppose généralement :", options: ["a. Une indemnisation préalable", "b. Une sanction pénale", "c. Une décision familiale"], correctAnswer: 0 },
-      { id: "m6_q6", question: "En matière foncière, les collectivités locales peuvent :", options: ["a. Participer à la gestion du domaine foncier", "b. Rendre des décisions pénales définitives", "c. Modifier la Constitution"], correctAnswer: 0 },
-      { id: "m6_q7", question: "Les droits coutumiers sur la terre :", options: ["a. Sont totalement interdits au Bénin", "b. Peuvent être reconnus dans certaines conditions", "c. Remplacent toujours le droit écrit"], correctAnswer: 1 },
-      { id: "m6_q8", question: "Un litige foncier peut être porté devant :", options: ["a. Les juridictions compétentes", "b. Les établissements scolaires", "c. Les services de santé"], correctAnswer: 0 },
-      { id: "m6_q9", question: "La sécurisation foncière vise notamment à :", options: ["a. Prévenir les conflits liés à la terre", "b. Supprimer les titres de propriété", "c. Interdire l’agriculture"], correctAnswer: 0 },
-      { id: "m6_q10", question: "Le respect des droits humains en matière foncière implique :", options: ["a. La protection contre les expulsions arbitraires", "b. L’interdiction de toute vente de terrain", "c. La suppression des droits successoraux"], correctAnswer: 0 }
+      { id: "m6_q1", question: "En droit béninois, le droit foncier concerne principalement :", options: ["a) Les relations commerciales", "b) La propriété et l’usage des terres", "c) Les infractions pénales"], correctAnswer: 1 },
+      { id: "m6_q2", question: "Le certificat foncier permet notamment :", options: ["a) D’attester des droits sur une parcelle", "b) De dissoudre une société", "c) D’autoriser un mariage"], correctAnswer: 0 },
+      { id: "m6_q3", question: "Les conflits fonciers portant souvent sur :", options: ["a) Les successions et les limites de propriété", "b) Les contrats de travail", "c) Les infractions routières"], correctAnswer: 0 },
+      { id: "m6_q4", question: "Le droit au logement est considéré comme :", options: ["a) Un droit humain fondamental", "b) Un privilège administratif", "c) Une simple faveur de l’État"], correctAnswer: 0 },
+      { id: "m6_q5", question: "L’expropriation pour cause d’utilité publique suppose généralement :", options: ["a) Une indemnisation préalable", "b) Une sanction pénale", "c) Une décision familiale"], correctAnswer: 0 },
+      { id: "m6_q6", question: "En matière foncière, les collectivités locales peuvent :", options: ["a) Participer à la gestion du domaine foncier", "b) Rendre des décisions pénales définitives", "c) Modifier la Constitution"], correctAnswer: 0 },
+      { id: "m6_q7", question: "Les droits coutumiers sur la terre :", options: ["a) Sont totalement interdits au Bénin", "b) Peuvent être reconnus dans certaines conditions", "c) Remplacent toujours le droit écrit"], correctAnswer: 1 },
+      { id: "m6_q8", question: "Un litige foncier peut être porté devant :", options: ["a) Les juridictions compétentes", "b) Les établissements scolaires", "c) Les services de santé"], correctAnswer: 0 },
+      { id: "m6_q9", question: "La sécurisation foncière vise notamment à :", options: ["a) Prévenir les conflits liés à la terre", "b) Supprimer les titres de propriété", "c) Interdire l’agriculture"], correctAnswer: 0 },
+      { id: "m6_q10", question: "Le respect des droits humains en matière foncière implique :", options: ["a) La protection contre les expulsions arbitraires", "b) L’interdiction de toute vente de terrain", "c) La suppression des droits successoraux"], correctAnswer: 0 }
     ],
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
   },

@@ -1302,11 +1302,11 @@ const FinalExamScreen = ({
   const [step, setStep] = useState<'intro' | 'exam' | 'result'>('intro');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
+  const [timeLeft, setTimeLeft] = useState(900); // 15 minutes
 
   // Generate random questions from all modules or use dedicated final exam questions
   const [examQuestions] = useState(() => {
-    return [...FINAL_EXAM_QUESTIONS].sort(() => 0.5 - Math.random()).slice(0, 15);
+    return [...FINAL_EXAM_QUESTIONS].sort(() => 0.5 - Math.random()).slice(0, 20);
   });
 
   useEffect(() => {
@@ -1376,8 +1376,8 @@ const FinalExamScreen = ({
         </div>
         <h2 className="text-2xl font-bold mb-4">Examen Final de Certification</h2>
         <p className="text-slate-500 mb-8 max-w-xs">
-          Cet examen comporte 15 questions couvrant l'ensemble de la formation. Vous avez 10 minutes pour terminer.
-          {FINAL_EXAM_QUESTIONS.length > 15 && (
+          Cet examen comporte 20 questions couvrant l'ensemble de la formation. Vous avez 15 minutes pour terminer.
+          {FINAL_EXAM_QUESTIONS.length > 20 && (
              <p className="text-slate-501 mt-2">Note: Les questions sont tirées aléatoirement d'une banque de {FINAL_EXAM_QUESTIONS.length} questions.</p>
           )}
         </p>
@@ -1394,7 +1394,16 @@ const FinalExamScreen = ({
   }
 
   if (step === 'result') {
-    const score = Math.round((answers.filter((a, i) => a === examQuestions[i].correctAnswer).length / examQuestions.length) * 100);
+    const score = Math.round((examQuestions.filter((q, i) => {
+      const answer = answers[i];
+      if (Array.isArray(q.correctAnswer)) {
+        const userAnswer = Array.isArray(answer) ? answer : [];
+        return userAnswer.length === q.correctAnswer.length && 
+               userAnswer.every(val => (q.correctAnswer as number[]).includes(val));
+      }
+      return answer === q.correctAnswer;
+    }).length / examQuestions.length) * 100);
+
     return (
       <div className="h-full bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
         <div className={cn(
@@ -2052,6 +2061,12 @@ const ModuleDetail = ({
     doc.save(`Cours_Module_${module.id}.pdf`);
   };
 
+  useEffect(() => {
+    if (audioRef.current && audioCurrentTime > 0 && !audioPlaying) {
+      audioRef.current.currentTime = audioCurrentTime;
+    }
+  }, [view]);
+
   const toggleAudio = () => {
     if (audioRef.current) {
       if (audioPlaying) {
@@ -2302,6 +2317,20 @@ const ModuleDetail = ({
                       Passer au Quiz d'évaluation
                     </Button>
                   )}
+                  {user.preferredLanguage !== 'fr' && module.quiz && module.quiz.length > 0 && (
+                    <Button 
+                      className={cn(
+                        "w-full h-16 text-lg font-bold rounded-2xl transition-all shadow-xl",
+                        audioFinished ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20" : "bg-slate-300 cursor-not-allowed shadow-none"
+                      )} 
+                      onClick={() => {
+                        if (audioFinished) setView('quiz');
+                      }}
+                      disabled={!audioFinished}
+                    >
+                      {audioFinished ? "Passer au Quiz d'évaluation" : "Fini l'audio d'abord"}
+                    </Button>
+                  )}
                   {module.isReporting && (
                     <Button variant="outline" className="w-full h-16 text-lg font-bold border-red-200 text-red-600 hover:bg-red-50 rounded-2xl border-2" onClick={() => setView('reporting')}>
                       Effectuer un Signalement
@@ -2334,21 +2363,29 @@ const ModuleDetail = ({
 
         {view === 'quiz' && module.quiz && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
+            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-4">
+              <p className="text-xs text-emerald-800 font-medium italic">
+                Répondez à toutes les questions. Pour les questions à choix multiples, sélectionnez toutes les bonnes réponses.
+              </p>
+            </div>
             {module.quiz.map((q, qIdx) => (
               <div key={q.id} className="space-y-4">
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start gap-3">
                   <h3 className="font-bold text-lg">{qIdx + 1}. {q.question}</h3>
                   {Array.isArray(q.correctAnswer) && (
-                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Multi-choix</span>
+                    <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-black uppercase tracking-wider shrink-0 shadow-sm border border-blue-200">
+                      Multi-choix
+                    </span>
                   )}
                 </div>
                 <div className="grid gap-3">
                   {q.options.map((opt, oIdx) => {
-                    const isSelected = Array.isArray(q.correctAnswer)
+                    const isMulti = Array.isArray(q.correctAnswer);
+                    const isSelected = isMulti
                       ? (quizAnswers[q.id] as number[])?.includes(oIdx)
                       : quizAnswers[q.id] === oIdx;
                     
-                    const isCorrect = Array.isArray(q.correctAnswer)
+                    const isCorrect = isMulti
                       ? (q.correctAnswer as number[]).includes(oIdx)
                       : q.correctAnswer === oIdx;
 
@@ -2357,7 +2394,7 @@ const ModuleDetail = ({
                         key={oIdx}
                         disabled={quizSubmitted}
                         onClick={() => {
-                          if (Array.isArray(q.correctAnswer)) {
+                          if (isMulti) {
                             const current = (quizAnswers[q.id] as number[]) || [];
                             const next = current.includes(oIdx) 
                               ? current.filter(i => i !== oIdx) 
@@ -2368,20 +2405,31 @@ const ModuleDetail = ({
                           }
                         }}
                         className={cn(
-                          "p-4 rounded-xl border text-left transition-all relative flex items-center justify-between",
+                          "p-4 rounded-xl border text-left transition-all relative flex items-center gap-3",
                           isSelected 
-                            ? "border-emerald-500 bg-emerald-50 text-emerald-700 font-medium" 
-                            : "border-slate-200 hover:border-slate-300",
-                          quizSubmitted && isCorrect && "border-emerald-500 bg-emerald-100",
-                          quizSubmitted && isSelected && !isCorrect && "border-red-500 bg-red-50"
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-700 font-medium ring-1 ring-emerald-500/20 shadow-sm" 
+                            : "border-slate-200 hover:border-slate-300 bg-white shadow-sm hover:shadow-md",
+                          quizSubmitted && isCorrect && "border-emerald-500 bg-emerald-100 ring-2 ring-emerald-500/30",
+                          quizSubmitted && isSelected && !isCorrect && "border-red-500 bg-red-50 ring-2 ring-red-500/30",
+                          !isSelected && quizSubmitted && isCorrect && "bg-emerald-50 ring-2 ring-emerald-200"
                         )}
                       >
-                        <span>{opt}</span>
-                        {isSelected && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 ml-2" />}
+                        <div className={cn(
+                          "w-5 h-5 flex items-center justify-center shrink-0 transition-all",
+                          isMulti ? "rounded-md" : "rounded-full",
+                          isSelected ? "bg-emerald-500 border-emerald-500" : "border-2 border-slate-200"
+                        )}>
+                          {isSelected && <CheckCircle2 size={12} className="text-white" />}
+                        </div>
+                        <span className="flex-1">{opt}</span>
+                        {quizSubmitted && isCorrect && <span className="text-[8px] font-bold text-emerald-600 uppercase bg-white px-1.5 py-0.5 rounded border border-emerald-200">Bonne réponse</span>}
                       </button>
                     );
                   })}
                 </div>
+                {Array.isArray(q.correctAnswer) && (
+                  <p className="text-[10px] text-slate-400 font-medium italic ml-1">Plusieurs réponses peuvent être correctes.</p>
+                )}
               </div>
             ))}
             
@@ -3977,39 +4025,75 @@ const AdminDashboard = ({
                         >
                           <Trash2 size={14} />
                         </button>
-                        <Input 
-                          label={`Question ${idx + 1}`} 
-                          value={q.question} 
-                          onChange={e => {
-                            const newQuiz = [...(editingModule.quiz || [])];
-                            newQuiz[idx].question = e.target.value;
-                            setEditingModule({...editingModule, quiz: newQuiz});
-                          }}
-                        />
+                        <div className="flex justify-between items-center mb-2">
+                           <div className="flex-1">
+                             <Input 
+                               label={`Question ${idx + 1}`} 
+                               value={q.question} 
+                               onChange={e => {
+                                 const newQuiz = [...(editingModule.quiz || [])];
+                                 newQuiz[idx].question = e.target.value;
+                                 setEditingModule({...editingModule, quiz: newQuiz});
+                               }}
+                             />
+                           </div>
+                           <div className="flex items-center gap-2 ml-4 self-end h-10 px-3 bg-white rounded-lg border border-slate-200">
+                             <input 
+                               type="checkbox" 
+                               id={`isMulti-${q.id}`}
+                               checked={Array.isArray(q.correctAnswer)}
+                               onChange={(e) => {
+                                 const newQuiz = [...(editingModule.quiz || [])];
+                                 if (e.target.checked) {
+                                   newQuiz[idx].correctAnswer = [newQuiz[idx].correctAnswer as number];
+                                 } else {
+                                   newQuiz[idx].correctAnswer = Array.isArray(newQuiz[idx].correctAnswer) ? newQuiz[idx].correctAnswer[0] : newQuiz[idx].correctAnswer;
+                                 }
+                                 setEditingModule({...editingModule, quiz: newQuiz});
+                               }}
+                             />
+                             <label htmlFor={`isMulti-${q.id}`} className="text-[10px] font-bold text-slate-500 uppercase">Plusieurs réponses</label>
+                           </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-2">
-                          {q.options.map((opt, oIdx) => (
-                            <div key={oIdx} className="flex items-center gap-2">
-                              <input 
-                                type="radio" 
-                                name={`correct-${q.id}`} 
-                                checked={q.correctAnswer === oIdx}
-                                onChange={() => {
-                                  const newQuiz = [...(editingModule.quiz || [])];
-                                  newQuiz[idx].correctAnswer = oIdx;
-                                  setEditingModule({...editingModule, quiz: newQuiz});
-                                }}
-                              />
-                              <input 
-                                className="flex-1 text-xs p-2 border rounded"
-                                value={opt}
-                                onChange={e => {
-                                  const newQuiz = [...(editingModule.quiz || [])];
-                                  newQuiz[idx].options[oIdx] = e.target.value;
-                                  setEditingModule({...editingModule, quiz: newQuiz});
-                                }}
-                              />
-                            </div>
-                          ))}
+                          {q.options.map((opt, oIdx) => {
+                            const isMulti = Array.isArray(q.correctAnswer);
+                            const isSelected = isMulti 
+                              ? (q.correctAnswer as number[]).includes(oIdx)
+                              : q.correctAnswer === oIdx;
+
+                            return (
+                              <div key={oIdx} className="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-100">
+                                <input 
+                                  type={isMulti ? "checkbox" : "radio"} 
+                                  name={`correct-${q.id}`} 
+                                  checked={isSelected}
+                                  onChange={() => {
+                                    const newQuiz = [...(editingModule.quiz || [])];
+                                    if (isMulti) {
+                                      const current = (newQuiz[idx].correctAnswer as number[]) || [];
+                                      const next = current.includes(oIdx)
+                                        ? current.filter(v => v !== oIdx)
+                                        : [...current, oIdx];
+                                      newQuiz[idx].correctAnswer = next;
+                                    } else {
+                                      newQuiz[idx].correctAnswer = oIdx;
+                                    }
+                                    setEditingModule({...editingModule, quiz: newQuiz});
+                                  }}
+                                />
+                                <input 
+                                  className="flex-1 text-xs p-2 border-none bg-transparent outline-none"
+                                  value={opt}
+                                  onChange={e => {
+                                    const newQuiz = [...(editingModule.quiz || [])];
+                                    newQuiz[idx].options[oIdx] = e.target.value;
+                                    setEditingModule({...editingModule, quiz: newQuiz});
+                                  }}
+                                />
+                              </div>
+                            );
+                          })}
                           <button 
                             type="button"
                             className="text-[10px] text-emerald-600 font-bold"
