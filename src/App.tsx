@@ -3532,7 +3532,7 @@ const AdminDashboard = ({
                   <div className="flex justify-between items-center border-b border-slate-100 pb-4">
                     <div>
                       <h3 className="font-bold text-lg">{selectedUserProgress.fullName}</h3>
-                      <p className="text-xs text-slate-500">{selectedUserProgress.phone} • Progression détaillée</p>
+                      <p className="text-xs text-slate-500">{selectedUserProgress.phone || selectedUserProgress.email || 'Pas de contact'} • Progression détaillée</p>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => setSelectedUserProgress(null)}>
                       <X size={20} />
@@ -4197,7 +4197,7 @@ const SettingsScreen = ({
           </div>
           <div>
             <h3 className="font-bold">{user.fullName}</h3>
-            <p className="text-xs text-slate-500">{user.phone} • {user.location}</p>
+            <p className="text-xs text-slate-500">{user.phone || user.email || 'Pas de contact'} • {user.location}</p>
           </div>
         </Card>
 
