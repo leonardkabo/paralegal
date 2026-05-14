@@ -93,6 +93,8 @@ import { ProgressBar } from './components/ProgressBar';
 import { useAppState } from './hooks/useAppState';
 import { cn } from './lib/utils';
 
+import { FINAL_EXAM_QUESTIONS } from './data/finalExam';
+
 // Helper for reverse geocoding
 const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
   try {
@@ -1302,10 +1304,9 @@ const FinalExamScreen = ({
   const [answers, setAnswers] = useState<number[]>([]);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
 
-  // Generate 10 random questions from all modules
+  // Generate random questions from all modules or use dedicated final exam questions
   const [examQuestions] = useState(() => {
-    const allQuestions = modules.flatMap(m => m.quiz || []);
-    return allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+    return [...FINAL_EXAM_QUESTIONS].sort(() => 0.5 - Math.random()).slice(0, 15);
   });
 
   useEffect(() => {
@@ -1319,19 +1320,42 @@ const FinalExamScreen = ({
   }, [step, timeLeft]);
 
   const handleAnswer = (index: number) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = index;
-    setAnswers(newAnswers);
-
-    if (currentQuestion < examQuestions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
+    const q = examQuestions[currentQuestion];
+    const isMulti = Array.isArray(q.correctAnswer);
+    
+    if (isMulti) {
+      const currentAnswers = (answers[currentQuestion] as unknown as number[]) || [];
+      const newAnswers = currentAnswers.includes(index)
+        ? currentAnswers.filter(a => a !== index)
+        : [...currentAnswers, index];
+      
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentQuestion] = newAnswers as any;
+      setAnswers(updatedAnswers);
+    } else {
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentQuestion] = index;
+      setAnswers(updatedAnswers);
+      
+      // Auto-advance for single choice
+      if (currentQuestion < examQuestions.length - 1) {
+        setTimeout(() => setCurrentQuestion(prev => prev + 1), 300);
+      }
     }
   };
 
   const handleFinish = () => {
     let correct = 0;
     examQuestions.forEach((q, i) => {
-      if (answers[i] === q.correctAnswer) correct++;
+      const answer = answers[i];
+      if (Array.isArray(q.correctAnswer)) {
+        const userAnswer = Array.isArray(answer) ? answer : [];
+        const isCorrect = userAnswer.length === q.correctAnswer.length && 
+                         userAnswer.every(val => (q.correctAnswer as number[]).includes(val));
+        if (isCorrect) correct++;
+      } else {
+        if (answer === q.correctAnswer) correct++;
+      }
     });
     const score = Math.round((correct / examQuestions.length) * 100);
     onComplete(score);
@@ -1352,7 +1376,10 @@ const FinalExamScreen = ({
         </div>
         <h2 className="text-2xl font-bold mb-4">Examen Final de Certification</h2>
         <p className="text-slate-500 mb-8 max-w-xs">
-          Cet examen comporte 10 questions aléatoires couvrant l'ensemble de la formation. Vous avez 10 minutes pour terminer.
+          Cet examen comporte 15 questions couvrant l'ensemble de la formation. Vous avez 10 minutes pour terminer.
+          {FINAL_EXAM_QUESTIONS.length > 15 && (
+             <p className="text-slate-501 mt-2">Note: Les questions sont tirées aléatoirement d'une banque de {FINAL_EXAM_QUESTIONS.length} questions.</p>
+          )}
         </p>
         <div className="space-y-3 w-full max-w-xs">
           <Button className="w-full py-6 rounded-2xl" onClick={() => setStep('exam')}>
@@ -1403,7 +1430,7 @@ const FinalExamScreen = ({
     <div className="h-full bg-white flex flex-col">
       <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <span className="text-xs font-bold text-slate-400">Question {currentQuestion + 1}/10</span>
+          <span className="text-xs font-bold text-slate-400">Question {currentQuestion + 1}/{examQuestions.length}</span>
         </div>
         <div className={cn(
           "flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold",
@@ -1420,21 +1447,33 @@ const FinalExamScreen = ({
         </h3>
 
         <div className="space-y-3">
-          {examQuestions[currentQuestion].options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => handleAnswer(i)}
-              className={cn(
-                "w-full p-5 rounded-2xl text-left text-sm transition-all border-2",
-                answers[currentQuestion] === i 
-                  ? "border-emerald-500 bg-emerald-50 text-emerald-900" 
-                  : "border-slate-100 bg-white hover:border-slate-200"
-              )}
-            >
-              {opt}
-            </button>
-          ))}
+          {examQuestions[currentQuestion].options.map((opt, i) => {
+            const isSelected = Array.isArray(examQuestions[currentQuestion].correctAnswer)
+              ? (answers[currentQuestion] as unknown as number[])?.includes(i)
+              : answers[currentQuestion] === i;
+              
+            return (
+              <button
+                key={i}
+                onClick={() => handleAnswer(i)}
+                className={cn(
+                  "w-full p-5 rounded-2xl text-left text-sm transition-all border-2",
+                  isSelected 
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-900" 
+                    : "border-slate-100 bg-white hover:border-slate-200"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{opt}</span>
+                  {isSelected && <CheckCircle2 size={18} className="text-emerald-500" />}
+                </div>
+              </button>
+            );
+          })}
         </div>
+        {Array.isArray(examQuestions[currentQuestion].correctAnswer) && (
+          <p className="text-xs text-slate-500 italic">Cette question peut avoir plusieurs bonnes réponses.</p>
+        )}
       </div>
 
       <div className="p-6 border-t border-slate-100 flex justify-between items-center">
@@ -1876,7 +1915,7 @@ const ModuleDetail = ({
   onComplete: (score?: number) => void 
 }) => {
   const [view, setView] = useState<'content' | 'quiz' | 'reporting'>('content');
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number | number[]>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioDuration, setAudioDuration] = useState(0);
@@ -1966,7 +2005,15 @@ const ModuleDetail = ({
     if (!module.quiz) return;
     let correct = 0;
     module.quiz.forEach(q => {
-      if (quizAnswers[q.id] === q.correctAnswer) correct++;
+      const answer = quizAnswers[q.id];
+      if (Array.isArray(q.correctAnswer)) {
+        const userAnswer = Array.isArray(answer) ? (answer as number[]) : [];
+        const isCorrect = userAnswer.length === q.correctAnswer.length && 
+                         userAnswer.every(val => (q.correctAnswer as number[]).includes(val));
+        if (isCorrect) correct++;
+      } else {
+        if (answer === q.correctAnswer) correct++;
+      }
     });
     const score = (correct / module.quiz.length) * 100;
     setQuizSubmitted(true);
@@ -2289,25 +2336,51 @@ const ModuleDetail = ({
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
             {module.quiz.map((q, qIdx) => (
               <div key={q.id} className="space-y-4">
-                <h3 className="font-bold text-lg">{qIdx + 1}. {q.question}</h3>
+                <div className="flex justify-between items-start">
+                  <h3 className="font-bold text-lg">{qIdx + 1}. {q.question}</h3>
+                  {Array.isArray(q.correctAnswer) && (
+                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Multi-choix</span>
+                  )}
+                </div>
                 <div className="grid gap-3">
-                  {q.options.map((opt, oIdx) => (
-                    <button
-                      key={oIdx}
-                      disabled={quizSubmitted}
-                      onClick={() => setQuizAnswers({ ...quizAnswers, [q.id]: oIdx })}
-                      className={cn(
-                        "p-4 rounded-xl border text-left transition-all",
-                        quizAnswers[q.id] === oIdx 
-                          ? "border-emerald-500 bg-emerald-50 text-emerald-700 font-medium" 
-                          : "border-slate-200 hover:border-slate-300",
-                        quizSubmitted && oIdx === q.correctAnswer && "border-emerald-500 bg-emerald-50",
-                        quizSubmitted && quizAnswers[q.id] === oIdx && oIdx !== q.correctAnswer && "border-red-500 bg-red-50"
-                      )}
-                    >
-                      {opt}
-                    </button>
-                  ))}
+                  {q.options.map((opt, oIdx) => {
+                    const isSelected = Array.isArray(q.correctAnswer)
+                      ? (quizAnswers[q.id] as number[])?.includes(oIdx)
+                      : quizAnswers[q.id] === oIdx;
+                    
+                    const isCorrect = Array.isArray(q.correctAnswer)
+                      ? (q.correctAnswer as number[]).includes(oIdx)
+                      : q.correctAnswer === oIdx;
+
+                    return (
+                      <button
+                        key={oIdx}
+                        disabled={quizSubmitted}
+                        onClick={() => {
+                          if (Array.isArray(q.correctAnswer)) {
+                            const current = (quizAnswers[q.id] as number[]) || [];
+                            const next = current.includes(oIdx) 
+                              ? current.filter(i => i !== oIdx) 
+                              : [...current, oIdx];
+                            setQuizAnswers({ ...quizAnswers, [q.id]: next });
+                          } else {
+                            setQuizAnswers({ ...quizAnswers, [q.id]: oIdx });
+                          }
+                        }}
+                        className={cn(
+                          "p-4 rounded-xl border text-left transition-all relative flex items-center justify-between",
+                          isSelected 
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-700 font-medium" 
+                            : "border-slate-200 hover:border-slate-300",
+                          quizSubmitted && isCorrect && "border-emerald-500 bg-emerald-100",
+                          quizSubmitted && isSelected && !isCorrect && "border-red-500 bg-red-50"
+                        )}
+                      >
+                        <span>{opt}</span>
+                        {isSelected && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 ml-2" />}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}

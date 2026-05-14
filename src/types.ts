@@ -17,7 +17,7 @@ export interface QuizQuestion {
   id: string;
   question: string;
   options: string[];
-  correctAnswer: number;
+  correctAnswer: number | number[];
 }
 
 export interface Attachment {
