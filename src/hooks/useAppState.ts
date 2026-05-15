@@ -67,6 +67,7 @@ export function useAppState(): AppState {
       try {
         const p = JSON.parse(cache_progres);
         return {
+          phone: p.phone || '',
           completedModules: p.completedModules || [],
           quizScores: p.quizScores || {},
           audioListened: p.audioListened || {},
@@ -84,6 +85,7 @@ export function useAppState(): AppState {
     
     // Valeurs par défaut si c'est la toute première fois
     return {
+      phone: '',
       completedModules: [],
       quizScores: {},
       audioListened: {},
@@ -441,22 +443,29 @@ export function useAppState(): AppState {
         return;
       }
 
-      // Determine Auth Email
+      // Determine Auth Email and User ID
       let authEmail = userData.email || "";
-      if (userData.phone && !authEmail) {
-        const normalizedPhone = userData.phone.replace(/[+\s]/g, '');
+      const normalizedPhone = userData.phone ? normalizePhone(userData.phone) : "";
+      
+      if (normalizedPhone && !authEmail) {
         authEmail = `${normalizedPhone}@paralegal.bj`;
+      }
+      
+      if (!authEmail) {
+        setError("Email ou téléphone manquant.");
+        setIsLoading(false);
+        return;
       }
 
       const password = userData.password || "password123";
       
-      // Use phone as ID if available, otherwise email
-      const userId = userData.phone || userData.email!;
+      // Use normalized phone as ID if available, otherwise email
+      const userId = normalizedPhone || userData.email!;
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
       
       if (userSnap.exists()) {
-        setError("Cet identifiant est déjà utilisé.");
+        setError("Un compte avec ce numéro ou cet email existe déjà.");
         setIsLoading(false);
         return;
       }
@@ -471,15 +480,23 @@ export function useAppState(): AppState {
           return;
         }
         if (authErr.code === 'auth/email-already-in-use') {
-          setError("Cet email ou document est déjà utilisé.");
+          setError("Cet email ou numéro de téléphone est déjà rattaché à un compte.");
           setIsLoading(false);
           return;
         }
-        throw authErr;
+        if (authErr.code === 'auth/invalid-email') {
+          setError("L'adresse email formatée est invalide.");
+          setIsLoading(false);
+          return;
+        }
+        setError("Erreur d'authentification: " + authErr.message);
+        setIsLoading(false);
+        return;
       }
 
       const fullUser: User = { 
         ...userData, 
+        phone: normalizedPhone || userData.phone, // Store normalized phone
         preferredLanguage: 'fr',
         isAdmin: false
       };
@@ -495,13 +512,15 @@ export function useAppState(): AppState {
         completedCaseStudies: [],
         lastActivity: 'Inscription réussie',
         lastUpdated: new Date().toISOString(),
-        lastModuleId: 0
+        lastModuleId: 0,
+        phone: normalizedPhone || userData.phone
       };
       await setDoc(progressRef, initialProgress);
       
       setUser({ ...fullUser, id: userId });
     } catch (err: any) {
-      handleFirestoreError(err, OperationType.CREATE, 'users');
+      console.error("Registration error:", err);
+      setError("Une erreur est survenue lors de l'enregistrement de vos données.");
     } finally {
       setIsLoading(false);
     }
@@ -519,60 +538,59 @@ export function useAppState(): AppState {
         return;
       }
 
-      let authEmail = identifier;
-      let targetUserDoc: User | null = null;
+    const normalizedPhone = identifier.replace(/[+\s]/g, '');
+    const authEmailFromPhone = `${normalizedPhone}@paralegal.bj`;
 
-      // 1. Try to find user in Firestore to see if they have a real email
-      const userRef = doc(db, 'users', identifier);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        targetUserDoc = userSnap.data() as User;
-        if (targetUserDoc.email && !identifier.includes('@')) {
-          authEmail = targetUserDoc.email;
-        }
-      }
-
-      // 2. If no doc found or no email, and it's a phone, use virtual email
-      if (!identifier.includes('@') && authEmail === identifier) {
-        const normalizedPhone = identifier.replace(/[+\s]/g, '');
-        authEmail = `${normalizedPhone}@paralegal.bj`;
-      }
-      
+    try {
+      // 1. Try with exact identifier (might be email or raw phone from old records)
+      await signInWithEmailAndPassword(auth, identifier, password);
+    } catch (authErr1: any) {
       try {
-        await signInWithEmailAndPassword(auth, authEmail, password);
-      } catch (authErr: any) {
-        if (authErr.code === 'auth/operation-not-allowed') {
+        // 2. Try with normalized virtual email (new standard)
+        await signInWithEmailAndPassword(auth, authEmailFromPhone, password);
+      } catch (authErr2: any) {
+        if (authErr2.code === 'auth/operation-not-allowed') {
           setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
           setIsLoading(false);
           return;
         }
         
-        // Migration/Fallback check (if not found in Auth, check if we need to migrate)
-        if (targetUserDoc && targetUserDoc.password === password) {
-          try {
-            await createUserWithEmailAndPassword(auth, authEmail, password);
-            return;
-          } catch (createErr: any) {
-            if (createErr.code === 'auth/operation-not-allowed') {
-              setError("ERREUR CONFIGURATION.");
-              setIsLoading(false);
-              return;
+        // Fallback for students who might be in Firestore but not in Auth yet (Migration)
+        // Search by phone or email
+        const usersCol = collection(db, 'users');
+        const qPhone = query(usersCol, where('phone', '==', identifier));
+        const qEmail = query(usersCol, where('email', '==', identifier));
+        
+        const [snapPhone, snapEmail] = await Promise.all([getDocs(qPhone), getDocs(qEmail)]);
+        const userDoc = !snapPhone.empty ? snapPhone.docs[0] : (!snapEmail.empty ? snapEmail.docs[0] : null);
+        
+        if (userDoc) {
+          const userData = userDoc.data() as User;
+          if (userData.password === password) {
+            // Found in DB with correct password, but Auth failed. Let's try to create the Auth account.
+            const targetEmail = userData.email || `${normalizePhone(userData.phone)}@paralegal.bj`;
+            try {
+              await createUserWithEmailAndPassword(auth, targetEmail, password);
+              return; // onAuthStateChanged will handle the rest
+            } catch (createErr: any) {
+              console.error("Migration error:", createErr);
             }
-            throw createErr;
           }
         }
-        throw authErr;
+
+        if (authErr2.code === 'auth/user-not-found' || authErr2.code === 'auth/wrong-password' || authErr2.code === 'auth/invalid-credential' || authErr2.code === 'auth/invalid-email') {
+          setError("L'email/téléphone ou le mot de passe est incorrect.");
+        } else {
+          setError("Une erreur est parvenue lors de la connexion: " + authErr2.message);
+        }
       }
-    } catch (err: any) {
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        setError("Identifiants incorrects");
-      } else {
-        handleFirestoreError(err, OperationType.GET, 'users');
-      }
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } catch (err: any) {
+    setError("Erreur système: " + err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const loginWithGoogle = async () => {
     setIsLoading(true);
@@ -712,6 +730,7 @@ export function useAppState(): AppState {
     lastSyncedRef.current = '';
     setUser(null);
     setProgress({ 
+      phone: '',
       completedModules: [], 
       quizScores: {}, 
       audioListened: {},
@@ -742,6 +761,7 @@ export function useAppState(): AppState {
       if (isNew) {
         // Initialize progress for new users created by admin
         const initialProgress: UserProgress = {
+          phone: userId,
           completedModules: [],
           quizScores: {},
           audioListened: {},

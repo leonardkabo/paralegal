@@ -94,6 +94,7 @@ export interface CaseStudy {
 }
 
 export interface UserProgress {
+  phone: string; // User primary phone number
   completedModules: number[]; // IDs of completed modules
   quizScores: Record<number, number>; // Module ID -> Score percentage
   audioListened: Record<number, boolean>; // Module ID -> Is fully listened
