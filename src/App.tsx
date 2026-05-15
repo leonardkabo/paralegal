@@ -1829,12 +1829,6 @@ const Dashboard = ({
         )}
       </div>
       
-      <div className="mt-12 mb-24 text-center px-6">
-        <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest italic">
-          "Code 17 puits dans 10 villages en 1995"
-        </p>
-        <p className="text-[8px] text-slate-400 mt-1">Signé : Léonard KABO</p>
-      </div>
     </div>
   );
 };
@@ -4648,11 +4642,10 @@ export default function App() {
 
   const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'reporting' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
-  const [showIntro, setShowIntro] = useState(false);
 
   useEffect(() => {
     if (user && !localStorage.getItem('paralegal_intro_seen')) {
-      setShowIntro(true);
+      localStorage.setItem('paralegal_intro_seen', 'true');
     }
   }, [user]);
 
@@ -4667,7 +4660,6 @@ export default function App() {
   const handleLanguageSelect = (lang: Language) => {
     setLanguage(lang);
     localStorage.setItem('paralegal_intro_seen', 'true');
-    setShowIntro(false);
   };
 
   const handleModuleSelect = (m: Module) => {
@@ -4688,10 +4680,6 @@ export default function App() {
         error={error} 
       />
     );
-  }
-
-  if (showIntro) {
-    return <LanguageSelectionScreen onSelect={handleLanguageSelect} />;
   }
 
   return (
