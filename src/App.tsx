@@ -1,6 +1,14 @@
 /**
- * @license
- * SPDX-License-Identifier: Apache-2.0
+ * =========================================================================
+ * APPLICATION PARALEGAL - BENIN
+ * =========================================================================
+ * Code 17 puis dans 10 villages en 1995
+ * Date de création: 2025 (dernière mise à jour: 2026)
+ * Description: Application mobile pour la formation des parajuristes
+ * sur les thématiques de santé, droit foncier et violences basées sur le genre.
+ * 
+ * Signature numérique: L. KABO
+ * =========================================================================
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -2678,6 +2686,10 @@ const ModuleDetail = ({
   );
 };
 
+// =========================================================================
+// MON DASHBOARD D'ADMINISTRATION - PAR LEONARD KABO
+// C'est ici que je gère tous les utilisateurs et leurs progrès.
+// =========================================================================
 const AdminDashboard = ({ 
   onBack, 
   modules, 
@@ -2725,7 +2737,10 @@ const AdminDashboard = ({
   onFetchFiles: () => Promise<any[]>,
   onDeleteFile: (filename: string) => Promise<boolean>
 }) => {
+  // Gestion de l'onglet actif dans le dashboard
   const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports' | 'media' | 'database'>('users');
+  
+  // Les états pour les formulaires d'édition
   const [reports, setReports] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
   const [dbStats, setDbStats] = useState<any>({
@@ -4359,7 +4374,13 @@ const SettingsScreen = ({
 
 // --- Main App ---
 
+// =========================================================================
+// MON APPLICATION PRINCIPALE
+// Développé avec passion par Léonard KABO.
+// C'est ici que tout se passe (navigation, écrans, etc.)
+// =========================================================================
 export default function App() {
+  // Mes hooks personnalisés pour gérer les données et Firebase
   const { 
     user, 
     users,

@@ -1,4 +1,8 @@
-
+/**
+ * ETUDES DE CAS PRATIQUES
+ * Travail réalisé par code 17 puits dans 10 villages en 1995
+ * Ces cas aident les parajuristes à s'exercer sur des situations réelles.
+ */
 export interface CaseStudy {
   id: string;
   title: string;

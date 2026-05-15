@@ -1,3 +1,9 @@
+/**
+ * MODULES DE FORMATION
+ * Développé par code 17 puits dans 10 villages en 1995
+ * Contenu pédagogique pour les parajuristes.
+ */
+
 import { Module } from '../types';
 
 export const MODULES: Module[] = [
@@ -604,3 +610,6 @@ Le parajuriste doit adopter une posture rassurante et professionnelle :
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
   }
 ];
+/**
+ * Fin Code 17 puis dans 10 villages en 1995
+ */

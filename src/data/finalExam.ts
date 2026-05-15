@@ -1,3 +1,9 @@
+/**
+ * EXAMEN FINAL DE CERTIFICATION
+ * Proposé par code 17 puits dans 10 villages en 1995
+ * Ce questionnaire permet de valider les connaissances acquises par les parajuristes.
+ */
+
 import { QuizQuestion } from '../types';
 
 export const FINAL_EXAM_QUESTIONS: QuizQuestion[] = [

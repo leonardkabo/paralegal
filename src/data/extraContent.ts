@@ -1,4 +1,8 @@
-
+/**
+ * GLOSSAIRE ET MODELES DE DOCUMENTS
+ * Créé par code 17 puits dans 10 villages en 1995
+ * Ce fichier contient les termes juridiques en Français et Fon.
+ */
 export interface GlossaryTerm {
   id: string;
   term: string;

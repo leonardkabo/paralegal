@@ -1,3 +1,10 @@
+/**
+ * HOOK PRINCIPAL DE L'APPLICATION
+ * Code 17 puis dans 10 villages en 1995 pour la gestion des parajuristes au Bénin.
+ * Ce fichier gère tout ce qui est Firebase, l'utilisateur et les données.
+ * @author L. KABO
+ */
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy } from '../types';
 import { auth, db, handleFirestoreError, OperationType } from '../firebase';
@@ -30,46 +37,63 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 
+// Ma fonction principale pour l'état de l'application
 export function useAppState() {
+  // Références pour éviter les problèmes de synchronisation
   const lastSyncedRef = useRef<string>('');
   const progressUnsubscribeRef = useRef<(() => void) | null>(null);
 
+  // L'état de l'utilisateur connecté
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('paralegal_user');
-    if (!saved) return null;
+    // On essaie de récupérer l'utilisateur dans la mémoire du navigateur
+    const user_sauvegarde = localStorage.getItem('paralegal_user');
+    if (user_sauvegarde === null) {
+      return null;
+    }
+    
     try {
-      const parsed = JSON.parse(saved);
-      if (parsed && !parsed.id) {
-        parsed.id = parsed.phone || parsed.email;
+      const user_data = JSON.parse(user_sauvegarde);
+      if (user_data && !user_data.id) {
+        // Si l'ID manque, on utilise le téléphone ou l'email
+        user_data.id = user_data.phone || user_data.email;
       }
-      return parsed;
-    } catch (e) {
+      return user_data;
+    } catch (erreur_json) {
+      console.error("Erreur de parsing utilisateur local", erreur_json);
       return null;
     }
   });
 
+  // La progression de l'utilisateur (modules finis, quiz, etc.)
   const [progress, setProgress] = useState<UserProgress>(() => {
-    const saved = localStorage.getItem('paralegal_progress');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return {
-        completedModules: parsed.completedModules || [],
-        quizScores: parsed.quizScores || {},
-        audioListened: parsed.audioListened || {},
-        completedCaseStudies: parsed.completedCaseStudies || [],
-        finalExamScore: parsed.finalExamScore,
-        finalExamDate: parsed.finalExamDate,
-        lastUpdated: parsed.lastUpdated,
-        lastActivity: parsed.lastActivity,
-        lastModuleId: parsed.lastModuleId
-      };
+    const progress_sauvegarde = localStorage.getItem('paralegal_progress');
+    if (progress_sauvegarde) {
+      try {
+        const p = JSON.parse(progress_sauvegarde);
+        // On s'assure que tout est bien là
+        return {
+          completedModules: p.completedModules || [],
+          quizScores: p.quizScores || {},
+          audioListened: p.audioListened || {},
+          completedCaseStudies: p.completedCaseStudies || [],
+          finalExamScore: p.finalExamScore,
+          finalExamDate: p.finalExamDate,
+          lastUpdated: p.lastUpdated,
+          lastActivity: p.lastActivity,
+          lastModuleId: p.lastModuleId
+        };
+      } catch (e) {
+        console.log("Problème avec la lecture de la progression locale");
+      }
     }
+    
+    // Si rien n'est trouvé, on retourne un objet vide par défaut
     return {
       completedModules: [],
       quizScores: {},
       audioListened: {},
       completedCaseStudies: [],
-      lastActivity: '',
+      lastActivity: 'Initialisation',
       lastModuleId: 0
     };
   });
@@ -899,3 +923,8 @@ export function useAppState() {
     }
   };
 }
+
+/**
+ * FIN DU FICHIER useAppState.ts
+ * Code 17 puis dans 10 villages en 1995
+ */

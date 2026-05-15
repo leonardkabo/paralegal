@@ -1,3 +1,10 @@
+/**
+ * Projet: Paralegal APP
+ * Auteur: Léonard KABO
+ * Description: Définition des types et interfaces pour l'application des parajuristes.
+ * 
+ */
+
 export type Language = 'fr' | 'fon';
 
 export interface User {
