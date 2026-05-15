@@ -19,7 +19,8 @@ service cloud.firestore {
       return isSignedIn() && (
         request.auth.uid == userId || 
         request.auth.token.email == userId ||
-        request.auth.token.email == userId + "@paralegal.bj"
+        request.auth.token.email == userId + "@paralegal.bj" ||
+        (request.resource != null && request.resource.data.email == request.auth.token.email)
       );
     }
 
@@ -58,11 +59,11 @@ service cloud.firestore {
         incoming().fullName is string && 
         incoming().fullName.size() > 0 &&
         incoming().fullName.size() < 100 &&
-        (incoming().isAdmin == false || isAdmin()); // Prevent self-elevation
+        (incoming().get('isAdmin', false) == false || isAdmin()); // Prevent self-elevation
         
       allow update: if (isOwner(userId) || isAdmin()) && (
         isAdmin() || 
-        (!incoming().diff(existing()).affectedKeys().hasAny(['isAdmin']) && incoming().isAdmin == existing().isAdmin)
+        (!incoming().diff(existing()).affectedKeys().hasAny(['isAdmin']) && incoming().get('isAdmin', false) == existing().get('isAdmin', false))
       );
     }
 

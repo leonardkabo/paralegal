@@ -514,40 +514,41 @@ export function useAppState(): AppState {
 
       // Create Firebase Auth account
       try {
-        await createUserWithEmailAndPassword(auth, authEmail, password);
+        const userCred = await createUserWithEmailAndPassword(auth, authEmail, password);
+        if (!userCred.user) {
+          throw new Error("Compte créé mais session non initialisée.");
+        }
       } catch (authErr: any) {
+        console.error("Détails erreur Auth:", authErr);
         if (authErr.code === 'auth/operation-not-allowed') {
-          setError("ERREUR SYSTEME : La méthode de connexion par email n'est pas activée. Veuillez prévenir l'administrateur.");
-          setIsLoading(false);
-          return;
+          setError("CONFIGURATION REQUISE : Le fournisseur 'Email/Mot de passe' n'est pas activé dans votre console Firebase.");
+        } else if (authErr.code === 'auth/email-already-in-use') {
+          setError("Cet identifiant (email ou numéro) est déjà lié à un compte existant. Veuillez vous connecter.");
+        } else if (authErr.code === 'auth/invalid-email') {
+          setError("Le format de l'e-mail est invalide.");
+        } else if (authErr.code === 'auth/weak-password') {
+          setError("Le mot de passe est trop court (6 caractères min).");
+        } else {
+          setError("Erreur Authentification : Assurez-vous que votre domaine est autorisé dans la console Firebase. " + authErr.message);
         }
-        if (authErr.code === 'auth/email-already-in-use') {
-          setError("Cet identifiant (email ou numéro) est déjà lié à un compte existant.");
-          setIsLoading(false);
-          return;
-        }
-        if (authErr.code === 'auth/invalid-email') {
-          setError("Le format de l'e-mail est invalide. Veuillez vérifier la saisie.");
-          setIsLoading(false);
-          return;
-        }
-        if (authErr.code === 'auth/weak-password') {
-          setError("Le mot de passe est trop court. Veuillez choisir un mot de passe plus sécurisé.");
-          setIsLoading(false);
-          return;
-        }
-        setError("Impossible de créer votre compte : " + authErr.message);
         setIsLoading(false);
         return;
       }
 
+      // Petite pause pour laisser le temps au token de se propager vers Firestore rules
+      if (!auth.currentUser) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
       const fullUser: User = { 
-        ...userData, 
-        phone: normalizedPhone || userData.phone, // Store normalized phone
+        ...userData,
+        id: userId,
+        email: rawEmail || authEmail,
+        phone: normalizedPhone || userData.phone,
         preferredLanguage: 'fr',
         isAdmin: false
       };
-      
+
       await setDoc(userRef, fullUser);
       
       // Initialize progress
