@@ -2,7 +2,7 @@
  * Projet: Paralegal APP
  * Auteur: Léonard KABO
  * Description: Définition des types et interfaces pour l'application des parajuristes.
- * 
+ * Signé: L. KABO
  */
 
 export type Language = 'fr' | 'fon';
@@ -127,4 +127,47 @@ export interface Report {
   }[];
   status: 'pending' | 'resolved' | 'dismissed';
   createdAt: string;
+}
+
+export interface AppState {
+  user: User | null;
+  users: User[];
+  allProgress: Record<string, UserProgress>;
+  progress: UserProgress;
+  modules: Module[];
+  glossary: GlossaryTerm[];
+  legalDocuments: LegalDocument[];
+  caseStudies: CaseStudy[];
+  settings: AppSettings;
+  isLoading: boolean;
+  error: string | null;
+  registerUser: (userData: any) => Promise<void>;
+  login: (identifier: string, pass: string) => Promise<void>;
+  loginWithGoogle: () => Promise<any>;
+  sendPasswordReset: (identifier: string) => Promise<boolean>;
+  setLanguage: (lang: Language) => Promise<void>;
+  completeModule: (moduleId: number, score?: number) => void;
+  markAudioListened: (moduleId: number) => void;
+  completeCaseStudy: (caseStudyId: string) => void;
+  setFinalExamScore: (score: number) => void;
+  updateLastActivity: (activity: string, moduleId: number) => void;
+  logout: () => Promise<void>;
+  deleteUser: (uid: string) => Promise<boolean>;
+  saveUser: (user: User) => Promise<boolean>;
+  saveModule: (module: Module) => Promise<boolean>;
+  deleteModule: (id: number) => Promise<boolean>;
+  saveGlossaryTerm: (term: GlossaryTerm) => Promise<boolean>;
+  deleteGlossaryTerm: (id: string) => Promise<boolean>;
+  saveLegalDocument: (doc: LegalDocument) => Promise<boolean>;
+  deleteLegalDocument: (id: string) => Promise<boolean>;
+  saveCaseStudy: (study: CaseStudy) => Promise<boolean>;
+  deleteCaseStudy: (id: string) => Promise<boolean>;
+  saveSettings: (settings: AppSettings) => Promise<boolean>;
+  changePassword: (newPass: string) => Promise<boolean>;
+  uploadFile: (file: File) => Promise<any>;
+  saveReport: (reportData: any) => Promise<boolean>;
+  isSyncing: boolean;
+  fetchFiles: () => Promise<any[]>;
+  deleteFile: (filename: string) => Promise<boolean>;
+  forceSync: () => Promise<void>;
 }

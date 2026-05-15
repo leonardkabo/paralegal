@@ -1516,7 +1516,8 @@ const Dashboard = ({
   onOpenPerformance,
   onOpenExam,
   onDownloadCertificate,
-  onForceSync
+  onForceSync,
+  updateLastActivity
 }: { 
   user: any, 
   progress: any, 
@@ -1529,7 +1530,8 @@ const Dashboard = ({
   onOpenPerformance: () => void,
   onOpenExam: () => void,
   onDownloadCertificate: () => void,
-  onForceSync: () => void
+  onForceSync: () => void,
+  updateLastActivity: (activity: string, id: number) => void
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const totalModules = modules.length;
@@ -1561,7 +1563,7 @@ const Dashboard = ({
                   className="flex items-center gap-1 text-[8px] font-bold text-emerald-500 uppercase tracking-tighter bg-emerald-50 px-1.5 py-0.5 rounded-full"
                 >
                   <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                  Synchronisation (10s)...
+                  Synchronisation en cours...
                 </motion.div>
               )}
             </div>
@@ -1649,6 +1651,47 @@ const Dashboard = ({
 
       {/* Quick Actions / Performance */}
       <div className="px-6 mb-8">
+        {/* Resume Activity Card */}
+        {progress.lastModuleId > 0 && !searchQuery && (
+          (() => {
+            const lastModule = modules.find(m => m.id === progress.lastModuleId);
+            if (!lastModule) return null;
+            const isCompleted = progress.completedModules.includes(lastModule.id);
+            
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4"
+              >
+                <Card 
+                  className="p-4 bg-emerald-50 border-emerald-100 flex items-center gap-4 cursor-pointer hover:bg-emerald-100 transition-colors shadow-sm"
+                  onClick={() => onSelectModule(lastModule)}
+                >
+                  <div className="w-12 h-12 bg-white text-emerald-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-emerald-50">
+                    <Play size={24} fill="currentColor" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Continuer mon cours</span>
+                      {isCompleted && <CheckCircle2 size={10} className="text-emerald-500" />}
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-900 truncate">
+                      {lastModule.id}. {lastModule.title}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 truncate italic">
+                      {progress.lastActivity || "Reprendre là où vous vous êtes arrêté"}
+                    </p>
+                  </div>
+                  <div className="p-2 bg-white rounded-full text-emerald-600 shadow-sm border border-emerald-50">
+                    <ChevronRight size={16} />
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          })()
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <Card 
             className="p-4 bg-purple-50 border-purple-100 cursor-pointer hover:bg-purple-100 transition-colors"
@@ -4403,6 +4446,7 @@ export default function App() {
     markAudioListened,
     completeCaseStudy,
     setFinalExamScore,
+    updateLastActivity,
     logout,
     deleteUser,
     saveUser,
@@ -4588,6 +4632,7 @@ export default function App() {
 
   const handleModuleSelect = (m: Module) => {
     setSelectedModule(m);
+    updateLastActivity(`Lecture du module: ${m.title}`, m.id);
     setCurrentScreen('module');
   };
 
@@ -4632,6 +4677,7 @@ export default function App() {
               onOpenExam={() => setCurrentScreen('exam')}
               onDownloadCertificate={generateCertificate}
               onForceSync={forceSync}
+              updateLastActivity={updateLastActivity}
             />
           </motion.div>
         )}

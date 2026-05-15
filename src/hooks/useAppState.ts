@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy } from '../types';
+import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy, AppState } from '../types';
 import { auth, db, handleFirestoreError, OperationType } from '../firebase';
 import { MODULES } from '../data/modules';
 import { CASE_STUDIES } from '../data/caseStudies';
@@ -39,7 +39,7 @@ import {
 } from 'firebase/auth';
 
 // Ma fonction principale pour l'état de l'application
-export function useAppState() {
+export function useAppState(): AppState {
   // Références pour éviter les problèmes de synchronisation
   const lastSyncedRef = useRef<string>('');
   const progressUnsubscribeRef = useRef<(() => void) | null>(null);
@@ -288,11 +288,13 @@ export function useAppState() {
           if (!matchingCodeMod) return false;
           
           // Update if question count differs
-          if (matchingCodeMod.quiz.length !== cm.quiz.length) return true;
+          const matchingQuiz = matchingCodeMod.quiz || [];
+          const cmQuiz = cm.quiz || [];
+          if (matchingQuiz.length !== cmQuiz.length) return true;
           
           // Update if labels are missing (check first option of first question as proxy)
-          const firstOpt = cm.quiz[0]?.options[0];
-          const codeFirstOpt = matchingCodeMod.quiz[0]?.options[0];
+          const firstOpt = cmQuiz[0]?.options?.[0];
+          const codeFirstOpt = matchingQuiz[0]?.options?.[0];
           if (firstOpt && codeFirstOpt && firstOpt !== codeFirstOpt) return true;
           
           return false;
@@ -695,6 +697,14 @@ export function useAppState() {
     });
   };
 
+  const updateLastActivity = (activity: string, moduleId: number) => {
+    setProgress(prev => ({
+      ...prev,
+      lastActivity: activity,
+      lastModuleId: moduleId
+    }));
+  };
+
   const logout = async () => {
     await signOut(auth);
     localStorage.removeItem('paralegal_user');
@@ -946,6 +956,7 @@ export function useAppState() {
     markAudioListened,
     completeCaseStudy,
     setFinalExamScore,
+    updateLastActivity,
     loginWithGoogle,
     logout,
     deleteUser,
@@ -980,5 +991,5 @@ export function useAppState() {
 
 /**
  * FIN DU FICHIER useAppState.ts
- * Code 17 Léonard KABO
+ * Code par Léonard KABO
  */
