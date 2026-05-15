@@ -3,7 +3,7 @@
  * APPLICATION PARALEGAL - BENIN
  * =========================================================================
  * Développé par: Léonard KABO
- * Date de création: 2025 (dernière mise à jour: 2026)
+ * Date de création: 2024 (dernière mise à jour: 2026)
  * Description: Application mobile pour la formation des parajuristes
  * sur les thématiques de santé, droit foncier et violences basées sur le genre.
  * 
@@ -1988,14 +1988,16 @@ const ModuleDetail = ({
   progress, 
   isSyncing,
   onBack, 
-  onComplete 
+  onComplete,
+  onNext
 }: { 
   module: Module, 
   user: any, 
   progress: any, 
   isSyncing: boolean,
   onBack: () => void,
-  onComplete: (score?: number) => void 
+  onComplete: (score?: number) => void,
+  onNext?: () => void 
 }) => {
   const [view, setView] = useState<'content' | 'quiz' | 'reporting'>('content');
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number | number[]>>({});
@@ -2524,15 +2526,31 @@ const ModuleDetail = ({
                   Score: {Math.round(progress.quizScores[module.id] || 0)}%
                   {(progress.quizScores[module.id] || 0) < 80 && " - Échec (80% requis)"}
                 </div>
-                <Button variant="outline" className="w-full" onClick={() => {
-                  setQuizSubmitted(false);
-                  setQuizAnswers({});
-                }}>
-                  Réessayer
-                </Button>
-                <Button className="w-full" onClick={onBack}>
-                  Retour au menu
-                </Button>
+                
+                {(progress.quizScores[module.id] || 0) >= 80 ? (
+                  <>
+                    {onNext && (
+                      <Button className="w-full h-14 text-base font-bold shadow-lg" onClick={onNext}>
+                        Passer au module suivant
+                      </Button>
+                    )}
+                    <Button variant="outline" className="w-full" onClick={onBack}>
+                      Retour au menu
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" className="w-full" onClick={() => {
+                      setQuizSubmitted(false);
+                      setQuizAnswers({});
+                    }}>
+                      Réessayer
+                    </Button>
+                    <Button className="w-full" onClick={onBack}>
+                      Retour au menu
+                    </Button>
+                  </>
+                )}
               </div>
             )}
           </motion.div>
@@ -4719,6 +4737,13 @@ export default function App() {
               progress={progress}
               isSyncing={isSyncing}
               onBack={() => setCurrentScreen('main')}
+              onNext={(() => {
+                const currentIndex = modules.findIndex(m => m.id === selectedModule.id);
+                if (currentIndex !== -1 && currentIndex < modules.length - 1) {
+                  return () => handleModuleSelect(modules[currentIndex + 1]);
+                }
+                return undefined;
+              })()}
               onComplete={(score) => {
                 if (user.preferredLanguage === 'fr') {
                   completeModule(selectedModule.id, score);
