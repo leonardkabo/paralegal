@@ -2,71 +2,76 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===============================================================
-    // Helper Functions
+    // Global Deny-All (Pillar 0)
     // ===============================================================
-    function isAuthenticated() {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===============================================================
+    // Shared Helpers (Phase 3)
+    // ===============================================================
+    function isSignedIn() {
       return request.auth != null;
     }
 
-    function isOwner(phoneOrId) {
-      return isAuthenticated() && (
-        request.auth.uid == phoneOrId ||
-        request.auth.token.email == phoneOrId ||
-        request.auth.token.email == phoneOrId + "@paralegal.bj"
+    function isOwner(userId) {
+      return isSignedIn() && (
+        request.auth.uid == userId || 
+        request.auth.token.email == userId ||
+        request.auth.token.email == userId + "@paralegal.bj"
       );
     }
 
     function isAdmin() {
-      return isAuthenticated() && (
+      return isSignedIn() && (
         request.auth.token.email == "leonardkabo32@gmail.com" ||
         request.auth.token.email == "healthaccessinitiativehai@gmail.com" ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.token.email)) && 
-         get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.isAdmin == true)
+        get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.isAdmin == true
       );
     }
 
-    // ===============================================================
-    // Domain Validators
-    // ===============================================================
-    function isValidUser(data) {
-      return data.fullName is string && data.fullName.size() > 0 &&
-             data.phone is string && data.phone.size() > 0;
-    }
-
-    function isValidProgress(data) {
-      return data.keys().hasAny(['completedModules', 'quizScores']);
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_+@.\\-]+$');
     }
 
     // ===============================================================
-    // Rules
+    // Collection Rules
     // ===============================================================
-    
+
     match /users/{userId} {
-      allow get: if true;
-      allow list: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      // Special case: allow registration (create) if data is valid
-      allow create: if isValidUser(request.resource.data);
-      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      allow delete: if isAdmin();
+      // PII Protection: Only owner or admin can read specific user profile
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      
+      // Validation for creation
+      allow create: if isSignedIn() && (isOwner(userId) || isAdmin()) &&
+        request.resource.data.fullName is string && 
+        request.resource.data.fullName.size() > 0 &&
+        request.resource.data.fullName.size() < 100;
+        
+      allow update: if (isOwner(userId) || isAdmin()) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']) || isAdmin();
     }
 
     match /progress/{userId} {
-      allow get: if true;
-      allow list: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      // Allow creation during registration or by admin
-      allow create: if isValidProgress(request.resource.data);
-      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+      // Ensure the ID is valid
+      allow create, update: if isValidId(userId);
     }
 
     match /modules/{moduleId} {
-      allow read: if true; // Modules are public content
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     match /reports/{reportId} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated();
-      allow update: if isAdmin();
+      // Anyone authenticated can create a report
+      allow create: if isSignedIn() && isValidId(reportId);
+      // Only admin or the creator can read the report
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
     }
 
     match /settings/{key} {

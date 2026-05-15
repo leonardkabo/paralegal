@@ -1,3 +1,11 @@
+/**
+ * APPLICATION PARAJURISTE BÉNIN - SERVEUR BACKEND
+ * Code écrit par Léonard KABO.
+ * Signature numérique : "Code 17 puits dans 10 villages en 1995"
+ * 
+ * Ce fichier gère l'API, la base de données SQLite (legacy) et les uploads.
+ */
+
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import Database from "better-sqlite3";
@@ -5,6 +13,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
 import fs from "fs";
+import { MODULES } from "./src/data/modules.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(__dirname, "paralegal.db");
@@ -147,13 +156,12 @@ if (settingsCount.count === 0) {
 const moduleCount = db.prepare("SELECT COUNT(*) as count FROM modules").get() as any;
 const dbVersion = db.prepare("SELECT value FROM settings WHERE key = 'db_version'").get() as any;
 
-if (moduleCount.count < 10 || !dbVersion || dbVersion.value !== '1.1') {
+if (moduleCount.count < 10 || !dbVersion || dbVersion.value !== '1.2') {
   db.prepare("DELETE FROM modules").run();
-  db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run("db_version", "1.1");
-  const initialModules = [
-      // MODULE 1: INTRODUCTION AU PARAJURISME ET EMPOWERMENT JURIDIQUE
-  {
-    id: 1,
+  db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run("db_version", "1.2");
+  const initialModules = MODULES;
+  
+  /*
     title: "Module 1 : Fondements du Parajurisme et Legal Empowerment",
     introduction: "Ce module établit les bases conceptuelles et éthiques du métier de parajuriste. Il explore la philosophie du Legal Empowerment, les principes déontologiques essentiels, et le rôle stratégique des parajuristes dans la chaîne d'accès à la justice au Bénin.",
     objectives: [
@@ -1570,15 +1578,15 @@ Félicitations ! Vous êtes désormais armés pour être des agents de changemen
       ],
       audioUrl: "", videoUrl: "", attachments: [], isReporting: 1, estimatedDuration: 120, difficultyLevel: "Débutant"
     }
-  ];
-
-  const insert = db.prepare(`
+  */
+  
+  const insertReal = db.prepare(`
     INSERT INTO modules (id, title, introduction, objectives, keyNotions, content, audioUrl, videoUrl, quiz, attachments, isReporting, estimatedDuration, difficultyLevel)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   
   for (const m of initialModules) {
-    insert.run(
+    insertReal.run(
       m.id,
       m.title,
       m.introduction,
@@ -1589,7 +1597,7 @@ Félicitations ! Vous êtes désormais armés pour être des agents de changemen
       m.videoUrl,
       JSON.stringify(m.quiz),
       JSON.stringify(m.attachments),
-      m.isReporting,
+      m.isReporting ? 1 : 0,
       m.estimatedDuration || null,
       m.difficultyLevel || null
     );
@@ -1778,58 +1786,9 @@ async function startServer() {
   app.post("/api/login", (req, res) => {
     const { phone, password } = req.body;
     
-    // Check for hardcoded admin credentials
-    const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
-    const adminPasswords = ["Kabotologue@20", "Hai@2025!"];
+    // Les comptes parajuristes se connectent ici.
+    // Les administrateurs doivent utiliser la connexion Google uniquement.
     
-    const adminIndex = adminEmails.indexOf(phone);
-    if (adminIndex !== -1 && password === adminPasswords[adminIndex]) {
-      const adminUser = {
-        phone: adminEmails[adminIndex],
-        fullName: adminIndex === 0 ? "Leonard Kabo" : "HAI Admin",
-        location: "Bénin",
-        gender: "M",
-        birthDate: "1990-01-01",
-        educationLevel: "Expert",
-        preferredLanguage: "fr",
-        isAdmin: true
-      };
-      
-      // Ensure admin has a progress entry
-      const existingUser = db.prepare("SELECT * FROM users WHERE phone = ?").get(adminUser.phone);
-      if (!existingUser) {
-        db.prepare(`
-          INSERT INTO users (phone, fullName, location, gender, birthDate, educationLevel, password, preferredLanguage, isAdmin)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
-        `).run(adminUser.phone, adminUser.fullName, adminUser.location, adminUser.gender, adminUser.birthDate, adminUser.educationLevel, adminPasswords[adminIndex], 'fr');
-      }
-
-      const existingProgress = db.prepare("SELECT * FROM progress WHERE phone = ?").get(adminUser.phone);
-      if (!existingProgress) {
-        db.prepare(`
-          INSERT INTO progress (phone, completedModules, quizScores, audioListened, completedCaseStudies)
-          VALUES (?, ?, ?, ?, ?)
-        `).run(adminUser.phone, JSON.stringify([]), JSON.stringify({}), JSON.stringify({}), JSON.stringify([]));
-      }
-
-      const progress = db.prepare("SELECT * FROM progress WHERE phone = ?").get(adminUser.phone) as any;
-      
-      return res.json({ 
-        success: true, 
-        user: adminUser,
-        progress: {
-          completedModules: JSON.parse(progress.completedModules || '[]'),
-          quizScores: JSON.parse(progress.quizScores || '{}'),
-          audioListened: JSON.parse(progress.audioListened || '{}'),
-          completedCaseStudies: JSON.parse(progress.completedCaseStudies || '[]'),
-          finalExamScore: progress.finalExamScore,
-          finalExamDate: progress.finalExamDate,
-          lastActivity: progress.lastActivity,
-          lastModuleId: progress.lastModuleId
-        }
-      });
-    }
-
     const user = db.prepare("SELECT * FROM users WHERE phone = ? AND password = ?").get(phone, password) as any;
     
     if (user) {

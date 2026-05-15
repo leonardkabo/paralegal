@@ -1,10 +1,10 @@
 /**
  * HOOK PRINCIPAL DE L'APPLICATION
- * Code 17 puis dans 10 villages en 1995 pour la gestion des parajuristes au Bénin.
+ * Créé par Léonard KABO pour la gestion des parajuristes au Bénin.
  * Ce fichier gère tout ce qui est Firebase, l'utilisateur et les données.
- * @author L. KABO
+ * @author Léonard KABO
+ * Signature numérique : "Code 17 puits dans 10 villages en 1995"
  */
-/**
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, UserProgress, Language, Module, AppSettings, Attachment, GlossaryTerm, LegalDocument, CaseStudy } from '../types';
@@ -109,10 +109,18 @@ export function useAppState() {
   });
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const normalizePhone = (p: string) => p.replace(/[+\s]/g, '').trim();
+
   // Helper to get reliable user ID
   const getUserId = (u: User | null): string | null => {
     if (!u) return null;
-    return (u as any).id || u.phone || u.email || null;
+    const rawId = (u as any).id || u.phone || u.email;
+    if (!rawId) return null;
+    // If it's a phone-like string, normalize it
+    if (typeof rawId === 'string' && /^[+0-9\s-]+$/.test(rawId)) {
+      return normalizePhone(rawId);
+    }
+    return rawId;
   };
 
   useEffect(() => {
@@ -184,6 +192,14 @@ export function useAppState() {
               email: fbUser.email
             };
             await setDoc(doc(db, 'users', fbUser.email), userData);
+          }
+        }
+
+        if (userData && fbUser.email) {
+          const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
+          if (adminEmails.includes(fbUser.email) && !userData.isAdmin) {
+            userData.isAdmin = true;
+            await updateDoc(doc(db, 'users', identifier!), { isAdmin: true });
           }
         }
 
@@ -415,6 +431,14 @@ export function useAppState() {
         return;
       }
 
+      // Bloquer les emails admin à l'inscription
+      const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
+      if (userData.email && adminEmails.includes(userData.email.toLowerCase())) {
+        setError("Cet email est réservé aux administrateurs. Veuillez utiliser la connexion Google.");
+        setIsLoading(false);
+        return;
+      }
+
       // Determine Auth Email
       let authEmail = userData.email || "";
       if (userData.phone && !authEmail) {
@@ -485,6 +509,14 @@ export function useAppState() {
     setIsLoading(true);
     setError(null);
     try {
+      // Bloquer les emails admin dans ce formulaire (doivent utiliser Google)
+      const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
+      if (adminEmails.includes(identifier.toLowerCase())) {
+        setError("Les administrateurs doivent utiliser le bouton 'Se connecter via Google'.");
+        setIsLoading(false);
+        return;
+      }
+
       let authEmail = identifier;
       let targetUserDoc: User | null = null;
 
@@ -832,14 +864,37 @@ export function useAppState() {
   const uploadFile = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch('/api/admin/upload', {
-      method: 'POST',
-      body: formData
-    });
-    if (res.ok) {
-      return await res.json();
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+      throw new Error("Upload failed");
+    } catch (err) {
+      console.error("File upload error:", err);
+      throw err;
     }
-    throw new Error("Upload failed");
+  };
+
+  const saveReport = async (reportData: any) => {
+    try {
+      const id = Math.random().toString(36).substr(2, 9);
+      const reportRef = doc(db, 'reports', id);
+      const fullReport = {
+        ...reportData,
+        id,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(reportRef, fullReport);
+      return true;
+    } catch (err) {
+      handleFirestoreError(err, OperationType.CREATE, 'reports');
+      return false;
+    }
   };
 
   const [users, setUsers] = useState<User[]>([]);
@@ -906,6 +961,7 @@ export function useAppState() {
     saveSettings,
     changePassword,
     uploadFile,
+    saveReport,
     isSyncing,
     fetchFiles: useCallback(async () => {
       const res = await fetch('/api/admin/files');
@@ -924,5 +980,5 @@ export function useAppState() {
 
 /**
  * FIN DU FICHIER useAppState.ts
- * Code par Léonard KABO
+ * Code 17 Léonard KABO
  */
