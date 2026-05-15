@@ -157,23 +157,35 @@ export function useAppState(): AppState {
     // Auth listener for persistence and real-time progress
     const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
-        let phone = '';
-        if (fbUser.email?.endsWith('@paralegal.bj')) {
-          phone = fbUser.email.split('@')[0];
-        }
-
         let userData: User | null = null;
-        const identifier = phone || fbUser.email;
-        
-        if (identifier) {
-          const userSnap = await getDoc(doc(db, 'users', identifier));
-          if (userSnap.exists()) {
-            userData = userSnap.data() as User;
+        let identifier = fbUser.uid;
+
+        // 1. Prioritize UID lookup (New standard)
+        const userUidSnap = await getDoc(doc(db, 'users', fbUser.uid));
+        if (userUidSnap.exists()) {
+          userData = userUidSnap.data() as User;
+        } else {
+          // 2. Legacy lookup (by Email or Phone ID)
+          let legacyId = '';
+          if (fbUser.email?.endsWith('@paralegal.bj')) {
+             legacyId = fbUser.email.split('@')[0];
           } else if (fbUser.email) {
-            const q = query(collection(db, 'users'), where('email', '==', fbUser.email));
-            const qSnap = await getDocs(q);
-            if (!qSnap.empty) {
-              userData = qSnap.docs[0].data() as User;
+             legacyId = fbUser.email;
+          }
+
+          if (legacyId) {
+            const legacySnap = await getDoc(doc(db, 'users', legacyId));
+            if (legacySnap.exists()) {
+              userData = legacySnap.data() as User;
+              identifier = legacyId;
+            } else if (fbUser.email) {
+              // Deep search by email field if ID lookup failed
+              const q = query(collection(db, 'users'), where('email', '==', fbUser.email));
+              const qSnap = await getDocs(q);
+              if (!qSnap.empty) {
+                userData = qSnap.docs[0].data() as User;
+                identifier = qSnap.docs[0].id;
+              }
             }
           }
         }
@@ -472,10 +484,10 @@ export function useAppState(): AppState {
       // Detailed duplicate check
       const usersCol = collection(db, 'users');
       
-      // 1. Check if the generated ID is taken
+      // 1. Check if the generated legacy ID is taken (Optional but good for fallback)
       userId = normalizedPhone || authEmail;
-      const userRef = doc(db, 'users', userId);
-      const userSnap = await getDoc(userRef);
+      const legacyUserRef = doc(db, 'users', userId);
+      const userSnap = await getDoc(legacyUserRef);
       
       if (userSnap.exists()) {
         const existingUser = userSnap.data() as User;
@@ -518,6 +530,7 @@ export function useAppState(): AppState {
         if (!userCred.user) {
           throw new Error("Compte créé mais session non initialisée.");
         }
+        userId = userCred.user.uid; // Switch to UID as the document ID for NEW users
       } catch (authErr: any) {
         console.error("Détails erreur Auth:", authErr);
         if (authErr.code === 'auth/operation-not-allowed') {
@@ -535,11 +548,9 @@ export function useAppState(): AppState {
         return;
       }
 
-      // Petite pause pour laisser le temps au token de se propager vers Firestore rules
-      if (!auth.currentUser) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-
+      // Final reference using the UID
+      const userRef = doc(db, 'users', userId);
+      
       const fullUser: User = { 
         ...userData,
         id: userId,

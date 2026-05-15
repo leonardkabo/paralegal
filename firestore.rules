@@ -16,20 +16,23 @@ service cloud.firestore {
     }
 
     function isOwner(userId) {
+      let email = request.auth.token.get('email', '');
       return isSignedIn() && (
         request.auth.uid == userId || 
-        request.auth.token.email == userId ||
-        request.auth.token.email == userId + "@paralegal.bj" ||
-        (request.resource != null && request.resource.data.email == request.auth.token.email)
+        (email != '' && email == userId) ||
+        (email != '' && email == userId + "@paralegal.bj") ||
+        (request.resource != null && request.resource.data.get('email', '') == email && email != '')
       );
     }
 
     function isAdmin() {
+      let email = request.auth.token.get('email', '');
       return isSignedIn() && (
-        request.auth.token.email == "leonardkabo32@gmail.com" ||
-        request.auth.token.email == "healthaccessinitiativehai@gmail.com" ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.token.email)) && 
-         get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.isAdmin == true)
+        email == "leonardkabo32@gmail.com" ||
+        email == "healthaccessinitiativehai@gmail.com" ||
+        (email != '' && 
+         exists(/databases/$(database)/documents/users/$(email)) && 
+         get(/databases/$(database)/documents/users/$(email)).data.get('isAdmin', false) == true)
       );
     }
 
