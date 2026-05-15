@@ -27,12 +27,21 @@ service cloud.firestore {
       return isSignedIn() && (
         request.auth.token.email == "leonardkabo32@gmail.com" ||
         request.auth.token.email == "healthaccessinitiativehai@gmail.com" ||
-        get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.isAdmin == true
+        (exists(/databases/$(database)/documents/users/$(request.auth.token.email)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.isAdmin == true)
       );
     }
 
     function isValidId(id) {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_+@.\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
     }
 
     // ===============================================================
@@ -46,19 +55,21 @@ service cloud.firestore {
       
       // Validation for creation
       allow create: if isSignedIn() && (isOwner(userId) || isAdmin()) &&
-        request.resource.data.fullName is string && 
-        request.resource.data.fullName.size() > 0 &&
-        request.resource.data.fullName.size() < 100;
+        incoming().fullName is string && 
+        incoming().fullName.size() > 0 &&
+        incoming().fullName.size() < 100 &&
+        (incoming().isAdmin == false || isAdmin()); // Prevent self-elevation
         
-      allow update: if (isOwner(userId) || isAdmin()) &&
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']) || isAdmin();
+      allow update: if (isOwner(userId) || isAdmin()) && (
+        isAdmin() || 
+        (!incoming().diff(existing()).affectedKeys().hasAny(['isAdmin']) && incoming().isAdmin == existing().isAdmin)
+      );
     }
 
     match /progress/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isOwner(userId) || isAdmin();
-      // Ensure the ID is valid
-      allow create, update: if isValidId(userId);
+      allow create: if isSignedIn() && isOwner(userId) && isValidId(userId);
+      allow update: if (isOwner(userId) || isAdmin()) && isValidId(userId);
     }
 
     match /modules/{moduleId} {

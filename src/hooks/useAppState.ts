@@ -428,6 +428,7 @@ export function useAppState(): AppState {
   const registerUser = async (userData: Omit<User, 'preferredLanguage'>) => {
     setIsLoading(true);
     setError(null);
+    let userId = '';
     try {
       if (!userData.phone && !userData.email) {
         setError("Veuillez renseigner au moins un numéro de téléphone ou un email.");
@@ -444,7 +445,7 @@ export function useAppState(): AppState {
       }
 
       // Determine Auth Email and User ID
-      let authEmail = userData.email || "";
+      let authEmail = (userData.email || "").toLowerCase();
       const normalizedPhone = userData.phone ? normalizePhone(userData.phone) : "";
       
       if (normalizedPhone && !authEmail) {
@@ -460,7 +461,7 @@ export function useAppState(): AppState {
       const password = userData.password || "password123";
       
       // Use normalized phone as ID if available, otherwise email
-      const userId = normalizedPhone || userData.email!;
+      userId = normalizedPhone || authEmail;
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
       
@@ -520,7 +521,7 @@ export function useAppState(): AppState {
       setUser({ ...fullUser, id: userId });
     } catch (err: any) {
       console.error("Registration error:", err);
-      setError("Une erreur est survenue lors de l'enregistrement de vos données.");
+      handleFirestoreError(err, OperationType.CREATE, `users/${userId}`);
     } finally {
       setIsLoading(false);
     }
@@ -530,67 +531,67 @@ export function useAppState(): AppState {
     setIsLoading(true);
     setError(null);
     try {
+      const cleanIdentifier = identifier.trim().toLowerCase();
       // Bloquer les emails admin dans ce formulaire (doivent utiliser Google)
       const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
-      if (adminEmails.includes(identifier.toLowerCase())) {
+      if (adminEmails.includes(cleanIdentifier)) {
         setError("Les administrateurs doivent utiliser le bouton 'Se connecter via Google'.");
         setIsLoading(false);
         return;
       }
 
-    const normalizedPhone = identifier.replace(/[+\s]/g, '');
-    const authEmailFromPhone = `${normalizedPhone}@paralegal.bj`;
+      const normalizedPhone = cleanIdentifier.replace(/[+\s]/g, '');
+      const authEmailFromPhone = `${normalizedPhone}@paralegal.bj`;
 
-    try {
-      // 1. Try with exact identifier (might be email or raw phone from old records)
-      await signInWithEmailAndPassword(auth, identifier, password);
-    } catch (authErr1: any) {
       try {
-        // 2. Try with normalized virtual email (new standard)
-        await signInWithEmailAndPassword(auth, authEmailFromPhone, password);
-      } catch (authErr2: any) {
-        if (authErr2.code === 'auth/operation-not-allowed') {
-          setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
-          setIsLoading(false);
-          return;
-        }
-        
-        // Fallback for students who might be in Firestore but not in Auth yet (Migration)
-        // Search by phone or email
-        const usersCol = collection(db, 'users');
-        const qPhone = query(usersCol, where('phone', '==', identifier));
-        const qEmail = query(usersCol, where('email', '==', identifier));
-        
-        const [snapPhone, snapEmail] = await Promise.all([getDocs(qPhone), getDocs(qEmail)]);
-        const userDoc = !snapPhone.empty ? snapPhone.docs[0] : (!snapEmail.empty ? snapEmail.docs[0] : null);
-        
-        if (userDoc) {
-          const userData = userDoc.data() as User;
-          if (userData.password === password) {
-            // Found in DB with correct password, but Auth failed. Let's try to create the Auth account.
-            const targetEmail = userData.email || `${normalizePhone(userData.phone)}@paralegal.bj`;
-            try {
-              await createUserWithEmailAndPassword(auth, targetEmail, password);
-              return; // onAuthStateChanged will handle the rest
-            } catch (createErr: any) {
-              console.error("Migration error:", createErr);
+        // 1. Try with exact identifier
+        await signInWithEmailAndPassword(auth, cleanIdentifier, password);
+      } catch (authErr1: any) {
+        try {
+          // 2. Try with normalized virtual email
+          await signInWithEmailAndPassword(auth, authEmailFromPhone, password);
+        } catch (authErr2: any) {
+          if (authErr2.code === 'auth/operation-not-allowed') {
+            setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
+            setIsLoading(false);
+            return;
+          }
+          
+          // Fallback for students: Migration check
+          const usersCol = collection(db, 'users');
+          const qPhone = query(usersCol, where('phone', '==', cleanIdentifier));
+          const qEmail = query(usersCol, where('email', '==', cleanIdentifier));
+          
+          const [snapPhone, snapEmail] = await Promise.all([getDocs(qPhone), getDocs(qEmail)]);
+          const userDoc = !snapPhone.empty ? snapPhone.docs[0] : (!snapEmail.empty ? snapEmail.docs[0] : null);
+          
+          if (userDoc) {
+            const userData = userDoc.data() as User;
+            if (userData.password === password) {
+              const targetEmail = userData.email || `${normalizePhone(userData.phone)}@paralegal.bj`;
+              try {
+                await createUserWithEmailAndPassword(auth, targetEmail, password);
+                return;
+              } catch (createErr: any) {
+                console.error("Migration error:", createErr);
+              }
             }
           }
-        }
 
-        if (authErr2.code === 'auth/user-not-found' || authErr2.code === 'auth/wrong-password' || authErr2.code === 'auth/invalid-credential' || authErr2.code === 'auth/invalid-email') {
-          setError("L'email/téléphone ou le mot de passe est incorrect.");
-        } else {
-          setError("Une erreur est parvenue lors de la connexion: " + authErr2.message);
+          if (authErr2.code === 'auth/user-not-found' || authErr2.code === 'auth/wrong-password' || authErr2.code === 'auth/invalid-credential' || authErr2.code === 'auth/invalid-email') {
+            setError("L'email/téléphone ou le mot de passe est incorrect.");
+          } else {
+            setError("Une erreur est parvenue lors de la connexion: " + authErr2.message);
+          }
         }
       }
+    } catch (err: any) {
+      console.error("Login system error:", err);
+      handleFirestoreError(err, OperationType.GET, 'users');
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err: any) {
-    setError("Erreur système: " + err.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   const loginWithGoogle = async () => {
     setIsLoading(true);
