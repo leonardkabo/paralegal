@@ -481,74 +481,31 @@ export function useAppState(): AppState {
 
       const password = userData.password || "password123";
       
-      // Detailed duplicate check
-      const usersCol = collection(db, 'users');
-      
-      // 1. Check if the generated legacy ID is taken (Optional but good for fallback)
-      userId = normalizedPhone || authEmail;
-      const legacyUserRef = doc(db, 'users', userId);
-      const userSnap = await getDoc(legacyUserRef);
-      
-      if (userSnap.exists()) {
-        const existingUser = userSnap.data() as User;
-        if (normalizedPhone && existingUser.phone === normalizedPhone) {
-          setError("Ce numéro de téléphone est déjà rattaché à un compte. Si c'est le vôtre, essayez de vous connecter.");
-        } else if (authEmail && existingUser.email === authEmail) {
-          setError("Cet email est déjà lié à un compte. Utilisez la récupération de mot de passe si besoin.");
-        } else {
-          setError("Cet identifiant est déjà utilisé par un autre étudiant.");
-        }
-        setIsLoading(false);
-        return;
-      }
-
-      // 2. Deep search for phone duplicates if we have a phone
-      if (normalizedPhone) {
-        const qPhone = query(usersCol, where('phone', '==', normalizedPhone));
-        const snapPhone = await getDocs(qPhone);
-        if (!snapPhone.empty) {
-          setError("Ce numéro de téléphone est déjà enregistré. Veuillez vous connecter au lieu de vous inscrire.");
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      // 3. Deep search for email duplicates if we have an email
-      if (rawEmail) {
-        const qEmail = query(usersCol, where('email', '==', rawEmail));
-        const snapEmail = await getDocs(qEmail);
-        if (!snapEmail.empty) {
-          setError("Cette adresse email est déjà enregistrée. Veuillez utiliser une autre adresse ou vous connecter.");
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      // Create Firebase Auth account
+      // Create Firebase Auth account first
+      // This handles duplicate email checking naturally
       try {
         const userCred = await createUserWithEmailAndPassword(auth, authEmail, password);
         if (!userCred.user) {
           throw new Error("Compte créé mais session non initialisée.");
         }
-        userId = userCred.user.uid; // Switch to UID as the document ID for NEW users
+        userId = userCred.user.uid; 
       } catch (authErr: any) {
         console.error("Détails erreur Auth:", authErr);
         if (authErr.code === 'auth/operation-not-allowed') {
           setError("CONFIGURATION REQUISE : Le fournisseur 'Email/Mot de passe' n'est pas activé dans votre console Firebase.");
         } else if (authErr.code === 'auth/email-already-in-use') {
-          setError("Cet identifiant (email ou numéro) est déjà lié à un compte existant. Veuillez vous connecter.");
+          setError("Ce compte (email ou numéro) existe déjà. Veuillez vous connecter.");
         } else if (authErr.code === 'auth/invalid-email') {
           setError("Le format de l'e-mail est invalide.");
         } else if (authErr.code === 'auth/weak-password') {
           setError("Le mot de passe est trop court (6 caractères min).");
         } else {
-          setError("Erreur Authentification : Assurez-vous que votre domaine est autorisé dans la console Firebase. " + authErr.message);
+          setError("Erreur Authentification : " + authErr.message);
         }
         setIsLoading(false);
         return;
       }
 
-      // Final reference using the UID
       const userRef = doc(db, 'users', userId);
       
       const fullUser: User = { 
@@ -613,33 +570,6 @@ export function useAppState(): AppState {
           // 2. Try with normalized virtual email
           await signInWithEmailAndPassword(auth, authEmailFromPhone, password);
         } catch (authErr2: any) {
-          if (authErr2.code === 'auth/operation-not-allowed') {
-            setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
-            setIsLoading(false);
-            return;
-          }
-          
-          // Fallback for students: Migration check or flexible lookup
-          const usersCol = collection(db, 'users');
-          const qPhone = query(usersCol, where('phone', '==', normalizedQueryId));
-          const qEmail = query(usersCol, where('email', '==', cleanIdentifier));
-          
-          const [snapPhone, snapEmail] = await Promise.all([getDocs(qPhone), getDocs(qEmail)]);
-          const userDoc = !snapPhone.empty ? snapPhone.docs[0] : (!snapEmail.empty ? snapEmail.docs[0] : null);
-          
-          if (userDoc) {
-            const userData = userDoc.data() as User;
-            if (userData.password === password) {
-              const targetEmail = userData.email || `${normalizePhone(userData.phone || "")}@paralegal.bj`;
-              try {
-                await createUserWithEmailAndPassword(auth, targetEmail, password);
-                return;
-              } catch (createErr: any) {
-                console.error("Migration error:", createErr);
-              }
-            }
-          }
-
           if (authErr2.code === 'auth/user-not-found' || authErr2.code === 'auth/wrong-password' || authErr2.code === 'auth/invalid-credential' || authErr2.code === 'auth/invalid-email') {
             setError("L'email/téléphone ou le mot de passe est incorrect.");
           } else {
