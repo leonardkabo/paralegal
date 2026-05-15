@@ -445,30 +445,71 @@ export function useAppState(): AppState {
       }
 
       // Determine Auth Email and User ID
-      let authEmail = (userData.email || "").toLowerCase();
-      const normalizedPhone = userData.phone ? normalizePhone(userData.phone) : "";
+      let rawEmail = (userData.email || "").toLowerCase().trim();
+      let rawPhone = (userData.phone || "").trim();
+      
+      // Si l'utilisateur a mis son email dans le champ téléphone
+      if (rawPhone.includes('@') && !rawEmail) {
+        rawEmail = rawPhone;
+        rawPhone = "";
+      }
+      
+      const normalizedPhone = rawPhone ? normalizePhone(rawPhone) : "";
+      let authEmail = rawEmail;
       
       if (normalizedPhone && !authEmail) {
         authEmail = `${normalizedPhone}@paralegal.bj`;
       }
       
       if (!authEmail) {
-        setError("Email ou téléphone manquant.");
+        setError("Veuillez fournir au moins un e-mail valide ou un numéro de téléphone.");
         setIsLoading(false);
         return;
       }
 
       const password = userData.password || "password123";
       
-      // Use normalized phone as ID if available, otherwise email
+      // Detailed duplicate check
+      const usersCol = collection(db, 'users');
+      
+      // 1. Check if the generated ID is taken
       userId = normalizedPhone || authEmail;
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
       
       if (userSnap.exists()) {
-        setError("Un compte avec ce numéro ou cet email existe déjà.");
+        const existingUser = userSnap.data() as User;
+        if (normalizedPhone && existingUser.phone === normalizedPhone) {
+          setError("Ce numéro de téléphone est déjà rattaché à un compte. Si c'est le vôtre, essayez de vous connecter.");
+        } else if (authEmail && existingUser.email === authEmail) {
+          setError("Cet email est déjà lié à un compte. Utilisez la récupération de mot de passe si besoin.");
+        } else {
+          setError("Cet identifiant est déjà utilisé par un autre étudiant.");
+        }
         setIsLoading(false);
         return;
+      }
+
+      // 2. Deep search for phone duplicates if we have a phone
+      if (normalizedPhone) {
+        const qPhone = query(usersCol, where('phone', '==', normalizedPhone));
+        const snapPhone = await getDocs(qPhone);
+        if (!snapPhone.empty) {
+          setError("Ce numéro de téléphone est déjà enregistré. Veuillez vous connecter au lieu de vous inscrire.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // 3. Deep search for email duplicates if we have an email
+      if (rawEmail) {
+        const qEmail = query(usersCol, where('email', '==', rawEmail));
+        const snapEmail = await getDocs(qEmail);
+        if (!snapEmail.empty) {
+          setError("Cette adresse email est déjà enregistrée. Veuillez utiliser une autre adresse ou vous connecter.");
+          setIsLoading(false);
+          return;
+        }
       }
 
       // Create Firebase Auth account
@@ -476,21 +517,26 @@ export function useAppState(): AppState {
         await createUserWithEmailAndPassword(auth, authEmail, password);
       } catch (authErr: any) {
         if (authErr.code === 'auth/operation-not-allowed') {
-          setError("ERREUR CONFIGURATION : Veuillez activer la méthode de connexion 'E-mail/Mot de passe' dans votre console Firebase.");
+          setError("ERREUR SYSTEME : La méthode de connexion par email n'est pas activée. Veuillez prévenir l'administrateur.");
           setIsLoading(false);
           return;
         }
         if (authErr.code === 'auth/email-already-in-use') {
-          setError("Cet email ou numéro de téléphone est déjà rattaché à un compte.");
+          setError("Cet identifiant (email ou numéro) est déjà lié à un compte existant.");
           setIsLoading(false);
           return;
         }
         if (authErr.code === 'auth/invalid-email') {
-          setError("L'adresse email formatée est invalide.");
+          setError("Le format de l'e-mail est invalide. Veuillez vérifier la saisie.");
           setIsLoading(false);
           return;
         }
-        setError("Erreur d'authentification: " + authErr.message);
+        if (authErr.code === 'auth/weak-password') {
+          setError("Le mot de passe est trop court. Veuillez choisir un mot de passe plus sécurisé.");
+          setIsLoading(false);
+          return;
+        }
+        setError("Impossible de créer votre compte : " + authErr.message);
         setIsLoading(false);
         return;
       }
@@ -514,14 +560,17 @@ export function useAppState(): AppState {
         lastActivity: 'Inscription réussie',
         lastUpdated: new Date().toISOString(),
         lastModuleId: 0,
-        phone: normalizedPhone || userData.phone
+        phone: normalizedPhone || userData.phone || ""
       };
       await setDoc(progressRef, initialProgress);
       
       setUser({ ...fullUser, id: userId });
     } catch (err: any) {
       console.error("Registration error:", err);
-      handleFirestoreError(err, OperationType.CREATE, `users/${userId}`);
+      setError("Erreur lors de l'inscription. Veuillez vérifier vos informations et votre connexion.");
+      try {
+        handleFirestoreError(err, OperationType.CREATE, `users/${userId}`);
+      } catch (e) {}
     } finally {
       setIsLoading(false);
     }
@@ -532,6 +581,8 @@ export function useAppState(): AppState {
     setError(null);
     try {
       const cleanIdentifier = identifier.trim().toLowerCase();
+      const normalizedQueryId = normalizePhone(cleanIdentifier);
+      
       // Bloquer les emails admin dans ce formulaire (doivent utiliser Google)
       const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
       if (adminEmails.includes(cleanIdentifier)) {
@@ -540,8 +591,7 @@ export function useAppState(): AppState {
         return;
       }
 
-      const normalizedPhone = cleanIdentifier.replace(/[+\s]/g, '');
-      const authEmailFromPhone = `${normalizedPhone}@paralegal.bj`;
+      const authEmailFromPhone = `${normalizedQueryId}@paralegal.bj`;
 
       try {
         // 1. Try with exact identifier
@@ -557,9 +607,9 @@ export function useAppState(): AppState {
             return;
           }
           
-          // Fallback for students: Migration check
+          // Fallback for students: Migration check or flexible lookup
           const usersCol = collection(db, 'users');
-          const qPhone = query(usersCol, where('phone', '==', cleanIdentifier));
+          const qPhone = query(usersCol, where('phone', '==', normalizedQueryId));
           const qEmail = query(usersCol, where('email', '==', cleanIdentifier));
           
           const [snapPhone, snapEmail] = await Promise.all([getDocs(qPhone), getDocs(qEmail)]);
@@ -568,7 +618,7 @@ export function useAppState(): AppState {
           if (userDoc) {
             const userData = userDoc.data() as User;
             if (userData.password === password) {
-              const targetEmail = userData.email || `${normalizePhone(userData.phone)}@paralegal.bj`;
+              const targetEmail = userData.email || `${normalizePhone(userData.phone || "")}@paralegal.bj`;
               try {
                 await createUserWithEmailAndPassword(auth, targetEmail, password);
                 return;
@@ -581,13 +631,16 @@ export function useAppState(): AppState {
           if (authErr2.code === 'auth/user-not-found' || authErr2.code === 'auth/wrong-password' || authErr2.code === 'auth/invalid-credential' || authErr2.code === 'auth/invalid-email') {
             setError("L'email/téléphone ou le mot de passe est incorrect.");
           } else {
-            setError("Une erreur est parvenue lors de la connexion: " + authErr2.message);
+            setError("Une erreur est survenue lors de la connexion. Veuillez réessayer.");
           }
         }
       }
     } catch (err: any) {
       console.error("Login system error:", err);
-      handleFirestoreError(err, OperationType.GET, 'users');
+      setError("Erreur système lors de la connexion.");
+      try {
+        handleFirestoreError(err, OperationType.GET, 'users');
+      } catch (e) {}
     } finally {
       setIsLoading(false);
     }

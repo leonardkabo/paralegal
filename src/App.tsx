@@ -192,30 +192,45 @@ const AuthScreen = ({
     confirmPassword: ''
   });
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLocalError(null);
+
     if (mode === 'register') {
+      if (!formData.fullName.trim()) {
+        setLocalError("Veuillez entrer votre nom complet.");
+        return;
+      }
       if (!formData.phone && !formData.email) {
-        alert("Veuillez renseigner au moins un numéro de téléphone ou un email.");
+        setLocalError("Veuillez renseigner au moins un numéro de téléphone ou un email pour vous inscrire.");
+        return;
+      }
+      if (formData.password.length < 6) {
+        setLocalError("Le mot de passe doit faire au moins 6 caractères.");
         return;
       }
       if (formData.password !== formData.confirmPassword) {
-        alert("Les mots de passe ne correspondent pas.");
+        setLocalError("Les mots de passe ne correspondent pas.");
         return;
       }
       onRegister(formData);
     } else if (mode === 'login') {
       const identifier = formData.phone || formData.email;
       if (!identifier) {
-        alert("Veuillez entrer votre téléphone ou email.");
+        setLocalError("Veuillez entrer votre téléphone ou email.");
+        return;
+      }
+      if (!formData.password) {
+        setLocalError("Veuillez entrer votre mot de passe.");
         return;
       }
       onLogin(identifier, formData.password);
     } else if (mode === 'forgot-password') {
       const identifier = formData.phone || formData.email;
       if (!identifier) {
-        alert("Veuillez entrer votre téléphone ou email.");
+        setLocalError("Veuillez entrer votre téléphone ou email.");
         return;
       }
       const success = await onResetPassword(identifier);
@@ -274,22 +289,23 @@ const AuthScreen = ({
           
           <div className="grid grid-cols-1 gap-4">
             <Input 
-              label={mode === 'login' || mode === 'forgot-password' ? "Téléphone ou Email" : "Numéro de téléphone"} 
-              type={mode === 'register' ? "tel" : "text"} 
-              placeholder={mode === 'register' ? "Ex: +229 ..." : "Votre téléphone ou email"} 
-              required={mode === 'register' ? !formData.email : true}
+              label={mode === 'login' || mode === 'forgot-password' ? "Téléphone ou Email" : "Identifiant (Tél ou Email)"} 
+              type="text" 
+              placeholder={mode === 'register' ? "Ex: +229 ... ou email" : "Votre téléphone ou email"} 
+              required={mode === 'register' ? (!formData.email && !formData.phone) : true}
               value={formData.phone}
               onChange={e => setFormData({...formData, phone: e.target.value})}
+              helperText={mode === 'register' ? "Utilisez votre numéro de téléphone ou un email au choix." : ""}
             />
             
             {mode === 'register' && (
               <Input 
-                label="Email (Facultatif)" 
-                type="email" 
-                placeholder="Ex: jean@exemple.com" 
-                required={!formData.phone}
+                label="E-mail ou second numéro (Optionnel)" 
+                type="text" 
+                placeholder="Autre numéro ou email" 
                 value={formData.email}
                 onChange={e => setFormData({...formData, email: e.target.value})}
+                helperText="Ceci facilite la récupération de votre compte."
               />
             )}
           </div>
@@ -371,7 +387,13 @@ const AuthScreen = ({
             </div>
           )}
           
-          {error && <p className="text-xs text-red-500 text-center font-medium">{error}</p>}
+          {(localError || error) && (
+            <div className="bg-red-50 border border-red-100 p-3 rounded-xl">
+              <p className="text-xs text-red-600 text-center font-medium leading-relaxed">
+                {localError || error}
+              </p>
+            </div>
+          )}
           
           <Button type="submit" className="w-full mt-4" isLoading={isLoading}>
             {mode === 'login' ? 'Se connecter' : mode === 'register' ? "S'inscrire" : "Réinitialiser"}
