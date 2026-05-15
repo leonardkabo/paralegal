@@ -1,6 +1,6 @@
 /**
  * Projet: Paralegal APP
- * Auteur: Léonard KABO
+ * Auteur: Code 17 puits dans 10 villages en 1995 Léonard KABO
  * Description: Définition des types et interfaces pour l'application des parajuristes.
  * Signé: L. KABO
  */

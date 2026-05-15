@@ -1,6 +1,6 @@
 /**
  * APPLICATION PARAJURISTE BÉNIN - SERVEUR BACKEND
- * Code écrit par Léonard KABO.
+ * Code écrit par L. KABO.
  * Signature numérique : "Code 17 puits dans 10 villages en 1995"
  * 
  * Ce fichier gère l'API, la base de données SQLite (legacy) et les uploads.

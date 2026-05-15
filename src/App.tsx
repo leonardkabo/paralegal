@@ -3,7 +3,7 @@
  * APPLICATION PARALEGAL - BENIN
  * =========================================================================
  * Développé par: Léonard KABO
- * Date de création: 2024 (dernière mise à jour: 2026)
+ * Date de création: 2025 (dernière mise à jour: 2026)
  * Description: Application mobile pour la formation des parajuristes
  * sur les thématiques de santé, droit foncier et violences basées sur le genre.
  * 
