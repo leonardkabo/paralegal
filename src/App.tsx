@@ -3,7 +3,7 @@
  * APPLICATION PARALEGAL - BENIN
  * =========================================================================
  * Développé par: Léonard KABO
- * Date de création: 2024 (dernière mise à jour: 2026)
+ * Date de création: 2025 (dernière mise à jour: 2026)
  * Description: Application mobile pour la formation des parajuristes
  * sur les thématiques de santé, droit foncier et violences basées sur le genre.
  * 
@@ -36,6 +36,7 @@ import {
   Library,
   Sparkles,
   Volume2,
+  Headphones,
   X,
   Key,
   HelpCircle,
@@ -153,6 +154,18 @@ const markdownComponents: any = {
 };
 import { useAppState } from './hooks/useAppState';
 import { cn } from './lib/utils';
+
+const getDirectAudioUrl = (url: string) => {
+  if (!url) return "";
+  // Handle Google Drive sharing links
+  if (url.includes('drive.google.com')) {
+    const idMatch = url.match(/[-\w]{25,}/);
+    if (idMatch) {
+      return `https://docs.google.com/uc?export=download&id=${idMatch[0]}`;
+    }
+  }
+  return url;
+};
 
 import { FINAL_EXAM_QUESTIONS } from './data/finalExam';
 
@@ -2053,6 +2066,7 @@ const ModuleDetail = ({
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [audioFinished, setAudioFinished] = useState(false);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -2195,7 +2209,11 @@ const ModuleDetail = ({
       if (audioPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play();
+        setIsAudioLoading(true);
+        audioRef.current.play().catch(err => {
+          console.error("Audio error:", err);
+          setIsAudioLoading(false);
+        });
       }
       setAudioPlaying(!audioPlaying);
     }
@@ -2298,63 +2316,107 @@ const ModuleDetail = ({
                 </div>
               )}
 
-              {/* Fon Specific Audio Player Section */}
+              {/* Fon Specific Audio Player Section - Improved Visibility */}
               {user.preferredLanguage !== 'fr' && module.audioUrl && (
-                <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100 shadow-lg shadow-orange-200/20 space-y-6 relative overflow-hidden group">
-                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl group-hover:bg-orange-200/40 transition-all duration-500" />
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-gradient-to-br from-emerald-600 to-emerald-800 p-8 rounded-[3rem] shadow-2xl border-4 border-white/20 relative overflow-hidden group"
+                >
+                  {/* High contrast glass decorations */}
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-110 transition-transform duration-700" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-yellow-400/10 rounded-full -ml-16 -mb-16 blur-2xl" />
                   
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shrink-0 shadow-inner">
-                      {audioPlaying ? <div className="flex gap-0.5 items-end h-6">
-                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_0.6s_infinite]" style={{height: '60%'}} />
-                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_0.8s_infinite]" style={{height: '100%'}} />
-                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_0.5s_infinite]" style={{height: '40%'}} />
-                        <div className="w-1 bg-orange-500 rounded-full animate-[bounce_1s_infinite]" style={{height: '80%'}} />
-                      </div> : <Volume2 size={24} />}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-orange-950">Traduction Parallèle (Fon)</h4>
-                      <p className="text-[10px] text-orange-700 font-medium italic">Écoutez la version audio pour mieux comprendre</p>
-                    </div>
-                  </div>
-
-                  <audio 
-                    ref={audioRef} 
-                    src={module.audioUrl} 
-                    onEnded={handleAudioEnded}
-                    onTimeUpdate={handleTimeUpdate}
-                    onLoadedMetadata={handleLoadedMetadata}
-                    className="hidden"
-                  />
-
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <Button 
-                        className="w-12 h-12 rounded-xl shadow-md bg-orange-600 hover:bg-orange-700 shrink-0"
-                        onClick={toggleAudio}
-                      >
-                        {audioPlaying ? <Pause size={20} /> : <Play size={20} />}
-                      </Button>
-                      <div className="flex-1 space-y-2">
-                        <div className="h-1.5 w-full bg-orange-200/50 rounded-full overflow-hidden cursor-pointer" onClick={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          const x = e.clientX - rect.left;
-                          const ratio = x / rect.width;
-                          if (audioRef.current) audioRef.current.currentTime = ratio * audioDuration;
-                        }}>
-                          <div 
-                            className="h-full bg-orange-500 transition-all duration-300" 
-                            style={{ width: `${(audioCurrentTime / audioDuration) * 100}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-[10px] font-bold text-orange-700/60 tabular-nums">
-                          <span>{formatTime(audioCurrentTime)}</span>
-                          <span>-{formatTime(audioDuration - audioCurrentTime)}</span>
+                  <div className="relative z-10 space-y-6">
+                    <div className="flex items-center gap-5">
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white ring-2 ring-white/30 shadow-xl">
+                        {audioPlaying ? (
+                          <div className="flex gap-1 items-end h-8">
+                            <motion.div animate={{ height: [12, 32, 20] }} transition={{ repeat: Infinity, duration: 0.5 }} className="w-1.5 bg-yellow-300 rounded-full" />
+                            <motion.div animate={{ height: [28, 14, 28] }} transition={{ repeat: Infinity, duration: 0.7 }} className="w-1.5 bg-yellow-300 rounded-full" />
+                            <motion.div animate={{ height: [18, 30, 15] }} transition={{ repeat: Infinity, duration: 0.6 }} className="w-1.5 bg-yellow-300 rounded-full" />
+                          </div>
+                        ) : (
+                          <Headphones size={32} className="text-white/90" />
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-xl font-black text-white tracking-tight leading-tight">Traduction en Fon</h4>
+                        <div className="flex items-center gap-2">
+                           <span className="px-2 py-0.5 bg-yellow-400 text-emerald-950 text-[10px] font-black rounded-full uppercase tracking-widest">Écouter</span>
+                           <p className="text-emerald-100 text-xs font-medium">Fongbe Parallel Translation</p>
                         </div>
                       </div>
                     </div>
+
+                    <div className="flex items-center gap-6">
+                      <button 
+                        onClick={toggleAudio}
+                        disabled={isAudioLoading && !audioPlaying}
+                        className={cn(
+                          "w-24 h-24 rounded-[2rem] flex items-center justify-center transition-all active:scale-90 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-4 border-white/40",
+                          audioPlaying 
+                            ? "bg-white text-emerald-700 hover:scale-105" 
+                            : "bg-yellow-400 text-emerald-900 hover:bg-yellow-300 ring-8 ring-yellow-400/20 hover:scale-110"
+                        )}
+                      >
+                        {isAudioLoading && !audioPlaying ? (
+                          <div className="w-8 h-8 border-4 border-emerald-900 border-t-transparent rounded-full animate-spin" />
+                        ) : audioPlaying ? (
+                          <Pause size={46} className="fill-current" />
+                        ) : (
+                          <Play size={46} className="ml-2 fill-current" />
+                        )}
+                      </button>
+
+                      <div className="flex-1 space-y-4">
+                        <div 
+                          className="h-4 w-full bg-black/30 rounded-full overflow-hidden cursor-pointer relative border border-white/10 group/track" 
+                          onClick={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const ratio = x / rect.width;
+                            if (audioRef.current) audioRef.current.currentTime = ratio * audioDuration;
+                          }}
+                        >
+                          <motion.div 
+                            className="h-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-200 relative shadow-[0_0_20px_rgba(253,224,71,0.5)]" 
+                            style={{ width: `${(audioCurrentTime / audioDuration) * 100}%` }}
+                          >
+                            <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/50 blur-[2px]" />
+                          </motion.div>
+                        </div>
+                        <div className="flex justify-between text-[11px] font-black text-emerald-100/80 tracking-widest uppercase">
+                          <span className="bg-black/20 px-2 py-0.5 rounded-md min-w-[45px] text-center">{formatTime(audioCurrentTime)}</span>
+                          <span className="bg-white/10 px-2 py-0.5 rounded-md min-w-[45px] text-center">-{formatTime(audioDuration - audioCurrentTime)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <audio 
+                      ref={audioRef} 
+                      src={getDirectAudioUrl(module.audioUrl)} 
+                      onEnded={handleAudioEnded}
+                      onTimeUpdate={handleTimeUpdate}
+                      onLoadedMetadata={handleLoadedMetadata}
+                      onLoadStart={() => setIsAudioLoading(true)}
+                      onCanPlay={() => setIsAudioLoading(false)}
+                      crossOrigin="anonymous"
+                      className="hidden"
+                    />
+                    
+                    {audioFinished && (
+                      <motion.div 
+                        initial={{ scale: 0 }} 
+                        animate={{ scale: 1 }} 
+                        className="absolute bottom-4 right-8 bg-white text-emerald-700 text-[10px] font-black px-4 py-1.5 rounded-full shadow-2xl flex items-center gap-2 border border-emerald-100"
+                      >
+                         <CheckCircle2 size={12} className="text-emerald-500" />
+                         TERMINÉ
+                      </motion.div>
+                    )}
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Common Learning Content */}
@@ -3293,7 +3355,12 @@ const AdminDashboard = ({
                     {report.audioUrl && (
                       <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                         <Volume2 size={18} className="text-emerald-600" />
-                        <audio src={report.audioUrl} controls className="h-8 flex-1" />
+                        <audio 
+                          src={getDirectAudioUrl(report.audioUrl)} 
+                          controls 
+                          className="h-8 flex-1" 
+                          crossOrigin="anonymous"
+                        />
                       </div>
                     )}
 
