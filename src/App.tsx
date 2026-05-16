@@ -3,7 +3,7 @@
  * APPLICATION PARALEGAL - BENIN
  * =========================================================================
  * Développé par: Léonard KABO
- * Date de création: 2025 (dernière mise à jour: 2026)
+ * Date de création: 2024 (dernière mise à jour: 2026)
  * Description: Application mobile pour la formation des parajuristes
  * sur les thématiques de santé, droit foncier et violences basées sur le genre.
  * 
@@ -105,6 +105,7 @@ const markdownComponents: any = {
     <div className="my-6">
       <img 
         {...props} 
+        src={getDirectUrl(props.src || '')}
         className="max-w-full h-auto rounded-3xl mx-auto block shadow-xl border-4 border-white" 
         referrerPolicy="no-referrer"
       />
@@ -114,7 +115,7 @@ const markdownComponents: any = {
   video: ({ src, title }: any) => (
     <div className="my-8 space-y-3">
       <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
-        <video src={src} controls className="w-full h-full" />
+        <video src={getDirectUrl(src || '')} controls className="w-full h-full" />
       </div>
       {title && <span className="text-center text-[10px] font-bold text-slate-400 italic block">Vidéo: {title}</span>}
     </div>
@@ -128,7 +129,7 @@ const markdownComponents: any = {
         return (
           <div className="my-8 space-y-3">
             <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
-              <video src={videoMatch[1]} controls className="w-full h-full" />
+              <video src={getDirectUrl(videoMatch[1])} controls className="w-full h-full" />
             </div>
           </div>
         );
@@ -143,7 +144,7 @@ const markdownComponents: any = {
       return (
         <div className="my-8 space-y-3">
           <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
-            <video src={href} controls className="w-full h-full" />
+            <video src={getDirectUrl(href)} controls className="w-full h-full" />
           </div>
           {props.children && <span className="text-center text-[10px] font-bold text-slate-400 italic block">Vidéo: {props.children}</span>}
         </div>
@@ -155,7 +156,7 @@ const markdownComponents: any = {
 import { useAppState } from './hooks/useAppState';
 import { cn } from './lib/utils';
 
-const getDirectAudioUrl = (url: string) => {
+const getDirectUrl = (url: string) => {
   if (!url) return "";
   // Handle Google Drive sharing links
   if (url.includes('drive.google.com')) {
@@ -163,6 +164,10 @@ const getDirectAudioUrl = (url: string) => {
     if (idMatch) {
       return `https://docs.google.com/uc?export=download&id=${idMatch[0]}`;
     }
+  }
+  // Handle Dropbox
+  if (url.includes('dropbox.com') && !url.includes('dl=1')) {
+    return url.replace(/\?(dl=0)?$/, '?dl=1');
   }
   return url;
 };
@@ -2321,57 +2326,56 @@ const ModuleDetail = ({
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-gradient-to-br from-emerald-600 to-emerald-800 p-8 rounded-[3rem] shadow-2xl border-4 border-white/20 relative overflow-hidden group"
+                  className="bg-gradient-to-br from-indigo-900 to-indigo-700 p-8 rounded-[3rem] shadow-2xl border-4 border-white relative overflow-hidden group"
                 >
                   {/* High contrast glass decorations */}
                   <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-yellow-400/10 rounded-full -ml-16 -mb-16 blur-2xl" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-yellow-400/20 rounded-full -ml-16 -mb-16 blur-2xl" />
                   
                   <div className="relative z-10 space-y-6">
                     <div className="flex items-center gap-5">
-                      <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white ring-2 ring-white/30 shadow-xl">
+                      <div className="w-16 h-16 bg-white/30 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white ring-2 ring-white/50 shadow-xl">
                         {audioPlaying ? (
                           <div className="flex gap-1 items-end h-8">
-                            <motion.div animate={{ height: [12, 32, 20] }} transition={{ repeat: Infinity, duration: 0.5 }} className="w-1.5 bg-yellow-300 rounded-full" />
-                            <motion.div animate={{ height: [28, 14, 28] }} transition={{ repeat: Infinity, duration: 0.7 }} className="w-1.5 bg-yellow-300 rounded-full" />
-                            <motion.div animate={{ height: [18, 30, 15] }} transition={{ repeat: Infinity, duration: 0.6 }} className="w-1.5 bg-yellow-300 rounded-full" />
+                            <motion.div animate={{ height: [12, 32, 20] }} transition={{ repeat: Infinity, duration: 0.5 }} className="w-1.5 bg-yellow-400 rounded-full" />
+                            <motion.div animate={{ height: [28, 14, 28] }} transition={{ repeat: Infinity, duration: 0.7 }} className="w-1.5 bg-yellow-400 rounded-full" />
+                            <motion.div animate={{ height: [18, 30, 15] }} transition={{ repeat: Infinity, duration: 0.6 }} className="w-1.5 bg-yellow-400 rounded-full" />
                           </div>
                         ) : (
-                          <Headphones size={32} className="text-white/90" />
+                          <Headphones size={32} className="text-white" />
                         )}
                       </div>
                       <div className="space-y-1">
-                        <h4 className="text-xl font-black text-white tracking-tight leading-tight">Traduction en Fon</h4>
+                        <h4 className="text-2xl font-black text-white tracking-tight leading-tight">Traduction en Fon</h4>
                         <div className="flex items-center gap-2">
-                           <span className="px-2 py-0.5 bg-yellow-400 text-emerald-950 text-[10px] font-black rounded-full uppercase tracking-widest">Écouter</span>
-                           <p className="text-emerald-100 text-xs font-medium">Fongbe Parallel Translation</p>
+                           <span className="px-3 py-1 bg-yellow-400 text-indigo-950 text-[12px] font-black rounded-full uppercase tracking-widest shadow-lg">AUDIO DISPONIBLE</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex flex-col sm:flex-row items-center gap-8">
                       <button 
                         onClick={toggleAudio}
                         disabled={isAudioLoading && !audioPlaying}
                         className={cn(
-                          "w-24 h-24 rounded-[2rem] flex items-center justify-center transition-all active:scale-90 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-4 border-white/40",
+                          "w-28 h-28 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-[0_20px_50px_rgba(0,0,0,0.4)] border-[6px] border-white focus:outline-none focus:ring-4 focus:ring-yellow-400",
                           audioPlaying 
-                            ? "bg-white text-emerald-700 hover:scale-105" 
-                            : "bg-yellow-400 text-emerald-900 hover:bg-yellow-300 ring-8 ring-yellow-400/20 hover:scale-110"
+                            ? "bg-white text-indigo-900 hover:scale-105" 
+                            : "bg-yellow-400 text-indigo-950 hover:bg-yellow-300 ring-8 ring-yellow-400/20 hover:scale-110"
                         )}
                       >
                         {isAudioLoading && !audioPlaying ? (
-                          <div className="w-8 h-8 border-4 border-emerald-900 border-t-transparent rounded-full animate-spin" />
+                          <div className="w-10 h-10 border-4 border-indigo-900 border-t-transparent rounded-full animate-spin" />
                         ) : audioPlaying ? (
-                          <Pause size={46} className="fill-current" />
+                          <Pause size={56} className="fill-current" />
                         ) : (
-                          <Play size={46} className="ml-2 fill-current" />
+                          <Play size={56} className="ml-2 fill-current" />
                         )}
                       </button>
 
-                      <div className="flex-1 space-y-4">
+                      <div className="flex-1 w-full space-y-4">
                         <div 
-                          className="h-4 w-full bg-black/30 rounded-full overflow-hidden cursor-pointer relative border border-white/10 group/track" 
+                          className="h-6 w-full bg-black/40 rounded-full overflow-hidden cursor-pointer relative border-2 border-white/20 group/track shadow-inner" 
                           onClick={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect();
                             const x = e.clientX - rect.left;
@@ -2380,22 +2384,22 @@ const ModuleDetail = ({
                           }}
                         >
                           <motion.div 
-                            className="h-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-200 relative shadow-[0_0_20px_rgba(253,224,71,0.5)]" 
+                            className="h-full bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-300 relative" 
                             style={{ width: `${(audioCurrentTime / audioDuration) * 100}%` }}
                           >
-                            <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/50 blur-[2px]" />
+                            <div className="absolute right-0 top-0 bottom-0 w-2 bg-white blur-[1px]" />
                           </motion.div>
                         </div>
-                        <div className="flex justify-between text-[11px] font-black text-emerald-100/80 tracking-widest uppercase">
-                          <span className="bg-black/20 px-2 py-0.5 rounded-md min-w-[45px] text-center">{formatTime(audioCurrentTime)}</span>
-                          <span className="bg-white/10 px-2 py-0.5 rounded-md min-w-[45px] text-center">-{formatTime(audioDuration - audioCurrentTime)}</span>
+                        <div className="flex justify-between text-xs font-black text-white px-2">
+                          <span className="bg-indigo-900/50 px-3 py-1 rounded-lg border border-white/10">{formatTime(audioCurrentTime)}</span>
+                          <span className="bg-indigo-900/50 px-3 py-1 rounded-lg border border-white/10">-{formatTime(audioDuration - audioCurrentTime)}</span>
                         </div>
                       </div>
                     </div>
 
                     <audio 
                       ref={audioRef} 
-                      src={getDirectAudioUrl(module.audioUrl)} 
+                      src={getDirectUrl(module.audioUrl)} 
                       onEnded={handleAudioEnded}
                       onTimeUpdate={handleTimeUpdate}
                       onLoadedMetadata={handleLoadedMetadata}
@@ -2911,7 +2915,8 @@ const AdminDashboard = ({
   onSaveSettings,
   onUploadFile,
   onFetchFiles,
-  onDeleteFile
+  onDeleteFile,
+  currentUser
 }: { 
   onBack: () => void, 
   modules: Module[],
@@ -2929,13 +2934,20 @@ const AdminDashboard = ({
   onDeleteLegalDocument: (id: string) => Promise<boolean>,
   onSaveCaseStudy: (c: CaseStudy) => Promise<boolean>,
   onDeleteCaseStudy: (id: string) => Promise<boolean>,
-  onDeleteUser: (phone: string) => Promise<boolean>,
+  onDeleteUser: (userId: string) => Promise<boolean>,
   onSaveUser: (userData: any) => Promise<boolean>,
   onSaveSettings: (s: AppSettings) => Promise<boolean>,
   onUploadFile: (file: File) => Promise<{ url: string, name: string }>,
   onFetchFiles: () => Promise<any[]>,
-  onDeleteFile: (filename: string) => Promise<boolean>
+  onDeleteFile: (filename: string) => Promise<boolean>,
+  currentUser: any
 }) => {
+  const hasPermission = (permission: string) => {
+    if (currentUser?.isAdmin || currentUser?.role === 'admin') return true;
+    if (currentUser?.role === 'moderator' && currentUser?.moderatorPermissions?.includes(permission)) return true;
+    return false;
+  };
+
   // Gestion de l'onglet actif dans le dashboard
   const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports' | 'media' | 'database'>('users');
   
@@ -2981,9 +2993,10 @@ const AdminDashboard = ({
   const [editingCase, setEditingCase] = useState<CaseStudy | null>(null);
   const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
   const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [selectedUserProgress, setSelectedUserProgress] = useState<any | null>(null);
   const [showUserForm, setShowUserForm] = useState(false);
-  const [newUser, setNewUser] = useState({
+  const [newUser, setNewUser] = useState<any>({
     id: '',
     fullName: '',
     phone: '',
@@ -2993,7 +3006,9 @@ const AdminDashboard = ({
     birthDate: '',
     educationLevel: '',
     password: '',
-    isAdmin: false
+    isAdmin: false,
+    role: 'student',
+    moderatorPermissions: []
   });
 
   useEffect(() => {
@@ -3115,11 +3130,16 @@ const AdminDashboard = ({
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = await onSaveUser(newUser);
-    if (ok) {
-      alert(editingUser ? "Utilisateur mis à jour !" : "Utilisateur créé !");
-      setShowUserForm(false);
-      setEditingUser(null);
+    setIsSaving(true);
+    try {
+      const ok = await onSaveUser(newUser);
+      if (ok) {
+        alert(editingUser ? "Utilisateur mis à jour !" : "Utilisateur créé !");
+        setShowUserForm(false);
+        setEditingUser(null);
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -3235,60 +3255,76 @@ const AdminDashboard = ({
       </div>
 
       <div className="flex border-b border-slate-100 bg-white overflow-x-auto no-scrollbar">
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'users' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('users')}
-        >
-          Utilisateurs
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'modules' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('modules')}
-        >
-          Modules
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'glossary' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('glossary')}
-        >
-          Glossaire
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'documents' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('documents')}
-        >
-          Documents
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'cases' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('cases')}
-        >
-          Cas
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'reports' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('reports')}
-        >
-          Signalements
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'media' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('media')}
-        >
-          Médiathèque
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'settings' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('settings')}
-        >
-          Paramètres
-        </button>
-        <button 
-          className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'database' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
-          onClick={() => setView('database')}
-        >
-          Base de données
-        </button>
+        {hasPermission('manage_users') && (
+          <button 
+            className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'users' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+            onClick={() => setView('users')}
+          >
+            Utilisateurs
+          </button>
+        )}
+        {hasPermission('manage_modules') && (
+          <button 
+            className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'modules' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+            onClick={() => setView('modules')}
+          >
+            Modules
+          </button>
+        )}
+        {hasPermission('manage_content') && (
+          <>
+            <button 
+              className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'glossary' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+              onClick={() => setView('glossary')}
+            >
+              Glossaire
+            </button>
+            <button 
+              className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'documents' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+              onClick={() => setView('documents')}
+            >
+              Documents
+            </button>
+            <button 
+              className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'cases' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+              onClick={() => setView('cases')}
+            >
+              Cas
+            </button>
+          </>
+        )}
+        {hasPermission('view_reports') && (
+          <button 
+            className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'reports' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+            onClick={() => setView('reports')}
+          >
+            Signalements
+          </button>
+        )}
+        {hasPermission('manage_media') && (
+          <button 
+            className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'media' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+            onClick={() => setView('media')}
+          >
+            Médiathèque
+          </button>
+        )}
+        {hasPermission('manage_settings') && (
+          <button 
+            className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'settings' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+            onClick={() => setView('settings')}
+          >
+            Paramètres
+          </button>
+        )}
+        {hasPermission('view_database') && (
+          <button 
+            className={cn("px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap", view === 'database' ? "text-emerald-600 border-b-2 border-emerald-600" : "text-slate-400")}
+            onClick={() => setView('database')}
+          >
+            Base de données
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 pb-24">
@@ -3356,7 +3392,7 @@ const AdminDashboard = ({
                       <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                         <Volume2 size={18} className="text-emerald-600" />
                         <audio 
-                          src={getDirectAudioUrl(report.audioUrl)} 
+                          src={getDirectUrl(report.audioUrl)} 
                           controls 
                           className="h-8 flex-1" 
                           crossOrigin="anonymous"
@@ -3650,19 +3686,63 @@ const AdminDashboard = ({
                     </div>
                     <Input label="Date de naissance" type="date" value={newUser.birthDate} onChange={e => setNewUser({...newUser, birthDate: e.target.value})} required />
                     <Input label="Niveau d'études" value={newUser.educationLevel} onChange={e => setNewUser({...newUser, educationLevel: e.target.value})} required />
-                    <Input label="Mot de passe" type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required />
-                    <div className="flex items-center gap-2 py-2">
-                      <input 
-                        type="checkbox" 
-                        id="isAdmin" 
-                        checked={newUser.isAdmin} 
-                        onChange={e => setNewUser({...newUser, isAdmin: e.target.checked})} 
-                        className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
-                      />
-                      <label htmlFor="isAdmin" className="text-sm font-medium text-slate-700">Rôle Administrateur</label>
+                    <Input label="Mot de passe" type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required={!editingUser} />
+                    
+                    <div className="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Rôle & Permissions</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['student', 'moderator', 'admin'].map((r) => (
+                           <button
+                             type="button"
+                             key={r}
+                             onClick={() => setNewUser({ ...newUser, role: r as any, isAdmin: r === 'admin' })}
+                             className={cn(
+                               "py-2 text-[10px] font-bold rounded-lg border transition-all",
+                               newUser.role === r 
+                                 ? "bg-emerald-600 text-white border-emerald-600" 
+                                 : "bg-white text-slate-500 border-slate-200 hover:border-emerald-300"
+                             )}
+                           >
+                             {r.toUpperCase()}
+                           </button>
+                        ))}
+                      </div>
+
+                      {newUser.role === 'moderator' && (
+                        <div className="space-y-2 mt-3 pt-3 border-t border-slate-200">
+                          <p className="text-[9px] font-bold text-slate-500 uppercase mb-2">Permissions spécifiques :</p>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                             {[
+                               { id: 'manage_users', label: 'Utilisateurs' },
+                               { id: 'manage_modules', label: 'Modules' },
+                               { id: 'view_reports', label: 'Signalements' },
+                               { id: 'manage_content', label: 'Contenu (Glossaire...)' },
+                               { id: 'manage_media', label: 'Médiathèque' },
+                               { id: 'manage_settings', label: 'Configuration' }
+                             ].map((perm) => (
+                               <label key={perm.id} className="flex items-center gap-2 cursor-pointer">
+                                 <input 
+                                   type="checkbox" 
+                                   checked={newUser.moderatorPermissions?.includes(perm.id)}
+                                   onChange={(e) => {
+                                     const current = newUser.moderatorPermissions || [];
+                                     const next = e.target.checked 
+                                       ? [...current, perm.id]
+                                       : current.filter(p => p !== perm.id);
+                                     setNewUser({ ...newUser, moderatorPermissions: next });
+                                   }}
+                                   className="w-3 h-3 text-emerald-600 rounded border-slate-300"
+                                 />
+                                 <span className="text-[10px] font-medium text-slate-700">{perm.label}</span>
+                               </label>
+                             ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <Button type="submit" className="w-full">
-                      {editingUser ? "Enregistrer les modifications" : "Créer l'utilisateur"}
+
+                    <Button type="submit" className="w-full" disabled={isSaving}>
+                      {isSaving ? "Traitement..." : (editingUser ? "Mettre à jour" : "Créer")}
                     </Button>
                   </form>
                 </Card>
@@ -3711,8 +3791,11 @@ const AdminDashboard = ({
                             </p>
                           )}
                         </div>
-                        {u.isAdmin && (
-                          <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[8px] font-bold uppercase rounded shrink-0">Admin</span>
+                        {(u.isAdmin || u.role === 'admin') && (
+                          <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[8px] font-black uppercase rounded shrink-0 border border-indigo-200 shadow-sm">Admin</span>
+                        )}
+                        {u.role === 'moderator' && (
+                          <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-[8px] font-black uppercase rounded shrink-0 border border-yellow-200 shadow-sm">Modo</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
@@ -5137,6 +5220,7 @@ export default function App() {
               onUploadFile={uploadFile}
               onFetchFiles={fetchFiles}
               onDeleteFile={deleteFile}
+              currentUser={user}
             />
           </motion.div>
         )}

@@ -736,11 +736,20 @@ export function useAppState(): AppState {
 
   const deleteUser = async (userId: string) => {
     try {
+      // 1. Delete from Firestore
       await deleteDoc(doc(db, 'users', userId));
       await deleteDoc(doc(db, 'progress', userId));
+      
+      // 2. Delete from SQLite (Success is optional as Firestore is primary)
+      try {
+        await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+      } catch (err) {
+        console.error("SQLite delete failed (possibly offline or no server):", err);
+      }
+      
       return true;
     } catch (err) {
-      console.error(err);
+      console.error("Firestore delete failed:", err);
       return false;
     }
   };
@@ -750,9 +759,30 @@ export function useAppState(): AppState {
       const userId = userData.id || userData.phone || userData.email;
       if (!userId) throw new Error("ID utilisateur manquant");
       
-      const isNew = !(await getDoc(doc(db, 'users', userId))).exists();
+      const userRef = doc(db, 'users', userId);
+      const userSnap = await getDoc(userRef);
+      const isNew = !userSnap.exists();
       
-      await setDoc(doc(db, 'users', userId), userData, { merge: true });
+      // Clean up data for Firestore
+      const cleanedData = {
+        ...userData,
+        isAdmin: !!userData.isAdmin,
+        role: userData.role || 'student',
+        moderatorPermissions: userData.moderatorPermissions || []
+      };
+      
+      await setDoc(userRef, cleanedData, { merge: true });
+
+      // Sync to SQLite if available
+      try {
+        await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cleanedData)
+        });
+      } catch (e) {
+         console.warn("SQLite sync failed during saveUser");
+      }
 
       if (isNew) {
         // Initialize progress for new users created by admin

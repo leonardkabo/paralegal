@@ -1,6 +1,6 @@
 /**
  * Projet: Paralegal APP
- * Auteur: Code 17 puits dans 10 villages en 1995 Léonard KABO
+ * Auteur: Léonard KABO
  * Description: Définition des types et interfaces pour l'application des parajuristes.
  * Signé: L. KABO
  */
@@ -19,13 +19,15 @@ export interface User {
   preferredLanguage: Language;
   password?: string;
   isAdmin?: boolean;
+  role?: 'student' | 'moderator' | 'admin';
+  moderatorPermissions?: string[];
 }
 
 export interface QuizQuestion {
   id: string;
   question: string;
   options: string[];
-  correctAnswer: number | number[];
+  correctAnswer: number | number[]; // If array, it's multi-choice. Default should be multi-choice.
 }
 
 export interface Attachment {
@@ -172,7 +174,3 @@ export interface AppState {
   deleteFile: (filename: string) => Promise<boolean>;
   forceSync: () => Promise<void>;
 }
-
-/**
- * The END
- */

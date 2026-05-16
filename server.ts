@@ -46,7 +46,9 @@ db.exec(`
     educationLevel TEXT,
     password TEXT,
     preferredLanguage TEXT,
-    isAdmin INTEGER DEFAULT 0
+    isAdmin INTEGER DEFAULT 0,
+    role TEXT DEFAULT 'student',
+    moderatorPermissions TEXT -- JSON array
   );
 
   CREATE TABLE IF NOT EXISTS progress (
@@ -138,6 +140,8 @@ try { db.exec("ALTER TABLE case_studies ADD COLUMN fileUrl TEXT"); } catch (e) {
 try { db.exec("ALTER TABLE case_studies ADD COLUMN fileName TEXT"); } catch (e) {}
 
 // Migration: Add missing columns to modules table if it already existed
+try { db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'student'"); } catch (e) {}
+try { db.exec("ALTER TABLE users ADD COLUMN moderatorPermissions TEXT"); } catch (e) {}
 try { db.exec("ALTER TABLE modules ADD COLUMN estimatedDuration INTEGER"); } catch (e) {}
 try { db.exec("ALTER TABLE modules ADD COLUMN difficultyLevel TEXT"); } catch (e) {}
 try { db.exec("ALTER TABLE users ADD COLUMN isAdmin INTEGER DEFAULT 0"); } catch (e) {}
@@ -1837,7 +1841,7 @@ async function startServer() {
     try {
       const users = db.prepare(`
         SELECT 
-          u.phone, u.fullName, u.location, u.gender, u.birthDate, u.educationLevel, u.preferredLanguage, u.isAdmin,
+          u.phone, u.fullName, u.location, u.gender, u.birthDate, u.educationLevel, u.preferredLanguage, u.isAdmin, u.role, u.moderatorPermissions,
           p.completedModules, p.quizScores, p.audioListened, p.completedCaseStudies, p.finalExamScore, p.lastUpdated,
           p.lastActivity, p.lastModuleId
         FROM users u
@@ -1852,16 +1856,18 @@ async function startServer() {
             quizScores: JSON.parse(u.quizScores || '{}'),
             audioListened: JSON.parse(u.audioListened || '{}'),
             completedCaseStudies: JSON.parse(u.completedCaseStudies || '[]'),
+            moderatorPermissions: JSON.parse(u.moderatorPermissions || '[]'),
             isAdmin: Boolean(u.isAdmin)
           };
         } catch (e) {
-          console.error(`Error parsing progress for user ${u.phone}:`, e);
+          console.error(`Error parsing data for user ${u.phone}:`, e);
           return {
             ...u,
             completedModules: [],
             quizScores: {},
             audioListened: {},
             completedCaseStudies: [],
+            moderatorPermissions: [],
             isAdmin: Boolean(u.isAdmin)
           };
         }
@@ -1875,11 +1881,11 @@ async function startServer() {
   });
 
   app.post("/api/admin/users", (req, res) => {
-    const { fullName, phone, location, gender, birthDate, educationLevel, password, isAdmin } = req.body;
+    const { fullName, phone, location, gender, birthDate, educationLevel, password, isAdmin, role, moderatorPermissions } = req.body;
     try {
       db.prepare(`
-        INSERT INTO users (phone, fullName, location, gender, birthDate, educationLevel, password, preferredLanguage, isAdmin)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO users (phone, fullName, location, gender, birthDate, educationLevel, password, preferredLanguage, isAdmin, role, moderatorPermissions)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(phone) DO UPDATE SET
           fullName = excluded.fullName,
           location = excluded.location,
@@ -1887,8 +1893,22 @@ async function startServer() {
           birthDate = excluded.birthDate,
           educationLevel = excluded.educationLevel,
           password = excluded.password,
-          isAdmin = excluded.isAdmin
-      `).run(phone, fullName, location, gender, birthDate, educationLevel, password, 'fr', isAdmin ? 1 : 0);
+          isAdmin = excluded.isAdmin,
+          role = excluded.role,
+          moderatorPermissions = excluded.moderatorPermissions
+      `).run(
+        phone, 
+        fullName, 
+        location, 
+        gender, 
+        birthDate, 
+        educationLevel, 
+        password, 
+        'fr', 
+        isAdmin ? 1 : 0, 
+        role || 'student', 
+        JSON.stringify(moderatorPermissions || [])
+      );
 
       // Only insert progress if it doesn't exist
       db.prepare(`
