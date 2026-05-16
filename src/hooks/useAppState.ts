@@ -763,12 +763,22 @@ export function useAppState(): AppState {
       const userSnap = await getDoc(userRef);
       const isNew = !userSnap.exists();
       
-      // Clean up data for Firestore
+      // Clean up data for Firestore - ensure only serializable fields are kept
+      const { id, phone, email, fullName, location, gender, birthDate, educationLevel, password, isAdmin, role, moderatorPermissions, preferredLanguage } = userData;
       const cleanedData = {
-        ...userData,
-        isAdmin: !!userData.isAdmin,
-        role: userData.role || 'student',
-        moderatorPermissions: userData.moderatorPermissions || []
+        id: id || phone || email,
+        fullName: fullName || '',
+        phone: phone || '',
+        email: email || '',
+        location: location || '',
+        gender: gender || 'M',
+        birthDate: birthDate || '',
+        educationLevel: educationLevel || '',
+        password: password || '',
+        preferredLanguage: preferredLanguage || 'fr',
+        isAdmin: !!isAdmin,
+        role: role || 'student',
+        moderatorPermissions: moderatorPermissions || []
       };
       
       await setDoc(userRef, cleanedData, { merge: true });

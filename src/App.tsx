@@ -158,17 +158,27 @@ import { cn } from './lib/utils';
 
 const getDirectUrl = (url: string) => {
   if (!url) return "";
-  // Handle Google Drive sharing links
+  
+  // Handle Google Drive
   if (url.includes('drive.google.com')) {
-    const idMatch = url.match(/[-\w]{25,}/);
-    if (idMatch) {
-      return `https://docs.google.com/uc?export=download&id=${idMatch[0]}`;
+    // Extract ID from /file/d/ID/view or ?id=ID
+    const idMatch = url.match(/\/d\/([-\w]{25,})/) || url.match(/[?&]id=([-\w]{25,})/);
+    if (idMatch && idMatch[1]) {
+      return `https://docs.google.com/uc?export=download&id=${idMatch[1]}`;
     }
   }
+  
   // Handle Dropbox
-  if (url.includes('dropbox.com') && !url.includes('dl=1')) {
-    return url.replace(/\?(dl=0)?$/, '?dl=1');
+  if (url.includes('dropbox.com')) {
+    return url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace(/\?dl=0$/, '');
   }
+
+  // Handle OneDrive
+  if (url.includes('1drv.ms')) {
+    // These usually need manual conversion to embed, but a direct link might work if it's the raw one
+    return url.replace('1drv.ms', 'api.onedrive.com/v1.0/shares/s!').replace('/root/content', '') + '/root/content';
+  }
+
   return url;
 };
 
@@ -2072,12 +2082,15 @@ const ModuleDetail = ({
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [audioFinished, setAudioFinished] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     setAudioFinished(false);
     setAudioCurrentTime(0);
     setAudioPlaying(false);
+    setAudioError(false);
+    setIsAudioLoading(false);
   }, [module.id]);
 
   // Reporting form state
@@ -2213,14 +2226,23 @@ const ModuleDetail = ({
     if (audioRef.current) {
       if (audioPlaying) {
         audioRef.current.pause();
+        setAudioPlaying(false);
+        setIsAudioLoading(false);
       } else {
+        setAudioError(false);
         setIsAudioLoading(true);
-        audioRef.current.play().catch(err => {
-          console.error("Audio error:", err);
-          setIsAudioLoading(false);
-        });
+        audioRef.current.play()
+          .then(() => {
+            setAudioPlaying(true);
+            setIsAudioLoading(false);
+          })
+          .catch(err => {
+            console.error("Audio error:", err);
+            setIsAudioLoading(false);
+            setAudioError(true);
+            setAudioPlaying(false);
+          });
       }
-      setAudioPlaying(!audioPlaying);
     }
   };
 
@@ -2405,10 +2427,30 @@ const ModuleDetail = ({
                       onLoadedMetadata={handleLoadedMetadata}
                       onLoadStart={() => setIsAudioLoading(true)}
                       onCanPlay={() => setIsAudioLoading(false)}
-                      crossOrigin="anonymous"
+                      onCanPlayThrough={() => setIsAudioLoading(false)}
+                      onPlaying={() => setIsAudioLoading(false)}
+                      onError={() => {
+                        console.error("Audio Load Error");
+                        setIsAudioLoading(false);
+                        setAudioError(true);
+                      }}
                       className="hidden"
                     />
                     
+                    {audioError && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-red-500/20 backdrop-blur-md border border-red-500/50 p-4 rounded-2xl flex items-center gap-3"
+                      >
+                        <AlertTriangle className="text-red-400 shrink-0" size={20} />
+                        <div className="space-y-1">
+                          <p className="text-white text-xs font-bold leading-tight">Impossible de charger l'audio</p>
+                          <p className="text-red-100/70 text-[10px] leading-tight">Verifiez que le lien est accessible au public (Ex: Google Drive "Tous les utilisateurs disposant du lien")</p>
+                        </div>
+                      </motion.div>
+                    )}
+
                     {audioFinished && (
                       <motion.div 
                         initial={{ scale: 0 }} 
