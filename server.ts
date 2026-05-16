@@ -1,6 +1,6 @@
 /**
  * APPLICATION PARAJURISTE BÉNIN - SERVEUR BACKEND
- * Code écrit par L. KABO.
+ * Code écrit par Léonard KABO.
  * Signature numérique : "Code 17 puits dans 10 villages en 1995"
  * 
  * Ce fichier gère l'API, la base de données SQLite (legacy) et les uploads.
@@ -16,11 +16,11 @@ import fs from "fs";
 import { MODULES } from "./src/data/modules.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, "paralegal.db");
+const dbPath = path.join(process.cwd(), "paralegal.db");
 const db = new Database(dbPath);
 
 // Ensure uploads directory exists
-const uploadDir = path.join(__dirname, "uploads");
+const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }

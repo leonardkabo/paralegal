@@ -172,3 +172,7 @@ export interface AppState {
   deleteFile: (filename: string) => Promise<boolean>;
   forceSync: () => Promise<void>;
 }
+
+/**
+ * The END
+ */

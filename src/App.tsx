@@ -98,6 +98,59 @@ import { Card } from './components/Card';
 import { Input } from './components/Input';
 import { Select } from './components/Select';
 import { ProgressBar } from './components/ProgressBar';
+
+const markdownComponents: any = {
+  img: ({ node, ...props }: any) => (
+    <div className="my-6">
+      <img 
+        {...props} 
+        className="max-w-full h-auto rounded-3xl mx-auto block shadow-xl border-4 border-white" 
+        referrerPolicy="no-referrer"
+      />
+      {props.title && <span className="text-center text-[10px] font-bold text-slate-400 mt-2 italic block">{props.title}</span>}
+    </div>
+  ),
+  video: ({ src, title }: any) => (
+    <div className="my-8 space-y-3">
+      <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+        <video src={src} controls className="w-full h-full" />
+      </div>
+      {title && <span className="text-center text-[10px] font-bold text-slate-400 italic block">Vidéo: {title}</span>}
+    </div>
+  ),
+  p: ({ children, ...props }: any) => {
+    const childrenArray = React.Children.toArray(children);
+    if (childrenArray.length === 1 && typeof childrenArray[0] === 'string') {
+      const text = childrenArray[0] as string;
+      const videoMatch = text.match(/@\[video\]\((.*?)\)/i) || text.match(/<video src="(.*?)".*?>/i);
+      if (videoMatch) {
+        return (
+          <div className="my-8 space-y-3">
+            <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+              <video src={videoMatch[1]} controls className="w-full h-full" />
+            </div>
+          </div>
+        );
+      }
+    }
+    return <div className="leading-relaxed mb-6 text-sm text-slate-700">{children}</div>;
+  },
+  a: ({ node, ...props }: any) => {
+    const href = props.href || '';
+    const isVideo = href.match(/\.(mp4|webm|ogg)$/i);
+    if (isVideo) {
+      return (
+        <div className="my-8 space-y-3">
+          <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+            <video src={href} controls className="w-full h-full" />
+          </div>
+          {props.children && <span className="text-center text-[10px] font-bold text-slate-400 italic block">Vidéo: {props.children}</span>}
+        </div>
+      );
+    }
+    return <a {...props} className="text-emerald-600 hover:underline font-bold underline-offset-2" target="_blank" rel="noopener noreferrer" />;
+  }
+};
 import { useAppState } from './hooks/useAppState';
 import { cn } from './lib/utils';
 
@@ -2171,6 +2224,7 @@ const ModuleDetail = ({
     setAudioFinished(true);
   };
 
+
   return (
     <div className="h-full bg-white flex flex-col overflow-hidden">
       <div className="p-6 border-b border-slate-100 flex items-center gap-4 shrink-0 bg-white z-10">
@@ -2338,9 +2392,14 @@ const ModuleDetail = ({
                   </div>
                 )}
                 
-                {user.preferredLanguage === 'fr' && (
-                  <div className="markdown-body p-2">
-                    <Markdown remarkPlugins={[remarkGfm]}>{module.content || ''}</Markdown>
+                {(user.preferredLanguage === 'fr' || (module.content && module.content.includes('![')) || (module.content && module.content.includes('@[video]'))) && (
+                  <div className="markdown-body p-2 prose prose-slate prose-sm max-w-none">
+                    <Markdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents}
+                    >
+                      {module.content || ''}
+                    </Markdown>
                   </div>
                 )}
 
@@ -2833,6 +2892,28 @@ const AdminDashboard = ({
     lastBackup: new Date().toISOString()
   });
   const [editingModule, setEditingModule] = useState<Module | null>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [editorTab, setEditorTab] = useState<'edit' | 'preview'>('edit');
+
+  const insertMarkdownAtCursor = (text: string) => {
+    if (!editingModule) return;
+    const textarea = contentRef.current;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const content = editingModule.content || '';
+      const newContent = content.substring(0, start) + text + content.substring(end);
+      setEditingModule({ ...editingModule, content: newContent });
+      
+      // Reset focus and selection after state update
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + text.length, start + text.length);
+      }, 0);
+    } else {
+      setEditingModule({ ...editingModule, content: (editingModule.content || '') + "\n" + text });
+    }
+  };
   const [editingTerm, setEditingTerm] = useState<GlossaryTerm | null>(null);
   const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
   const [editingCase, setEditingCase] = useState<CaseStudy | null>(null);
@@ -3004,7 +3085,7 @@ const AdminDashboard = ({
     }
   };
 
-  const handleModuleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'audio' | 'video' | 'pdf') => {
+  const handleModuleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'audio' | 'video' | 'pdf' | 'image') => {
     const file = e.target.files?.[0];
     if (file && editingModule) {
       try {
@@ -4009,54 +4090,118 @@ const AdminDashboard = ({
                   </div>
                 </div>
 
-                <div className="space-y-1.5 pt-4 border-t border-slate-100">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Contenu (Markdown)</label>
-                  <textarea 
-                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl min-h-[200px] text-sm font-mono"
-                    value={editingModule.content}
-                    onChange={e => setEditingModule({...editingModule, content: e.target.value})}
-                  />
+                <div className="space-y-2 pt-4 border-t border-slate-100">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Contenu (Markdown)</label>
+                    <div className="flex gap-1">
+                      <button 
+                        type="button" 
+                        onClick={() => insertMarkdownAtCursor("**Texte en gras**")}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-[10px] font-bold"
+                        title="Gras"
+                      >B</button>
+                      <button 
+                        type="button" 
+                        onClick={() => insertMarkdownAtCursor("*Texte en italique*")}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-[10px] italic"
+                        title="Italique"
+                      >I</button>
+                      <button 
+                        type="button" 
+                        onClick={() => insertMarkdownAtCursor("# Nouveau Titre\n")}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-[10px] font-bold"
+                        title="Titre"
+                      >H</button>
+                      <button 
+                        type="button" 
+                        onClick={() => insertMarkdownAtCursor("\n- Liste à puces\n")}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-[10px]"
+                        title="Liste"
+                      >•</button>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-2">
+                       <button 
+                         type="button"
+                         onClick={() => setEditorTab('edit')}
+                         className={cn("px-4 py-1 text-xs font-bold rounded-full transition-all", editorTab === 'edit' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}
+                       >Édition</button>
+                       <button 
+                         type="button"
+                         onClick={() => setEditorTab('preview')}
+                         className={cn("px-4 py-1 text-xs font-bold rounded-full transition-all", editorTab === 'preview' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}
+                       >Aperçu</button>
+                    </div>
+                  </div>
+                  {editorTab === 'edit' ? (
+                    <textarea 
+                      ref={contentRef}
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl min-h-[300px] text-sm font-mono focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                      value={editingModule.content}
+                      onChange={e => setEditingModule({...editingModule, content: e.target.value})}
+                      placeholder="Tapez votre contenu ici... Utilisez ![alt](url) pour les images ou @[video](url) pour les vidéos."
+                    />
+                  ) : (
+                    <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl min-h-[300px] overflow-auto markdown-body prose prose-slate prose-sm max-w-none shadow-inner">
+                      <Markdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                        {editingModule.content || '*Aucun contenu à afficher. Commencez à rédiger dans l\'onglet Édition.*'}
+                      </Markdown>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-slate-400 italic mt-2">Astuce: Vous pouvez insérer des images et vidéos en utilisant les boutons "Insérer" ci-dessous.</p>
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-slate-100">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Médias & Fichiers</h4>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-3">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio Translation (Fon)</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio (Fon)</label>
                       <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <input type="file" accept="audio/*" onChange={e => handleModuleFileUpload(e, 'audio')} className="text-[10px] flex-1" />
-                        </div>
+                        <input type="file" accept="audio/*" onChange={e => handleModuleFileUpload(e, 'audio')} className="text-[10px]" />
                         <div className="relative">
-                          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-                            <Globe size={12} />
-                          </div>
                           <input 
                             className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-emerald-500 outline-none"
-                            placeholder="Ou coller un lien URL audio..."
+                            placeholder="URL..."
                             value={editingModule.audioUrl || ''}
                             onChange={e => setEditingModule({...editingModule, audioUrl: e.target.value})}
                           />
+                          <Globe size={12} className="absolute left-3 top-2.5 text-slate-400" />
                         </div>
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vidéo du cours (URL/Upload)</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vidéo du cours</label>
                       <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <input type="file" accept="video/*" onChange={e => handleModuleFileUpload(e, 'video')} className="text-[10px] flex-1" />
-                        </div>
+                        <input type="file" accept="video/*" onChange={e => handleModuleFileUpload(e, 'video')} className="text-[10px]" />
                         <div className="relative">
-                          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-                            <Video size={12} />
-                          </div>
                           <input 
                             className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-emerald-500 outline-none"
-                            placeholder="Ou coller un lien URL vidéo..."
+                            placeholder="URL..."
                             value={editingModule.videoUrl || ''}
                             onChange={e => setEditingModule({...editingModule, videoUrl: e.target.value})}
                           />
+                          <Video size={12} className="absolute left-3 top-2.5 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Média pour texte</label>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1.5 overflow-hidden">
+                           <ImageIcon size={14} className="text-slate-400 ml-1 shrink-0" />
+                           <input 
+                             type="file" 
+                             accept="image/*,video/*" 
+                             onChange={async (e) => {
+                               const file = e.target.files?.[0];
+                               if (!file) return;
+                               const type = file.type.startsWith('video') ? 'video' : 'image';
+                               await handleModuleFileUpload(e, type);
+                             }} 
+                             className="text-[9px] file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[9px] file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" 
+                           />
                         </div>
                       </div>
                     </div>
@@ -4081,22 +4226,47 @@ const AdminDashboard = ({
                         <Plus size={10} /> Ajouter via URL
                       </button>
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
-                      <Paperclip size={14} className="text-slate-400 ml-1" />
-                      <input type="file" accept=".pdf,image/*" onChange={e => handleModuleFileUpload(e, 'pdf')} className="text-[10px] flex-1 bg-transparent border-none outline-none" />
-                    </div>
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="flex flex-wrap gap-3 mt-4">
                       {editingModule.attachments?.map(att => (
-                        <div key={att.id} className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-[10px] shadow-sm group">
-                          {att.type === 'audio' ? <Volume2 size={12} className="text-blue-500" /> : att.type === 'video' ? <Video size={12} className="text-slate-500" /> : <FileText size={12} className="text-emerald-500" />}
-                          <span className="truncate max-w-[120px] font-medium">{att.name}</span>
-                          <button 
-                            type="button"
-                            onClick={() => handleDeleteAttachment(att.id)} 
-                            className="text-slate-300 hover:text-red-500 transition-colors"
-                          >
-                            <X size={14} />
-                          </button>
+                        <div key={att.id} className="flex flex-col gap-2 bg-white border border-slate-200 p-2 rounded-2xl text-[10px] shadow-sm group min-w-[150px] max-w-[220px]">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            {att.type === 'image' ? (
+                              <div className="w-10 h-10 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+                                <img src={att.url} alt="Aperçu" className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">
+                                {att.type === 'audio' ? <Volume2 size={16} className="text-blue-500" /> : att.type === 'video' ? <Video size={16} className="text-purple-500" /> : <FileText size={16} className="text-emerald-500" />}
+                              </div>
+                            )}
+                            <div className="flex-1 overflow-hidden">
+                              <p className="truncate font-bold text-slate-700">{att.name}</p>
+                              <p className="text-[8px] text-slate-400 truncate uppercase">{att.type}</p>
+                            </div>
+                            <button 
+                              type="button"
+                              onClick={() => handleDeleteAttachment(att.id)} 
+                              className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                          
+                          {(att.type === 'image' || att.type === 'video') && (
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                const md = att.type === 'image' 
+                                  ? `\n![${att.name}](${att.url})\n`
+                                  : `\n@[video](${att.url})\n`;
+                                insertMarkdownAtCursor(md);
+                                contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                              }}
+                              className="w-full text-center py-2 bg-emerald-50 text-emerald-700 font-bold rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-all text-[10px]"
+                            >
+                              Insérer dans le texte
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -4106,7 +4276,7 @@ const AdminDashboard = ({
                 <div className="space-y-4 pt-4 border-t border-slate-100">
                   <div className="flex justify-between items-center">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Quiz ({editingModule.quiz?.length || 0} questions)</h4>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setEditingModule({...editingModule, quiz: [...(editingModule.quiz || []), { id: Date.now().toString(), question: 'Nouvelle question', options: ['Option 1', 'Option 2'], correctAnswer: 0 }]})}>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setEditingModule({...editingModule, quiz: [...(editingModule.quiz || []), { id: Date.now().toString(), question: 'Nouvelle question', options: ['Option 1', 'Option 2'], correctAnswer: [0] }]})}>
                       <Plus size={14} className="mr-1" /> Ajouter
                     </Button>
                   </div>
