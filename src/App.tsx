@@ -2991,7 +2991,12 @@ const AdminDashboard = ({
   };
 
   // Gestion de l'onglet actif dans le dashboard
-  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports' | 'media' | 'database'>('users');
+  const [view, setView] = useState<'users' | 'modules' | 'glossary' | 'documents' | 'cases' | 'settings' | 'reports' | 'media' | 'database'>(
+    hasPermission('manage_users') ? 'users' : 
+    hasPermission('manage_modules') ? 'modules' :
+    hasPermission('view_reports') ? 'reports' :
+    'settings'
+  );
   
   // Les états pour les formulaires d'édition
   const [reports, setReports] = useState<any[]>([]);
@@ -3065,7 +3070,9 @@ const AdminDashboard = ({
         birthDate: editingUser.birthDate || '',
         educationLevel: editingUser.educationLevel || '',
         password: editingUser.password || '',
-        isAdmin: !!editingUser.isAdmin
+        isAdmin: !!editingUser.isAdmin,
+        role: editingUser.role || 'student',
+        moderatorPermissions: editingUser.moderatorPermissions || []
       });
       setShowUserForm(true);
     } else {
@@ -3079,7 +3086,9 @@ const AdminDashboard = ({
         birthDate: '',
         educationLevel: '',
         password: '',
-        isAdmin: false
+        isAdmin: false,
+        role: 'student',
+        moderatorPermissions: []
       });
     }
   }, [editingUser]);
@@ -3121,7 +3130,11 @@ const AdminDashboard = ({
   };
 
   const handleDeleteUser = async (phone: string) => {
-    if (confirm("Supprimer cet utilisateur ?")) {
+    if (!currentUser?.isAdmin && currentUser?.role !== 'admin') {
+      alert("Seuls les administrateurs peuvent supprimer des utilisateurs.");
+      return;
+    }
+    if (confirm("Supprimer cet utilisateur définitivement ?")) {
       await onDeleteUser(phone);
     }
   };
@@ -3870,7 +3883,7 @@ const AdminDashboard = ({
                       <Button variant="ghost" size="icon" className="text-slate-400" onClick={() => setEditingUser(u)}>
                         <Edit size={18} />
                       </Button>
-                      {!u.isAdmin && (
+                      {!u.isAdmin && (currentUser?.isAdmin || currentUser?.role === 'admin') && (
                         <Button variant="ghost" size="icon" className="text-red-500" onClick={() => {
                           if (confirm(`Voulez-vous vraiment supprimer l'utilisateur ${u.fullName} ?`)) {
                             onDeleteUser((u as any).id || u.phone || "");
