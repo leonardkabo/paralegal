@@ -735,16 +735,32 @@ export function useAppState(): AppState {
   };
 
   const deleteUser = async (userId: string) => {
+    // Only admins can delete users definitively
+    if (!user?.isAdmin && user?.role !== 'admin') {
+      alert("Seuls les administrateurs peuvent supprimer des utilisateurs définitivement.");
+      return false;
+    }
+
     try {
-      // 1. Delete from Firestore
+      // Find the user to get their phone for SQLite deletion
+      const userToDelete = users.find(u => (u as any).id === userId || u.phone === userId || (u as any).uid === userId);
+      const phoneToDelete = userToDelete?.phone || userId;
+
+      // 1. Delete from Firestore (try multiple possible IDs for thorough cleanup)
       await deleteDoc(doc(db, 'users', userId));
       await deleteDoc(doc(db, 'progress', userId));
       
+      if (userToDelete && userToDelete.phone && userToDelete.phone !== userId) {
+        // Handle cases where the document ID is the phone number but we passed a UID
+        try { await deleteDoc(doc(db, 'users', userToDelete.phone)); } catch (e) {}
+        try { await deleteDoc(doc(db, 'progress', userToDelete.phone)); } catch (e) {}
+      }
+      
       // 2. Delete from SQLite (Success is optional as Firestore is primary)
       try {
-        await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+        await fetch(`/api/admin/users/${phoneToDelete}`, { method: 'DELETE' });
       } catch (err) {
-        console.error("SQLite delete failed (possibly offline or no server):", err);
+        console.error("SQLite delete failed:", err);
       }
       
       return true;
@@ -777,11 +793,18 @@ export function useAppState(): AppState {
         password: password || '',
         preferredLanguage: preferredLanguage || 'fr',
         isAdmin: !!isAdmin,
-        role: role || 'student',
+        role: role || (isAdmin ? 'admin' : 'student'),
         moderatorPermissions: moderatorPermissions || []
       };
       
       await setDoc(userRef, cleanedData, { merge: true });
+
+      // Admin helping user reset password
+      if (!isNew && password && password.length >= 4) {
+         // In this app, we also store the password in plain text in Firestore for "legacy" check or reference
+         // Ideally we'd use Firebase Admin to update the Auth password too.
+         // Without Admin SDK, we at least update the SQLite and Firestore records.
+      }
 
       // Sync to SQLite if available
       try {
@@ -790,6 +813,15 @@ export function useAppState(): AppState {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(cleanedData)
         });
+        
+        // Also sync password specifically if provided
+        if (password && phone) {
+          await fetch('/api/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, newPassword: password })
+          });
+        }
       } catch (e) {
          console.warn("SQLite sync failed during saveUser");
       }
@@ -797,7 +829,7 @@ export function useAppState(): AppState {
       if (isNew) {
         // Initialize progress for new users created by admin
         const initialProgress: UserProgress = {
-          phone: userId,
+          phone: phone || userId,
           completedModules: [],
           quizScores: {},
           audioListened: {},

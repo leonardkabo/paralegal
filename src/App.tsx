@@ -164,13 +164,20 @@ const getDirectUrl = (url: string) => {
     // Extract ID from /file/d/ID/view or ?id=ID
     const idMatch = url.match(/\/d\/([-\w]{25,})/) || url.match(/[?&]id=([-\w]{25,})/);
     if (idMatch && idMatch[1]) {
-      return `https://docs.google.com/uc?export=download&id=${idMatch[1]}`;
+      // Use direct stream-friendly link
+      return `https://docs.google.com/uc?id=${idMatch[1]}`;
     }
   }
   
   // Handle Dropbox
   if (url.includes('dropbox.com')) {
     return url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace(/\?dl=0$/, '');
+  }
+
+  // Handle Google Drive file/d/ links
+  if (url.includes('drive.google.com/file/d/')) {
+    const id = url.split('/d/')[1]?.split('/')[0];
+    if (id) return `https://docs.google.com/uc?id=${id}`;
   }
 
   // Handle OneDrive
@@ -3727,7 +3734,64 @@ const AdminDashboard = ({
                         required={!newUser.phone}
                       />
                     </div>
-                    <Input label="Localisation" value={newUser.location} onChange={e => setNewUser({...newUser, location: e.target.value})} required />
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input label="Localisation" value={newUser.location} onChange={e => setNewUser({...newUser, location: e.target.value})} required />
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Rôle</label>
+                        <select 
+                          value={newUser.role || 'student'} 
+                          onChange={e => {
+                            const role = e.target.value;
+                            setNewUser({...newUser, role, isAdmin: role === 'admin'});
+                          }}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                        >
+                          <option value="student">Étudiant</option>
+                          <option value="moderator">Modérateur</option>
+                          <option value="admin">Administrateur</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {newUser.role === 'moderator' && (
+                      <div className="space-y-2 p-4 bg-yellow-50 rounded-2xl border border-yellow-100">
+                        <label className="text-[10px] font-black text-yellow-800 uppercase tracking-widest flex items-center gap-2">
+                           <ShieldCheck size={14} /> Droits du Modérateur
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: 'manage_users', label: 'Inscriptions' },
+                            { id: 'manage_modules', label: 'Modules' },
+                            { id: 'manage_content', label: 'Contenu (Glossaire...)' },
+                            { id: 'view_reports', label: 'Signalements' },
+                            { id: 'manage_media', label: 'Médiathèque' },
+                            { id: 'manage_settings', label: 'Paramètres' }
+                          ].map(perm => (
+                            <label key={perm.id} className="flex items-center gap-2 text-[10px] font-bold text-yellow-700 cursor-pointer hover:bg-white/50 p-1 rounded transition-colors">
+                              <input 
+                                type="checkbox" 
+                                checked={newUser.moderatorPermissions?.includes(perm.id)}
+                                onChange={e => {
+                                  const perms = newUser.moderatorPermissions || [];
+                                  if (e.target.checked) setNewUser({...newUser, moderatorPermissions: [...perms, perm.id]});
+                                  else setNewUser({...newUser, moderatorPermissions: perms.filter((p: string) => p !== perm.id)});
+                                }}
+                                className="w-3 h-3 text-yellow-600 rounded"
+                              />
+                              {perm.label}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <Input 
+                      label={editingUser ? "Modifier le mot de passe" : "Mot de passe"} 
+                      type="text"
+                      value={newUser.password} 
+                      onChange={e => setNewUser({...newUser, password: e.target.value})} 
+                      placeholder={editingUser ? "Laissez vide pour ne pas changer" : "Minimum 6 caractères"}
+                    />
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase">Genre</label>
                       <div className="flex gap-4">
@@ -3741,7 +3805,20 @@ const AdminDashboard = ({
                     </div>
                     <Input label="Date de naissance" type="date" value={newUser.birthDate} onChange={e => setNewUser({...newUser, birthDate: e.target.value})} required />
                     <Input label="Niveau d'études" value={newUser.educationLevel} onChange={e => setNewUser({...newUser, educationLevel: e.target.value})} required />
-                    <Input label="Mot de passe" type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required={!editingUser} />
+                    <div className="space-y-1">
+                      <Input 
+                        label="Mot de passe" 
+                        type="password" 
+                        value={newUser.password} 
+                        onChange={e => setNewUser({...newUser, password: e.target.value})} 
+                        required={!editingUser} 
+                      />
+                      {editingUser && (
+                        <p className="text-[9px] text-amber-600 font-medium ml-1">
+                          Laissez tel quel pour ne pas changer, ou saisissez un nouveau mot de passe pour le réinitialiser.
+                        </p>
+                      )}
+                    </div>
                     
                     <div className="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Rôle & Permissions</label>
@@ -3783,7 +3860,7 @@ const AdminDashboard = ({
                                      const current = newUser.moderatorPermissions || [];
                                      const next = e.target.checked 
                                        ? [...current, perm.id]
-                                       : current.filter(p => p !== perm.id);
+                                       : current.filter((p: string) => p !== perm.id);
                                      setNewUser({ ...newUser, moderatorPermissions: next });
                                    }}
                                    className="w-3 h-3 text-emerald-600 rounded border-slate-300"
@@ -4669,9 +4746,9 @@ const SettingsScreen = ({
           </div>
         </Card>
 
-        {user.isAdmin && (
+        {(user.isAdmin || user.role === 'moderator' || user.role === 'admin') && (
           <div className="space-y-3">
-            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Administration</h4>
+            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{user.role === 'moderator' ? 'Modération' : 'Administration'}</h4>
             <Card className="p-0 overflow-hidden">
               <button 
                 onClick={onOpenAdmin}
@@ -4680,8 +4757,10 @@ const SettingsScreen = ({
                 <div className="flex items-center gap-3">
                   <Settings size={20} className="text-emerald-600" />
                   <div className="text-left">
-                    <p className="text-sm font-bold text-emerald-900">Tableau de bord Admin</p>
-                    <p className="text-[10px] text-emerald-600">Gérer les utilisateurs et le contenu</p>
+                    <p className="text-sm font-bold text-emerald-900">{user.role === 'moderator' ? 'Tableau de bord Modo' : 'Tableau de bord Admin'}</p>
+                    <p className="text-[10px] text-emerald-600">
+                      {user.role === 'moderator' ? 'Gérer selon vos permissions' : 'Gérer les utilisateurs et le contenu'}
+                    </p>
                   </div>
                 </div>
                 <ChevronRight size={16} className="text-emerald-400" />
