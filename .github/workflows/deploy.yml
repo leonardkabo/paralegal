@@ -43,4 +43,4 @@ jobs:
             echo "NODE_ENV=production" >> .env
             
             # Lancement/Reconstruction de l'application
-            docker compose up -d --build
+            docker compose build --no-cache && docker compose up -d
