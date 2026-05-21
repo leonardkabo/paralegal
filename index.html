@@ -6,7 +6,42 @@
     <meta name="theme-color" content="#10b981" />
     <link rel="icon" type="image/png" href="favicon.png">
     <title>Paralegal APP</title>
-    <!-- Code développé par Léonard KABO - +229 0165458778 -->
+    <!-- Code développé par Léonard KABO +229 0165458778-->
+    
+    <!-- Pare-feu et mesure de sécurité contre les injections liées aux navigateurs -->
+    <script>
+      (function() {
+        var isExtensionError = function(msg, url, line) {
+          var errorString = String(msg || '');
+          var urlString = String(url || '');
+          return (
+            errorString.indexOf('fetch of #<Window>') !== -1 ||
+            errorString.indexOf('MetaMask') !== -1 ||
+            errorString.indexOf('ethereum') !== -1 ||
+            errorString.indexOf('Cannot set property fetch') !== -1 ||
+            urlString.indexOf('extension') !== -1 ||
+            urlString.indexOf('metamax') !== -1
+          );
+        };
+
+        window.addEventListener('error', function(event) {
+          if (isExtensionError(event.message, event.filename, event.lineno)) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason;
+          var msg = reason ? (reason.message || reason) : '';
+          var file = reason ? (reason.fileName || reason.sourceURL) : '';
+          if (isExtensionError(msg, file)) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+          }
+        }, true);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
