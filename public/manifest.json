@@ -1,0 +1,59 @@
+{
+  "name": "Paralegal",
+  "short_name": "Paralegal",
+  "description": "Application pédagogique pour la formation des parajuristes communautaires",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#10b981",
+  "background_color": "#ffffff",
+  "categories": [
+    "education",
+    "government",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot_portrait.png",
+      "sizes": "900x1600",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Paralegal application mobile"
+    },
+    {
+      "src": "/screenshot_landscape.png",
+      "sizes": "1600x900",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Paralegal espace de travail"
+    }
+  ]
+}

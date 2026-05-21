@@ -20,7 +20,6 @@
         "./*"
       ]
     },
-    "types": ["vite-plugin-pwa/client"],
     "allowImportingTsExtensions": true,
     "noEmit": true
   }
