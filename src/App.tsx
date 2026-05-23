@@ -257,7 +257,8 @@ const AuthScreen = ({
   onResetPassword,
   logoUrl,
   isLoading, 
-  error 
+  error,
+  isAdminPortal = false
 }: { 
   onRegister: (data: any) => void, 
   onLogin: (phone: string, pass: string) => void,
@@ -265,7 +266,8 @@ const AuthScreen = ({
   onResetPassword: (identifier: string) => Promise<boolean>,
   logoUrl?: string,
   isLoading: boolean,
-  error: string | null
+  error: string | null,
+  isAdminPortal?: boolean
 }) => {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot-password'>('login');
   const [formData, setFormData] = useState({
@@ -281,6 +283,12 @@ const AuthScreen = ({
   });
   const [resetSuccess, setResetSuccess] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isAdminPortal) {
+      setMode('login');
+    }
+  }, [isAdminPortal]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -343,14 +351,19 @@ const AuthScreen = ({
           )}
         </div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {mode === 'login' ? 'Connexion' : mode === 'register' ? 'Inscription' : 'Récupération'}
+          {isAdminPortal 
+            ? "Espace d'Administration" 
+            : (mode === 'login' ? 'Connexion' : mode === 'register' ? 'Inscription' : 'Récupération')
+          }
         </h1>
         <p className="text-slate-500 mt-2">
-          {mode === 'login' 
-            ? 'Connectez-vous pour retrouver votre progression.' 
-            : mode === 'register'
-            ? 'Inscrivez-vous pour commencer votre cours en ligne (MOOC) sur le parajuralisme.'
-            : 'Entrez votre email ou numéro de téléphone pour recevoir un lien de réinitialisation.'}
+          {isAdminPortal 
+            ? "Portail d'administration sécurisé réservé aux membres de l'équipe HAI." 
+            : (mode === 'login' 
+                ? 'Connectez-vous pour retrouver votre progression.' 
+                : mode === 'register'
+                ? 'Inscrivez-vous pour commencer votre cours en ligne (MOOC) sur le parajuralisme.'
+                : 'Entrez votre email ou numéro de téléphone pour recevoir un lien de réinitialisation.')}
         </p>
       </div>
 
@@ -487,35 +500,36 @@ const AuthScreen = ({
             {mode === 'login' ? 'Se connecter' : mode === 'register' ? "S'inscrire" : "Réinitialiser"}
           </Button>
 
-          {mode === 'login' && (
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
+          {isAdminPortal && mode === 'login' && (
+            <div className="space-y-4 pt-4">
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-slate-50 px-2 text-slate-400 font-bold">Authentification Unique</span>
+                </div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-slate-50 px-2 text-slate-400 font-bold">Ou Admin</span>
-              </div>
-            </div>
-          )}
 
-          {mode === 'login' && (
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="w-full gap-2 border-slate-200 text-slate-600 hover:bg-slate-100" 
-              onClick={onLoginWithGoogle}
-              isLoading={isLoading}
-            >
-              <GoogleIcon className="w-4 h-4" />
-              Connexion Admin (Google)
-            </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full gap-2 border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 py-5 font-bold" 
+                onClick={onLoginWithGoogle}
+                isLoading={isLoading}
+              >
+                <GoogleIcon className="w-4 h-4" />
+                Se connecter avec Google Workspace
+              </Button>
+            </div>
           )}
         </form>
       )}
 
       <div className="mt-8 text-center space-y-4">
-        {mode === 'login' && (
+        {mode === 'login' && !isAdminPortal && (
           <button 
+            type="button"
             onClick={() => setMode('forgot-password')}
             className="block w-full text-sm font-medium text-slate-500 hover:text-emerald-600"
           >
@@ -523,19 +537,29 @@ const AuthScreen = ({
           </button>
         )}
         
-        <button 
-          onClick={() => {
-            if (mode === 'forgot-password') setMode('login');
-            else setMode(mode === 'login' ? 'register' : 'login');
-          }}
-          className="text-sm font-semibold text-emerald-600 hover:text-emerald-700"
-        >
-          {mode === 'login' 
-            ? "Pas encore de compte ? S'inscrire" 
-            : mode === 'register'
-            ? "Déjà un compte ? Se connecter"
-            : "Retour à la connexion"}
-        </button>
+        {isAdminPortal ? (
+          <a 
+            href="/" 
+            className="text-sm font-semibold text-slate-500 hover:text-emerald-600 block text-center"
+          >
+            ← Accéder à l'Espace Élèves
+          </a>
+        ) : (
+          <button 
+            type="button"
+            onClick={() => {
+              if (mode === 'forgot-password') setMode('login');
+              else setMode(mode === 'login' ? 'register' : 'login');
+            }}
+            className="text-sm font-semibold text-emerald-600 hover:text-emerald-700"
+          >
+            {mode === 'login' 
+              ? "Pas encore de compte ? S'inscrire" 
+              : mode === 'register'
+              ? "Déjà un compte ? Se connecter"
+              : "Retour à la connexion"}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -5199,6 +5223,29 @@ export default function App() {
     }
   };
 
+  const isAdminPortal = window.location.pathname.includes('/chezlekabotologue/admin');
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      if (user.isAdmin) {
+        if (!isAdminPortal) {
+          setAuthError("Cet accès est réservé aux élèves. Pour des raisons de sécurité, les administrateurs doivent impérativement se connecter via l'adresse d'administration secrète.");
+          logout();
+        } else {
+          setAuthError(null);
+        }
+      } else {
+        if (isAdminPortal) {
+          setAuthError("Accès refusé. Ce portail de connexion est strictement réservé aux administrateurs.");
+          logout();
+        } else {
+          setAuthError(null);
+        }
+      }
+    }
+  }, [user, isAdminPortal]);
+
   const [showFirstRegLanguageSelect, setShowFirstRegLanguageSelect] = useState(() => {
     return localStorage.getItem('first_registration_pending_lang') === 'true';
   });
@@ -5253,7 +5300,8 @@ export default function App() {
         onResetPassword={sendPasswordReset}
         logoUrl={settings.logoUrl}
         isLoading={isLoading} 
-        error={error} 
+        error={authError || error} 
+        isAdminPortal={isAdminPortal}
       />
     );
   }
