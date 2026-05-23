@@ -2187,6 +2187,13 @@ async function startServer() {
     }
   });
 
+  // Support for Android Digital Asset Links (Trusted Web Activity)
+  app.get(["/.well-known/assetlinks.json", "/well-known/assetlinks.json"], (req, res) => {
+    const assetlinksPath = path.join(process.cwd(), "public", ".well-known", "assetlinks.json");
+    res.setHeader("Content-Type", "application/json");
+    res.sendFile(assetlinksPath);
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
