@@ -2,8 +2,8 @@
  * =========================================================================
  * APPLICATION PARALEGAL - BENIN
  * =========================================================================
- * Développé par: Léonard KABO - Le kabotologue
- * Date de création: 2025 (dernière mise à jour: 2026)
+ * Développé par: Léonard KABO
+ * Date de création: 2024 (dernière mise à jour: 2026)
  * Description: Application mobile pour la formation des parajuristes
  * sur les thématiques de santé, droit foncier et violences basées sur le genre.
  * 
@@ -541,37 +541,113 @@ const AuthScreen = ({
   );
 };
 
-const LanguageSelectionScreen = ({ onSelect }: { onSelect: (lang: Language) => void }) => {
+const LanguageSelectionScreen = ({ 
+  user, 
+  onSelectLanguage, 
+  onSelect,
+  logoUrl 
+}: { 
+  user?: any, 
+  onSelectLanguage?: (lang: Language) => void,
+  onSelect?: (lang: Language) => void,
+  logoUrl?: string 
+}) => {
+  const [selected, setSelected] = useState<Language>('fr');
+
+  const handleConfirm = () => {
+    if (onSelectLanguage) {
+      onSelectLanguage(selected);
+    } else if (onSelect) {
+      onSelect(selected);
+    }
+  };
+
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen p-6 flex flex-col max-w-2xl mx-auto text-center py-24"
-    >
-      <h2 className="text-2xl font-bold mb-8">Choisissez votre langue d'apprentissage</h2>
-      <div className="grid gap-4">
-        <Card onClick={() => onSelect('fr')} className="flex items-center gap-4 p-6">
-          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
-            <Globe size={24} />
-          </div>
-          <div className="text-left">
-            <h3 className="font-bold">Français</h3>
-            <p className="text-xs text-slate-500">Texte + Quiz interactifs</p>
-          </div>
-          <ChevronRight className="ml-auto text-slate-300" />
-        </Card>
-        <Card onClick={() => onSelect('fon')} className="flex items-center gap-4 p-6">
-          <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center">
-            <Mic size={24} />
-          </div>
-          <div className="text-left">
-            <h3 className="font-bold">Fon</h3>
-            <p className="text-xs text-slate-500">Audio uniquement</p>
-          </div>
-          <ChevronRight className="ml-auto text-slate-300" />
-        </Card>
+    <div className="min-h-screen p-6 flex flex-col justify-center max-w-md mx-auto py-12">
+      <div className="mb-8 text-center shrink-0">
+        <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden bg-white shadow-sm border border-slate-100 p-2">
+          {logoUrl ? (
+            <img src={logoUrl} alt="Logo HAI" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+          ) : (
+            <div className="bg-emerald-100 text-emerald-600 w-full h-full flex items-center justify-center rounded-xl">
+              <Globe size={32} />
+            </div>
+          )}
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+          Bienvenue, {user?.fullName || 'Cher Parajuriste'} !
+        </h1>
+        <p className="text-slate-500 mt-2 text-sm">
+          Félicitations pour votre inscription réussie. Veuillez choisir votre langue d’apprentissage pour continuer.
+        </p>
       </div>
-    </motion.div>
+
+      <div className="space-y-4 mb-8">
+        <button
+          onClick={() => setSelected('fr')}
+          className={cn(
+            "w-full p-5 rounded-2xl border text-left transition-all relative overflow-hidden flex items-start gap-4",
+            selected === 'fr' 
+              ? "border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-500/20" 
+              : "border-slate-200 bg-white hover:border-slate-300"
+          )}
+        >
+          <div className={cn(
+            "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+            selected === 'fr' ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-500"
+          )}>
+            <Globe size={20} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-slate-900">Français</h3>
+              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                Texte + Quiz
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Idéal pour lire les cours directement, répondre aux quiz et valider vos modules.
+            </p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setSelected('fon')}
+          className={cn(
+            "w-full p-5 rounded-2xl border text-left transition-all relative overflow-hidden flex items-start gap-4",
+            selected === 'fon' 
+              ? "border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-500/20" 
+              : "border-slate-200 bg-white hover:border-slate-300"
+          )}
+        >
+          <div className={cn(
+            "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+            selected === 'fon' ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-500"
+          )}>
+            <Volume2 size={20} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-slate-900">Fongbe (Fon)</h3>
+              <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                Audio
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Idéal pour écouter l'apprentissage audio directement traduit pour notre région.
+            </p>
+          </div>
+        </button>
+      </div>
+
+      <Button onClick={handleConfirm} className="w-full py-6 text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white">
+        Confirmer et commencer <ChevronRight size={16} className="ml-1" />
+      </Button>
+
+      <p className="text-center text-[10px] text-slate-400 mt-4">
+        * Vous pouvez à tout moment modifier ce choix dans l'onglet "Mon Profil".
+      </p>
+    </div>
   );
 };
 
@@ -5123,6 +5199,10 @@ export default function App() {
     }
   };
 
+  const [showFirstRegLanguageSelect, setShowFirstRegLanguageSelect] = useState(() => {
+    return localStorage.getItem('first_registration_pending_lang') === 'true';
+  });
+
   useEffect(() => {
     if (user && !localStorage.getItem('paralegal_intro_seen')) {
       localStorage.setItem('paralegal_intro_seen', 'true');
@@ -5130,15 +5210,26 @@ export default function App() {
   }, [user]);
 
   const handleRegister = (data: any) => {
+    localStorage.setItem('first_registration_pending_lang', 'true');
+    setShowFirstRegLanguageSelect(true);
     registerUser(data);
   };
 
   const handleLogin = (phone: string, pass: string) => {
+    localStorage.removeItem('first_registration_pending_lang');
+    setShowFirstRegLanguageSelect(false);
     login(phone, pass);
   };
 
   const handleLanguageSelect = (lang: Language) => {
     setLanguage(lang);
+    localStorage.setItem('paralegal_intro_seen', 'true');
+  };
+
+  const handleFirstTimeLanguageSelect = (lang: Language) => {
+    setLanguage(lang);
+    localStorage.removeItem('first_registration_pending_lang');
+    setShowFirstRegLanguageSelect(false);
     localStorage.setItem('paralegal_intro_seen', 'true');
   };
 
@@ -5158,6 +5249,17 @@ export default function App() {
         logoUrl={settings.logoUrl}
         isLoading={isLoading} 
         error={error} 
+      />
+    );
+  }
+
+  // Écran intermédiaire de sélection de langue si premier enregistrement
+  if (showFirstRegLanguageSelect) {
+    return (
+      <LanguageSelectionScreen 
+        user={user} 
+        onSelectLanguage={handleFirstTimeLanguageSelect}
+        logoUrl={settings.logoUrl}
       />
     );
   }
