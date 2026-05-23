@@ -606,7 +606,7 @@ const LanguageSelectionScreen = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Idéal pour lire les cours directement, répondre aux quiz et valider vos modules.
+              Lire les cours directement en Français, répondre aux quiz et valider vos modules.
             </p>
           </div>
         </button>
@@ -634,7 +634,7 @@ const LanguageSelectionScreen = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Idéal pour écouter l'apprentissage audio directement traduit pour notre région.
+              Ecoutez le cours en version audio dans la langue Fongbé (Fon)
             </p>
           </div>
         </button>
