@@ -2,8 +2,8 @@
  * =========================================================================
  * APPLICATION PARALEGAL - BENIN
  * =========================================================================
- * Développé par: Léonard KABO
- * Date de création: 2024 (dernière mise à jour: 2026)
+ * Développé par: Léonard KABO - Le kabotologue
+ * Date de création: 2025 (dernière mise à jour: 2026)
  * Description: Application mobile pour la formation des parajuristes
  * sur les thématiques de santé, droit foncier et violences basées sur le genre.
  * 
@@ -2193,36 +2193,6 @@ const ModuleDetail = ({
     }
   };
 
-  const downloadCourse = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(20);
-    doc.text(module.title, 20, 20);
-    doc.setFontSize(12);
-    doc.text(`MOOC Droit & Parajuralisme - Module ${module.id}`, 20, 30);
-    
-    let y = 50;
-    if (module.introduction) {
-      doc.setFontSize(14);
-      doc.text('Introduction', 20, y);
-      y += 10;
-      doc.setFontSize(10);
-      const splitIntro = doc.splitTextToSize(module.introduction, 170);
-      doc.text(splitIntro, 20, y);
-      y += splitIntro.length * 5 + 10;
-    }
-
-    if (module.content) {
-      doc.setFontSize(14);
-      doc.text('Contenu du cours', 20, y);
-      y += 10;
-      doc.setFontSize(10);
-      const splitContent = doc.splitTextToSize(module.content, 170);
-      doc.text(splitContent, 20, y);
-    }
-
-    doc.save(`Cours_Module_${module.id}.pdf`);
-  };
-
   useEffect(() => {
     if (audioRef.current && audioCurrentTime > 0 && !audioPlaying) {
       audioRef.current.currentTime = audioCurrentTime;
@@ -2278,7 +2248,7 @@ const ModuleDetail = ({
 
 
   return (
-    <div className="h-full bg-white flex flex-col overflow-hidden">
+    <div className="h-full bg-white flex flex-col overflow-hidden no-select" onContextMenu={(e) => e.preventDefault()}>
       <div className="p-6 border-b border-slate-100 flex items-center gap-4 shrink-0 bg-white z-10">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft size={20} />
@@ -2295,9 +2265,6 @@ const ModuleDetail = ({
           </motion.div>
         )}
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={downloadCourse} title="Télécharger le cours">
-            <Download size={18} />
-          </Button>
           {progress.completedModules.includes(module.id) && (
             <div className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shrink-0">
               <CheckCircle2 size={12} /> Validé
@@ -2546,8 +2513,8 @@ const ModuleDetail = ({
                                 </span>
                             </div>
                           </div>
-                          <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all">
-                            <Download size={18} />
+                          <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all" title="Consulter">
+                            <ExternalLink size={18} />
                           </div>
                         </a>
                       ))}
@@ -5097,6 +5064,65 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'reporting' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
 
+  // Synchronisation de l'état avec l'historique du navigateur (pour le bouton Retour matériel d'Android & navigateur)
+  const isPopStateRef = useRef(false);
+
+  useEffect(() => {
+    if (window.history.state === null) {
+      window.history.replaceState({ screen: 'main', moduleId: null }, '', '');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isPopStateRef.current) {
+      isPopStateRef.current = false;
+      return;
+    }
+    const currentHistState = window.history.state;
+    const nextHistState = { screen: currentScreen, moduleId: selectedModule?.id || null };
+    if (!currentHistState || currentHistState.screen !== currentScreen || currentHistState.moduleId !== (selectedModule?.id || null)) {
+      window.history.pushState(nextHistState, '', '');
+    }
+  }, [currentScreen, selectedModule]);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      isPopStateRef.current = true;
+      if (event.state) {
+        const { screen, moduleId } = event.state;
+        setCurrentScreen(screen);
+        if (moduleId) {
+          const m = modules.find(item => item.id === moduleId);
+          setSelectedModule(m || null);
+        } else {
+          setSelectedModule(null);
+        }
+      } else {
+        setCurrentScreen('main');
+        setSelectedModule(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [modules]);
+
+  const goBack = () => {
+    if (window.history.state && window.history.state.screen !== 'main') {
+      window.history.back();
+    } else {
+      setCurrentScreen('main');
+      setSelectedModule(null);
+    }
+  };
+
+  const goBackToSettings = () => {
+    if (window.history.state && window.history.state.screen === 'admin') {
+      window.history.back();
+    } else {
+      setCurrentScreen('settings');
+    }
+  };
+
   useEffect(() => {
     if (user && !localStorage.getItem('paralegal_intro_seen')) {
       localStorage.setItem('paralegal_intro_seen', 'true');
@@ -5178,7 +5204,7 @@ export default function App() {
               user={user}
               progress={progress}
               isSyncing={isSyncing}
-              onBack={() => setCurrentScreen('main')}
+              onBack={goBack}
               onNext={(() => {
                 const currentIndex = modules.findIndex(m => m.id === selectedModule.id);
                 if (currentIndex !== -1 && currentIndex < modules.length - 1) {
@@ -5213,7 +5239,7 @@ export default function App() {
               settings={settings}
               onUpdateLanguage={setLanguage}
               onLogout={logout}
-              onBack={() => setCurrentScreen('main')}
+              onBack={goBack}
               onOpenAdmin={() => setCurrentScreen('admin')}
               onDownloadCertificate={generateCertificate}
               onChangePassword={changePassword}
@@ -5230,7 +5256,7 @@ export default function App() {
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed inset-0 z-50 bg-slate-50 max-w-2xl mx-auto shadow-2xl overflow-y-auto"
           >
-            <GlossaryScreen onBack={() => setCurrentScreen('main')} glossary={glossary} />
+            <GlossaryScreen onBack={goBack} glossary={glossary} />
           </motion.div>
         )}
 
@@ -5243,7 +5269,7 @@ export default function App() {
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed inset-0 z-50 bg-slate-50 max-w-2xl mx-auto shadow-2xl overflow-y-auto"
           >
-            <DocumentsScreen onBack={() => setCurrentScreen('main')} documents={legalDocuments} />
+            <DocumentsScreen onBack={goBack} documents={legalDocuments} />
           </motion.div>
         )}
 
@@ -5259,10 +5285,8 @@ export default function App() {
             <ReportingScreen 
               user={user}
               modules={modules}
-              onBack={() => setCurrentScreen('main')}
-              onComplete={() => {
-                setCurrentScreen('main');
-              }}
+              onBack={goBack}
+              onComplete={goBack}
               saveReport={saveReport}
             />
           </motion.div>
@@ -5278,7 +5302,7 @@ export default function App() {
             className="fixed inset-0 z-50 bg-slate-50 max-w-2xl mx-auto shadow-2xl overflow-y-auto"
           >
             <CaseStudiesScreen 
-              onBack={() => setCurrentScreen('main')} 
+              onBack={goBack} 
               progress={progress}
               caseStudies={caseStudies}
               isSyncing={isSyncing}
@@ -5300,7 +5324,7 @@ export default function App() {
               progress={progress}
               modules={modules}
               caseStudies={caseStudies}
-              onBack={() => setCurrentScreen('main')}
+              onBack={goBack}
             />
           </motion.div>
         )}
@@ -5314,7 +5338,7 @@ export default function App() {
             className="fixed inset-0 z-[100] bg-white max-w-2xl mx-auto overflow-y-auto"
           >
             <FinalExamScreen 
-              onBack={() => setCurrentScreen('main')}
+              onBack={goBack}
               onComplete={setFinalExamScore}
               onDownloadCertificate={generateCertificate}
               modules={modules}
@@ -5332,7 +5356,7 @@ export default function App() {
             className="fixed inset-0 z-[100] bg-slate-50 max-w-2xl mx-auto shadow-2xl"
           >
             <AdminDashboard 
-              onBack={() => setCurrentScreen('settings')}
+              onBack={goBackToSettings}
               modules={modules}
               glossary={glossary}
               legalDocuments={legalDocuments}
