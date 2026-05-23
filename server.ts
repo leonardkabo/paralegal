@@ -2189,9 +2189,36 @@ async function startServer() {
 
   // Support for Android Digital Asset Links (Trusted Web Activity)
   app.get(["/.well-known/assetlinks.json", "/well-known/assetlinks.json"], (req, res) => {
-    const assetlinksPath = path.join(process.cwd(), "public", ".well-known", "assetlinks.json");
-    res.setHeader("Content-Type", "application/json");
-    res.sendFile(assetlinksPath);
+    const pathsToTry = [
+      path.join(process.cwd(), "public", ".well-known", "assetlinks.json"),
+      path.join(process.cwd(), "dist", ".well-known", "assetlinks.json"),
+      path.join(process.cwd(), ".well-known", "assetlinks.json"),
+      path.resolve(__dirname, "public", ".well-known", "assetlinks.json"),
+      path.resolve(__dirname, "dist", ".well-known", "assetlinks.json"),
+      path.resolve(__dirname, ".well-known", "assetlinks.json")
+    ];
+
+    let found = false;
+    for (const p of pathsToTry) {
+      if (fs.existsSync(p)) {
+        res.setHeader("Content-Type", "application/json");
+        res.sendFile(p);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      res.setHeader("Content-Type", "application/json");
+      res.json([{
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+          "namespace": "android_app",
+          "package_name": "cloud.leonardkabo.paralegal.twa",
+          "sha256_cert_fingerprints": ["E2:2D:A5:B4:A7:99:60:BF:40:0A:8E:0C:0C:81:CC:0E:0F:F9:C1:44:82:47:67:61:76:3F:9C:2E:A4:A7:D1:C7"]
+        }
+      }]);
+    }
   });
 
   // Vite middleware for development
