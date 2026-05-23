@@ -5216,18 +5216,23 @@ export default function App() {
   };
 
   const handleLogin = (phone: string, pass: string) => {
-    localStorage.removeItem('first_registration_pending_lang');
-    setShowFirstRegLanguageSelect(false);
+    // Si l'utilisateur se connecte, nous vérifions s'il a déjà choisi sa langue à l'avenir
     login(phone, pass);
   };
 
   const handleLanguageSelect = (lang: Language) => {
     setLanguage(lang);
+    if (user?.id) {
+      localStorage.setItem(`lang_chosen_${user?.id}`, 'true');
+    }
     localStorage.setItem('paralegal_intro_seen', 'true');
   };
 
   const handleFirstTimeLanguageSelect = (lang: Language) => {
     setLanguage(lang);
+    if (user?.id) {
+      localStorage.setItem(`lang_chosen_${user?.id}`, 'true');
+    }
     localStorage.removeItem('first_registration_pending_lang');
     setShowFirstRegLanguageSelect(false);
     localStorage.setItem('paralegal_intro_seen', 'true');
@@ -5253,8 +5258,10 @@ export default function App() {
     );
   }
 
-  // Écran intermédiaire de sélection de langue si premier enregistrement
-  if (showFirstRegLanguageSelect) {
+  // Écran intermédiaire de sélection de langue si premier enregistrement OU si la langue d'origine n'a pas été choisie/enregistrée pour cet utilisateur
+  const needsLanguageSelection = showFirstRegLanguageSelect || !localStorage.getItem(`lang_chosen_${user.id}`);
+
+  if (needsLanguageSelection) {
     return (
       <LanguageSelectionScreen 
         user={user} 
