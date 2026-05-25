@@ -191,9 +191,9 @@ export function useAppState(): AppState {
         }
 
         if (!userData && fbUser.email) {
-          // First time admin login
           const adminEmails = ["leonardkabo32@gmail.com", "healthaccessinitiativehai@gmail.com"];
           if (adminEmails.includes(fbUser.email)) {
+            // First time admin login
             userData = {
               fullName: fbUser.displayName || "Admin",
               phone: fbUser.email,
@@ -206,6 +206,22 @@ export function useAppState(): AppState {
               email: fbUser.email
             };
             await setDoc(doc(db, 'users', fbUser.email), userData);
+          } else {
+            // First time learner registration via Google Login
+            userData = {
+              fullName: fbUser.displayName || fbUser.email.split('@')[0],
+              phone: "",
+              location: "Bénin",
+              gender: "M",
+              birthDate: "2000-01-01",
+              educationLevel: "Secondaire",
+              preferredLanguage: "fr",
+              isAdmin: false,
+              email: fbUser.email
+            };
+            await setDoc(doc(db, 'users', fbUser.uid), userData);
+            // On positionne le flag pour forcer l'affichage immédiat du sélecteur de langue
+            localStorage.setItem('first_registration_pending_lang', 'true');
           }
         }
 

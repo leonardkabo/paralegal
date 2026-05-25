@@ -3,7 +3,7 @@
  * APPLICATION PARALEGAL - BENIN
  * =========================================================================
  * Développé par: Léonard KABO
- * Date de création: 2024 (dernière mise à jour: 2026)
+ * Date de création: 2025 (dernière mise à jour: 2026)
  * Description: Application mobile pour la formation des parajuristes
  * sur les thématiques de santé, droit foncier et violences basées sur le genre.
  * 
@@ -396,7 +396,13 @@ const AuthScreen = ({
               required={mode === 'register' ? (!formData.email && !formData.phone) : true}
               value={formData.phone}
               onChange={e => setFormData({...formData, phone: e.target.value})}
-              helperText={mode === 'register' ? "Utilisez votre numéro de téléphone ou un email au choix." : ""}
+              helperText={
+                mode === 'register' 
+                  ? "Utilisez votre numéro de téléphone ou un email au choix." 
+                  : (mode === 'forgot-password' 
+                      ? "Conseil : En utilisant la connexion Google, vous n'aurez plus à vous soucier de la perte de votre mot de passe." 
+                      : "")
+              }
             />
             
             {mode === 'register' && (
@@ -500,6 +506,30 @@ const AuthScreen = ({
             {mode === 'login' ? 'Se connecter' : mode === 'register' ? "S'inscrire" : "Réinitialiser"}
           </Button>
 
+          {!isAdminPortal && (mode === 'login' || mode === 'register') && (
+            <div className="space-y-4 pt-4">
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-100"></div>
+                </div>
+                <div className="relative flex justify-center text-[10px] uppercase">
+                  <span className="bg-slate-50 px-2 text-slate-400 font-black tracking-widest">Ou continuer avec</span>
+                </div>
+              </div>
+
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full gap-2 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold py-5 rounded-xl text-xs flex items-center justify-center transition-all shadow-sm" 
+                onClick={onLoginWithGoogle}
+                isLoading={isLoading}
+              >
+                <GoogleIcon className="w-4 h-4" />
+                {mode === 'login' ? "Se connecter avec Google" : "S'inscrire avec Google"}
+              </Button>
+            </div>
+          )}
+
           {isAdminPortal && mode === 'login' && (
             <div className="space-y-4 pt-4">
               <div className="relative my-4">
@@ -527,16 +557,6 @@ const AuthScreen = ({
       )}
 
       <div className="mt-8 text-center space-y-4">
-        {mode === 'login' && !isAdminPortal && (
-          <button 
-            type="button"
-            onClick={() => setMode('forgot-password')}
-            className="block w-full text-sm font-medium text-slate-500 hover:text-emerald-600"
-          >
-            Mot de passe oublié ?
-          </button>
-        )}
-        
         {isAdminPortal ? (
           <a 
             href="/" 
@@ -5251,8 +5271,13 @@ export default function App() {
   });
 
   useEffect(() => {
-    if (user && !localStorage.getItem('paralegal_intro_seen')) {
-      localStorage.setItem('paralegal_intro_seen', 'true');
+    if (user) {
+      if (!localStorage.getItem('paralegal_intro_seen')) {
+        localStorage.setItem('paralegal_intro_seen', 'true');
+      }
+      if (localStorage.getItem('first_registration_pending_lang') === 'true') {
+        setShowFirstRegLanguageSelect(true);
+      }
     }
   }, [user]);
 
