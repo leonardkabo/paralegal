@@ -2215,11 +2215,24 @@ const ModuleDetail = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    setView('content');
+    setQuizAnswers({});
+    setQuizSubmitted(false);
     setAudioFinished(false);
     setAudioCurrentTime(0);
     setAudioPlaying(false);
     setAudioError(false);
     setIsAudioLoading(false);
+    setReportData({
+      type: '',
+      description: '',
+      location: '',
+      date: '',
+      anonymous: false,
+      audioBlob: null,
+      attachments: [],
+      coordinates: null
+    });
   }, [module.id]);
 
   // Reporting form state
