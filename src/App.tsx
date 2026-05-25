@@ -33,6 +33,8 @@ import {
   Camera,
   FileText,
   Search,
+  Phone,
+  Mail,
   Library,
   Sparkles,
   Volume2,
@@ -4959,27 +4961,88 @@ const SettingsScreen = ({
         </div>
 
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Système</h4>
-          <Card className="p-0 overflow-hidden">
-            <div className="p-5 flex items-center justify-between border-b border-slate-50">
-              <div className="flex items-center gap-3">
-                <Download size={20} className="text-slate-400" />
-                <div className="text-left">
-                  <p className="text-sm font-medium">Mode Hors-Ligne</p>
-                  <p className="text-[10px] text-slate-500">Contenu disponible sans internet</p>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Contact de l'Équipe</h4>
+          <Card className="p-5 space-y-4">
+            <p className="text-xs text-slate-600 leading-relaxed text-left">
+              Pour signaler un problème avec l'application, poser une question ou faire une suggestion, n'hésitez pas à contacter l'équipe **Health Access Initiative (HAI)** :
+            </p>
+            
+            <div className="space-y-3 pt-1">
+              {/* WhatsApp & Téléphone 1 */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50 rounded-xl gap-2 hover:bg-slate-100 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Phone size={16} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-semibold text-slate-800">+229 01 57 57 51 67</p>
+                    <p className="text-[9px] text-slate-400 font-medium">WhatsApp / Appel direct</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a 
+                    href="https://wa.me/2290157575167" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold rounded-lg hover:bg-emerald-700 transition-all text-center flex-1 sm:flex-none"
+                  >
+                    WhatsApp
+                  </a>
+                  <a 
+                    href="tel:+2290157575167" 
+                    className="px-3 py-1 border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-white hover:text-slate-800 transition-all text-center flex-1 sm:flex-none"
+                  >
+                    Appeler
+                  </a>
                 </div>
               </div>
-              <div className="w-10 h-6 bg-emerald-500 rounded-full relative">
-                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full" />
+
+              {/* WhatsApp & Téléphone 2 */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50 rounded-xl gap-2 hover:bg-slate-100 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Phone size={16} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-semibold text-slate-800">+229 01 65 45 87 78</p>
+                    <p className="text-[9px] text-slate-400 font-medium">WhatsApp / Appel direct</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a 
+                    href="https://wa.me/2290165458778" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold rounded-lg hover:bg-emerald-700 transition-all text-center flex-1 sm:flex-none"
+                  >
+                    WhatsApp
+                  </a>
+                  <a 
+                    href="tel:+2290165458778" 
+                    className="px-3 py-1 border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-white hover:text-slate-800 transition-all text-center flex-1 sm:flex-none"
+                  >
+                    Appeler
+                  </a>
+                </div>
               </div>
+
+              {/* Email direct */}
+              <a 
+                href="mailto:info@healthaccess-initiative.org"
+                className="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <Mail size={16} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-semibold text-slate-800">info@healthaccess-initiative.org</p>
+                    <p className="text-[9px] text-slate-400 font-medium">Adresse e-mail directe</p>
+                  </div>
+                </div>
+                <ChevronRight size={14} className="text-slate-400 mr-1" />
+              </a>
             </div>
-            <button 
-              onClick={() => alert("Cache vidé avec succès")}
-              className="w-full p-5 flex items-center gap-3 hover:bg-slate-50 transition-colors"
-            >
-              <X size={20} className="text-slate-400" />
-              <p className="text-sm font-medium">Vider le cache</p>
-            </button>
           </Card>
         </div>
 
