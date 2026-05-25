@@ -56,7 +56,7 @@ service cloud.firestore {
     match /users/{userId} {
       // PII Protection: Only owner or admin can read specific user profile
       allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin() || (isSignedIn() && (resource.data.email == request.auth.token.get('email', '') && request.auth.token.get('email', '') != ''));
+      allow list: if isAdmin() || (isSignedIn() && (resource.data.get('email', '') == request.auth.token.get('email', '') && request.auth.token.get('email', '') != ''));
       
       // Validation for creation
       allow create: if isSignedIn() && (isOwner(userId) || isAdmin()) &&
@@ -89,7 +89,7 @@ service cloud.firestore {
       // Anyone authenticated can create a report
       allow create: if isSignedIn() && isValidId(reportId);
       // Only admin or the creator can read the report
-      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow read: if isAdmin() || (isSignedIn() && resource.data.get('userId', '') == request.auth.uid);
       allow update, delete: if isAdmin();
     }
 

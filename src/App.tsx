@@ -5341,6 +5341,14 @@ export default function App() {
       if (localStorage.getItem('first_registration_pending_lang') === 'true') {
         setShowFirstRegLanguageSelect(true);
       }
+      // On s'assure de revenir vers 'main' par défaut à la connexion si l'utilisateur a déjà choisi sa langue
+      const hasChosenLang = localStorage.getItem(`lang_chosen_${user.id}`) === 'true';
+      if (hasChosenLang) {
+        setCurrentScreen('main');
+      }
+    } else {
+      // Si déconnecté, on remet l'écran par défaut à 'main'
+      setCurrentScreen('main');
     }
   }, [user]);
 
@@ -5371,6 +5379,7 @@ export default function App() {
     localStorage.removeItem('first_registration_pending_lang');
     setShowFirstRegLanguageSelect(false);
     localStorage.setItem('paralegal_intro_seen', 'true');
+    setCurrentScreen('main');
   };
 
   const handleModuleSelect = (m: Module) => {
