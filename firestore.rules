@@ -20,8 +20,7 @@ service cloud.firestore {
       return isSignedIn() && (
         request.auth.uid == userId || 
         (email != '' && email == userId) ||
-        (email != '' && email == userId + "@paralegal.bj") ||
-        (request.resource != null && request.resource.data.get('email', '') == email && email != '')
+        (email != '' && email == userId + "@paralegal.bj")
       );
     }
 
@@ -57,7 +56,7 @@ service cloud.firestore {
     match /users/{userId} {
       // PII Protection: Only owner or admin can read specific user profile
       allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin() || (isSignedIn() && (resource.data.get('email', '') == request.auth.token.get('email', '') && request.auth.token.get('email', '') != ''));
+      allow list: if isAdmin() || (isSignedIn() && (resource.data.email == request.auth.token.get('email', '') && request.auth.token.get('email', '') != ''));
       
       // Validation for creation
       allow create: if isSignedIn() && (isOwner(userId) || isAdmin()) &&
@@ -70,12 +69,15 @@ service cloud.firestore {
         isAdmin() || 
         (!incoming().diff(existing()).affectedKeys().hasAny(['isAdmin']) && incoming().get('isAdmin', false) == existing().get('isAdmin', false))
       );
+
+      allow delete: if isAdmin();
     }
 
     match /progress/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isSignedIn() && isOwner(userId) && isValidId(userId);
       allow update: if (isOwner(userId) || isAdmin()) && isValidId(userId);
+      allow delete: if isAdmin();
     }
 
     match /modules/{moduleId} {

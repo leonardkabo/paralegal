@@ -758,11 +758,38 @@ export function useAppState(): AppState {
     }
 
     try {
-      // Find the user to get their phone for SQLite deletion
+      // Find the user to get their phone and other info
       const userToDelete = users.find(u => (u as any).id === userId || u.phone === userId || (u as any).uid === userId);
       const phoneToDelete = userToDelete?.phone || userId;
+      const emailToDelete = userToDelete?.email || "";
 
-      // 1. Delete from Firestore (try multiple possible IDs for thorough cleanup)
+      console.log(`[Admin state deleteUser] Début nettoyage complet pour l'utilisateur: ID=${userId}, Phone=${phoneToDelete}, Email=${emailToDelete}`);
+
+      // 1. Delete user reports from Firestore
+      try {
+        const reportsRef = collection(db, 'reports');
+        const identifiers = [userId, phoneToDelete];
+        if (emailToDelete) {
+          identifiers.push(emailToDelete);
+        }
+        // Add default pattern email just in case
+        if (phoneToDelete) {
+          identifiers.push(`${phoneToDelete}@paralegal.bj`);
+        }
+        
+        for (const ident of identifiers) {
+          if (!ident) continue;
+          const q = query(reportsRef, where('userId', '==', ident));
+          const snapshot = await getDocs(q);
+          const deletePromises = snapshot.docs.map(docSnap => deleteDoc(docSnap.ref));
+          await Promise.all(deletePromises);
+        }
+        console.log("[Admin state deleteUser] Signalements Firestore nettoyés.");
+      } catch (reportsErr) {
+        console.error("[Admin state deleteUser] Erreur lors de la suppression des signalements Firestore:", reportsErr);
+      }
+
+      // 2. Delete main User and Progress documents from Firestore
       await deleteDoc(doc(db, 'users', userId));
       await deleteDoc(doc(db, 'progress', userId));
       
@@ -771,17 +798,30 @@ export function useAppState(): AppState {
         try { await deleteDoc(doc(db, 'users', userToDelete.phone)); } catch (e) {}
         try { await deleteDoc(doc(db, 'progress', userToDelete.phone)); } catch (e) {}
       }
-      
-      // 2. Delete from SQLite (Success is optional as Firestore is primary)
+
+      // 3. Delete from SQLite and trigger Firebase Auth deletion (via backend integration)
       try {
-        await fetch(`/api/admin/users/${phoneToDelete}`, { method: 'DELETE' });
+        const queryParams = new URLSearchParams();
+        if (userId) queryParams.append("uid", userId);
+        if (emailToDelete) queryParams.append("email", emailToDelete);
+        
+        const response = await fetch(`/api/admin/users/${phoneToDelete}?${queryParams.toString()}`, { 
+          method: 'DELETE' 
+        });
+        
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error("[Admin state deleteUser] Code retour SQLite/Auth suppression anormal:", response.status, errText);
+        } else {
+          console.log("[Admin state deleteUser] Nettoyage SQLite et signal de suppression Firebase Auth lancés.");
+        }
       } catch (err) {
-        console.error("SQLite delete failed:", err);
+        console.error("[Admin state deleteUser] SQLite/Auth delete endpoint failed:", err);
       }
       
       return true;
     } catch (err) {
-      console.error("Firestore delete failed:", err);
+      console.error("[Admin state deleteUser] Échec nettoyage critique Firestore:", err);
       return false;
     }
   };

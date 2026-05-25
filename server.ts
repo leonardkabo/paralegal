@@ -19,6 +19,36 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(process.cwd(), "paralegal.db");
 const db = new Database(dbPath);
 
+import admin from "firebase-admin";
+
+// Initialize Firebase Admin SDK for user authentication deletion
+const deleteAuthUser = async (uid: string) => {
+  if (!uid) return false;
+  try {
+    if (admin.apps.length === 0) {
+      const configPath = path.join(process.cwd(), "firebase-applet-config.json");
+      let options = {};
+      if (fs.existsSync(configPath)) {
+        const firebaseConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+        if (firebaseConfig.projectId) {
+          options = { projectId: firebaseConfig.projectId };
+        }
+      }
+      admin.initializeApp(options);
+    }
+    await admin.auth().deleteUser(uid);
+    console.log(`[Firebase Admin] Utilisateur Firebase Auth '${uid}' supprimé définitivement.`);
+    return true;
+  } catch (error: any) {
+    if (error.code === 'auth/user-not-found') {
+      console.log(`[Firebase Admin] Utilisateur Auth '${uid}' non trouvé (déjà supprimé ou inexistant).`);
+      return true;
+    }
+    console.error(`[Firebase Admin] Erreur de suppression Auth pour '${uid}':`, error);
+    return false;
+  }
+};
+
 // Ensure uploads directory exists
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -1947,11 +1977,54 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/admin/users/:phone", (req, res) => {
+  app.delete("/api/admin/users/:phone", async (req, res) => {
     const { phone } = req.params;
-    db.prepare("DELETE FROM users WHERE phone = ?").run(phone);
-    db.prepare("DELETE FROM progress WHERE phone = ?").run(phone);
-    res.json({ success: true });
+    const uid = req.query.uid as string;
+    const email = req.query.email as string;
+
+    console.log(`[Server admin delete] Demande de suppression pour téléphone: ${phone}, UID: ${uid}, Email: ${email}`);
+
+    try {
+      // 1. Delete progress from SQLite
+      try {
+        db.prepare("DELETE FROM progress WHERE phone = ?").run(phone);
+      } catch (err: any) {
+        console.error("Failed to delete SQLite progress:", err.message);
+      }
+
+      // 2. Delete reports from SQLite (associated with this user via phone, custom auth email, or UID)
+      try {
+        const deleteReports = db.prepare(`
+          DELETE FROM reports 
+          WHERE userId = ? 
+             OR userId = ? 
+             OR (? IS NOT NULL AND userId = ?) 
+             OR (? IS NOT NULL AND userId = ?)
+        `);
+        deleteReports.run(phone, phone + "@paralegal.bj", uid, uid, email, email);
+        console.log(`[Server admin delete] Signalements SQLite associés à l'utilisateur nettoyés.`);
+      } catch (err: any) {
+        console.error("Failed to delete SQLite reports:", err.message);
+      }
+
+      // 3. Delete user from SQLite
+      try {
+        db.prepare("DELETE FROM users WHERE phone = ?").run(phone);
+      } catch (err: any) {
+        console.error("Failed to delete SQLite user:", err.message);
+      }
+
+      // 4. Delete user from Firebase Auth asynchronously if uid is present
+      if (uid) {
+        // We await or call in background
+        await deleteAuthUser(uid);
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error in server-side admin delete user route:", error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   app.post("/api/admin/modules", (req, res) => {
