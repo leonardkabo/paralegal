@@ -4964,7 +4964,7 @@ const SettingsScreen = ({
           <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Contact de l'Équipe</h4>
           <Card className="p-5 space-y-4">
             <p className="text-xs text-slate-600 leading-relaxed text-left">
-              Pour signaler un problème avec l'application, poser une question ou faire une suggestion, n'hésitez pas à contacter l'équipe **Health Access Initiative (HAI)** :
+              Pour signaler un problème avec l'application, poser une question ou faire une suggestion, n'hésitez pas à contacter l'équipe <strong>Health Access Initiative (HAI):</strong>
             </p>
             
             <div className="space-y-3 pt-1">

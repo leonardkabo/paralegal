@@ -57,7 +57,7 @@ service cloud.firestore {
     match /users/{userId} {
       // PII Protection: Only owner or admin can read specific user profile
       allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin() || (isSignedIn() && (resource == null || resource.data.email == request.auth.token.get('email', '')));
+      allow list: if isAdmin() || (isSignedIn() && (resource.data.get('email', '') == request.auth.token.get('email', '') && request.auth.token.get('email', '') != ''));
       
       // Validation for creation
       allow create: if isSignedIn() && (isOwner(userId) || isAdmin()) &&
