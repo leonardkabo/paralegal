@@ -697,6 +697,123 @@ const LanguageSelectionScreen = ({
   );
 };
 
+const PrivacyScreen = ({ onBack, organizationName }: { onBack: () => void, organizationName: string }) => {
+  return (
+    <div className="h-full bg-slate-50 flex flex-col overflow-hidden text-left">
+      <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-white shrink-0 z-10">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft size={20} />
+        </Button>
+        <h2 className="font-bold">Charte de Confidentialité</h2>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-24 text-slate-700 leading-relaxed text-sm">
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+          <div className="flex items-center gap-3 text-emerald-600">
+            <ShieldCheck size={28} />
+            <h3 className="font-bold text-lg text-slate-800">Engagement de Confidentialité</h3>
+          </div>
+         
+          <p>
+            Cette charte de confidentialité s'applique à l'application <strong>« Paralegal APP »</strong>, conçue et éditée par l'ONG <strong>{organizationName}</strong> pour la formation, l'évaluation et l'accompagnement des parajuristes au Bénin.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">1. Données Collectées</h4>
+          <Card className="p-5 space-y-3">
+            <p className="font-semibold text-slate-800 text-xs">A. Profil de l'utilisateur (Création de compte)</p>
+            <p className="text-xs text-slate-600">
+              Lors de votre inscription, nous collectons les informations suivantes pour constituer votre dossier d'élève parajuriste :
+            </p>
+            <ul className="list-disc pl-5 text-xs text-slate-600 space-y-1">
+              <li>Nom complet</li>
+              <li>Numéro de téléphone et/ou adresse e-mail (utilisés comme identifiants sécurisés)</li>
+              <li>Localisation (Département / Commune pour cartographier le réseau des parajuristes)</li>
+              <li>Date de naissance, Genre, Niveau d'étude (destinés aux statistiques d'impact de l'ONG)</li>
+              <li>Mot de passe (chiffré de manière sécurisée dans Firebase Auth)</li>
+            </ul>
+
+            <p className="font-semibold text-slate-800 text-xs pt-2">B. Activité d'apprentissage et de formation</p>
+            <p className="text-xs text-slate-600">
+              Afin de mesurer votre progression et de vous permettre de télécharger votre certificat de réussite, nous enregistrons :
+            </p>
+            <ul className="list-disc pl-5 text-xs text-slate-600 space-y-1">
+              <li>Les modules consultés et validés</li>
+              <li>Les scores obtenus aux questionnaires d'évaluation (quiz)</li>
+              <li>Le suivi d'écoute des versions audio</li>
+              <li>Les études de cas pratiques complétées</li>
+            </ul>
+
+            <p className="font-semibold text-slate-800 text-xs pt-2">C. Signalements et rapports de terrain</p>
+            <p className="text-xs text-slate-600">
+              L'application intègre un outil de signalement facultatif vous permettant de déclarer des cas d'injustice ou de violences sur le terrain. Ces rapports contiennent les détails du cas, les pièces jointes (fichiers/images) ou enregistrements audio sous votre contrôle exclusif.
+            </p>
+          </Card>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">2. Utilisation de vos données</h4>
+          <Card className="p-5 space-y-3">
+            <p className="text-xs text-slate-600">
+              L'ONG <strong>{organizationName}</strong> s'engage à n'utiliser vos données que dans les cas suivants :
+            </p>
+            <ul className="list-disc pl-5 text-xs text-slate-600 space-y-1">
+              <li><strong>Suivi de Formation :</strong> Évaluer votre compréhension des modules juridiques et valider votre diplôme de parajuriste.</li>
+              <li><strong>Assistance juridique :</strong> Permettre aux juristes et modérateurs de l'ONG d'instruire les cas que vous signalez sur le terrain pour conseiller la victime.</li>
+              <li><strong>Rapport d'activité :</strong> Produire des analyses statistiques de manière consolidée et totalement anonyme pour nos partenaires au développement (aucun profil individuel n'est divulgué).</li>
+            </ul>
+            <p className="text-xs text-red-600 font-semibold bg-red-50 p-2 rounded-lg">
+              Aucune donnée personnelle n'est louée, vendue, échangée ou partagée avec des tiers à des fins de prospection commerciale ou publicitaire.
+            </p>
+          </Card>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">3. Stockage et Sécurité</h4>
+          <Card className="p-5 space-y-3">
+            <p className="text-xs text-slate-600">
+              Vos informations sont stockées avec le plus haut niveau de protection sur les infrastructures sécurisées de <strong>Google Firebase Firestore</strong> et de <strong>Firebase Authentication</strong>.
+            </p>
+            <p className="text-xs text-slate-600">
+              L'accès aux données des utilisateurs est restreint aux seuls administrateurs habilités de l'ONG HAI au Bénin. Les communications entre l'appareil et le serveur sont systématiquement sécurisées par chiffrement HTTPS/SSL.
+            </p>
+          </Card>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">4. Contrôle et Suppression</h4>
+          <Card className="p-5 space-y-3">
+            <p className="text-xs text-slate-600">
+              Conformément aux lois internationales de protection des données et aux régulations de l'autorité de protection du Bénin, vous disposez d'un contrôle total sur votre compte :
+            </p>
+            <p className="text-xs text-slate-600 font-bold">
+              • Suppression complète de votre compte et de vos données :
+            </p>
+            <p className="text-xs text-slate-600">
+              Vous pouvez à tout moment demander la désactivation ou la suppression immédiate et définitive de votre compte et de l'ensemble de vos données associées (profil, progression, rapports) en contactant directement l'administrateur de l'ONG par e-mail ou depuis la page de contact.
+            </p>
+          </Card>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">5. Contact et Réclamations</h4>
+          <Card className="p-5 text-xs text-slate-600 space-y-2">
+            <p>
+              Pour toute question relative à l'exercice de vos droits ou à l'application de cette charte de confidentialité, veuillez contacter l'ONG :
+            </p>
+            <p className="font-semibold text-slate-800">ONG Health Access Initiative (HAI)</p>
+            <p>- E-mail : info@healthaccess-initiative.org</p>
+            <p>- Tél/WhatsApp : +229 01 57 57 51 67 / +229 01 65 45 87 78</p>
+            <p>- Siège : Cotonou, République du Bénin</p>
+          </Card>
+        </div>
+      
+      </div>
+    </div>
+  );
+};
+
 const GlossaryScreen = ({ onBack, glossary }: { onBack: () => void, glossary: GlossaryTerm[] }) => {
   const [search, setSearch] = useState('');
   const [selectedTerm, setSelectedTerm] = useState<GlossaryTerm | null>(null);
@@ -4784,7 +4901,8 @@ const SettingsScreen = ({
   onBack,
   onOpenAdmin,
   onDownloadCertificate,
-  onChangePassword
+  onChangePassword,
+  onOpenPrivacy
 }: { 
   user: any, 
   progress: any, 
@@ -4795,7 +4913,8 @@ const SettingsScreen = ({
   onBack: () => void,
   onOpenAdmin: () => void,
   onDownloadCertificate: () => void,
-  onChangePassword: (pass: string) => Promise<boolean>
+  onChangePassword: (pass: string) => Promise<boolean>,
+  onOpenPrivacy: () => void
 }) => {
   const isFullyCompleted = progress.finalExamScore !== undefined && progress.finalExamScore >= 80;
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -4930,6 +5049,25 @@ const SettingsScreen = ({
                 </p>
               )
             )}
+          </Card>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Légal & Confidentialité</h4>
+          <Card className="p-0 overflow-hidden">
+            <button 
+              onClick={onOpenPrivacy}
+              className="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <ShieldCheck size={20} className="text-emerald-600" />
+                <div className="text-left">
+                  <p className="text-sm font-medium">Règles de Confidentialité</p>
+                  <p className="text-[10px] text-slate-400">Consulter notre charte de protection des données privées</p>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-slate-300" />
+            </button>
           </Card>
         </div>
 
@@ -5257,7 +5395,7 @@ export default function App() {
     doc.save(`Certificat_HAI_${user.fullName.replace(/\s/g, '_')}.pdf`);
   };
 
-  const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'reporting' | 'cases' | 'performance' | 'exam' | 'admin'>('main');
+  const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'reporting' | 'cases' | 'performance' | 'exam' | 'admin' | 'privacy'>('main');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
 
   // Synchronisation de l'état avec l'historique du navigateur (pour le bouton Retour matériel d'Android & navigateur)
@@ -5510,6 +5648,23 @@ export default function App() {
               onOpenAdmin={() => setCurrentScreen('admin')}
               onDownloadCertificate={generateCertificate}
               onChangePassword={changePassword}
+              onOpenPrivacy={() => setCurrentScreen('privacy')}
+            />
+          </motion.div>
+        )}
+
+        {currentScreen === 'privacy' && (
+          <motion.div 
+            key="privacy"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-50 bg-slate-50 max-w-2xl mx-auto shadow-2xl overflow-y-auto"
+          >
+            <PrivacyScreen 
+              onBack={goBack} 
+              organizationName={settings.organizationName || 'Health Access Initiative (HAI)'} 
             />
           </motion.div>
         )}
