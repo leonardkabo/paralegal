@@ -156,6 +156,16 @@ db.exec(`
     status TEXT DEFAULT 'pending',
     createdAt TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS deletion_requests (
+    id TEXT PRIMARY KEY,
+    fullName TEXT,
+    phone TEXT,
+    email TEXT,
+    reason TEXT,
+    status TEXT DEFAULT 'pending',
+    createdAt TEXT
+  );
 `);
 
 // Migration: Add missing columns to progress table if it already existed
@@ -2291,6 +2301,392 @@ async function startServer() {
           "sha256_cert_fingerprints": ["E2:2D:A5:B4:A7:99:60:BF:40:0A:8E:0C:0C:81:CC:0E:0F:F9:C1:44:82:47:67:61:76:3F:9C:2E:A4:A7:D1:C7"]
         }
       }]);
+    }
+  });
+
+  // -------------------------------------------------------------
+  // PUBLIC ROUTES: PRIVACY POLICY & ACCOUNT DELETION (PLAY STORE COMPLIANCE)
+  // -------------------------------------------------------------
+
+  // 1. Serving Privacy Policy as a beautiful responsive page
+  app.get(["/privacy", "/privacy-policy"], (req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(`
+<!DOCTYPE html>
+<html lang="fr" class="bg-slate-50 text-slate-800">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charte de Confidentialité - Paralegal APP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col items-center text-center space-y-4 mb-8">
+      <div class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-md shadow-emerald-500/10">
+        P
+      </div>
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight sm:text-3xl">Paralegal APP</h1>
+        <p class="text-sm font-semibold text-emerald-600 mt-1">ONG Health Access Initiative (HAI)</p>
+      </div>
+      <div class="h-px w-24 bg-slate-100 my-2"></div>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+        Charte de Confidentialité officielle
+      </span>
+    </div>
+
+    <!-- Content Card -->
+    <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100 space-y-8">
+      <div class="space-y-4">
+        <div class="flex items-center gap-3 text-emerald-600">
+          <svg class="w-7 h-7 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          <h2 class="font-extrabold text-xl text-slate-900">Engagement de l'ONG HAI</h2>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Cette charte de confidentialité s'applique à l'application mobile et de bureau <strong>« Paralegal APP »</strong> , conçue et éditée par l'ONG <strong>Health Access Initiative (HAI)</strong> pour la formation, l'évaluation et l'accompagnement d'impact des parajuristes en République du Bénin.
+        </p>
+        </div>
+
+      <div class="h-px bg-slate-100"></div>
+
+      <!-- Section 1 -->
+      <div class="space-y-4">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">1. Données Collectées</h3>
+        
+        <div class="space-y-4">
+          <div>
+            <h4 class="text-sm font-bold text-slate-800">A. Profil de l'utilisateur (Création de compte)</h4>
+            <p class="text-xs text-slate-600 mt-1">Lors de votre inscription, les données suivantes sont récoltées pour constituer votre dossier d'étudiant parajuriste :</p>
+            <ul class="list-disc pl-5 text-xs text-slate-500 mt-2 space-y-1">
+              <li>Nom complet</li>
+              <li>Numéro de téléphone et/ou adresse e-mail (qui font office d'identifiants sécurisés)</li>
+              <li>Localisation géographique (Département / Commune pour cartographier notre réseau)</li>
+              <li>Date de naissance, Genre et Niveau d'étude (destinés aux statistiques d'impact social de l'ONG)</li>
+              <li>Mot de passe (stocké de manière chiffrée et hautement sécurisée via Firebase Authentication)</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-sm font-bold text-slate-800">B. Activité d'apprentissage et de formation</h4>
+            <p class="text-xs text-slate-600 mt-1">Afin de comptabiliser votre progression et de valider la délivrance de votre diplôme certifié de parajuriste, nous enregistrons :</p>
+            <ul class="list-disc pl-5 text-xs text-slate-500 mt-2 space-y-1">
+              <li>Les modules consultés, écoutés en audio ou validés</li>
+              <li>Les scores obtenus aux questionnaires (quiz) d'évaluation hebdomadaires</li>
+              <li>Les études de cas pratiques complétées</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-sm font-bold text-slate-800">C. Signalements et rapports de terrain</h4>
+            <p class="text-xs text-slate-600 mt-1">L'application propose un utilitaire de signalement qui vous permet de déclarer des cas d'injustices ou d'infractions constatés sur le terrain. Ces rapports contiennent les détails textuels, géolocalisations, pièces jointes ainsi que des enregistrements audio sous votre contrôle exclusif.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-px bg-slate-100"></div>
+
+      <!-- Section 2 -->
+      <div class="space-y-3">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">2. Utilisation de vos données</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          L'ONG <strong>Health Access Initiative (HAI)</strong> s'engage formellement à restreindre l'utilisation de vos informations exclusivement aux finalités suivantes :
+        </p>
+        <ul class="list-disc pl-5 text-xs text-slate-500 space-y-1">
+          <li><strong>Suivi Educatif :</strong> Assurer la vérification de vos acquis, la délivrance de certificats officiels de parajuriste.</li>
+          <li><strong>Assistance Juridique :</strong> Instruire les dossiers et rapports d'injustices que vous soumettez afin d'offrir des conseils judiciaires adéquats aux victimes.</li>
+          <li><strong>Rapportage Statistique :</strong> Établir des consolidations d'impact géographiques pour les rapports annuels de l'ONG (sans aucun profil individuel identifiable).</li>
+        </ul>
+        <div class="bg-rose-50 border border-rose-100 text-rose-800 text-xs p-4 rounded-2xl flex items-start gap-2 mt-2">
+          <svg class="w-5 h-5 shrink-0 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <div>
+            <strong class="font-bold">Zéro revente commerciale :</strong> Aucune donnée personnelle n'est vendue, louée, échangée ou exploitée commercialement d'aucune manière.
+          </div>
+        </div>
+      </div>
+
+      <div class="h-px bg-slate-100"></div>
+
+      <!-- Section 3 -->
+      <div class="space-y-3">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">3. Contrôle, Droits et Suppression immédiate</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Conformément aux législations de protection des données, vous disposez d'un contrôle total sur votre compte. Vous pouvez demander la désactivation et la suppression intégrale de vos informations de nos bases de données.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <a href="/suppression" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-rose-200 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors">
+            <svg class="w-4 h-4 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            Demander la suppression de mes données en ligne
+          </a>
+        </div>
+      </div>
+
+      <div class="h-px bg-slate-100"></div>
+
+      <!-- Section 4 -->
+      <div class="space-y-3">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">4. Identité du Contact</h3>
+        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-xs text-slate-600 space-y-2">
+          <p class="font-bold text-slate-900 text-sm">ONG Health Access Initiative (HAI)</p>
+          <p><span class="font-medium text-slate-800">E-mail :</span> info@healthaccess-initiative.org</p>
+          <p><span class="font-medium text-slate-800">Tél/WhatsApp :</span> +229 01 57 57 51 67 / +229 01 65 45 87 78</p>
+          <p><span class="font-medium text-slate-800">Siège :</span> Cotonou, République du Bénin</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-[11px] text-slate-400 mt-8">
+      Paralegal APP © 2026. Une application éditée par l'ONG HAI au Bénin.
+    </p>
+  </div>
+</body>
+</html>
+    `);
+  });
+
+  // 2. Serving Account Deletion request as a beautiful, interactive form page
+  app.get(["/suppression", "/delete-account"], (req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(`
+<!DOCTYPE html>
+<html lang="fr" class="bg-slate-50 text-slate-800">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande de Suppression de Compte et de Données - Paralegal APP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+  <div class="max-w-2xl mx-auto px-4 py-8">
+    <!-- Back Header link -->
+    <div class="mb-4">
+      <a href="/privacy" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Retour à la charte de confidentialité
+      </a>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+      <!-- Top banner -->
+      <div class="bg-slate-900 px-6 py-8 sm:p-10 text-white relative">
+        <div class="absolute top-4 right-4 bg-rose-500/20 text-rose-300 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full border border-rose-500/30">
+          Suppression de compte
+        </div>
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Supprimer vos Données Personnelles</h1>
+        <p class="text-slate-400 text-xs sm:text-sm mt-2 max-w-lg leading-relaxed">
+          Saisissez vos informations pour envoyer une demande de suppression définitive à l'administrateur de l'ONG HAI. Vos informations, votre progression et vos données seront supprimées dans un délai de 48h.
+        </p>
+      </div>
+
+      <!-- Main body container -->
+      <div class="p-6 sm:p-10" id="main-content-block">
+        <div class="bg-rose-50 border border-rose-100 text-rose-800 text-xs p-4 rounded-2xl flex items-start gap-3 mb-6">
+          <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <div>
+            <h3 class="font-bold">Conséquences de la suppression :</h3>
+            <p class="mt-1 opacity-90 text-slate-600 leading-normal">
+              Cette action supprimera définitivement votre profil parajuriste, votre compte, l'intégralité de vos modules complétés, vos résultats aux évaluations ainsi que votre accès général. Cette action de suppression est irréversible.
+            </p>
+          </div>
+        </div>
+
+        <form id="deletion-form" class="space-y-5 text-left">
+          <!-- Nom complet -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-wider block">Nom Complet (utilisé sur votre compte)</label>
+            <input 
+              type="text" 
+              id="fullName" 
+              required
+              placeholder="Ex. Koffi Mensah"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+            >
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Numéro de téléphone -->
+            <div class="space-y-1.5">
+              <label class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-wider block">Numéro de Téléphone (Identifiant principal)</label>
+              <input 
+                type="tel" 
+                id="phone" 
+                required
+                placeholder="Ex. +229 01..."
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+              >
+            </div>
+
+            <!-- Email -->
+            <div class="space-y-1.5">
+              <label class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-wider block">Adresse E-mail (facultatif)</label>
+              <input 
+                type="email" 
+                id="email" 
+                placeholder="Ex. koffi@gmail.com"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+              >
+            </div>
+          </div>
+
+          <!-- Raison de suppression -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-wider block">Pourquoi souhaitez-vous supprimer vos données ? (facultatif)</label>
+            <textarea 
+              id="reason" 
+              rows="3"
+              placeholder="Ex. Formation complétée, changement d'organisation, ou retrait de l'application..."
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm resize-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+            ></textarea>
+          </div>
+
+          <!-- Consent checkbox -->
+          <label class="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-100/50 transition-colors">
+            <input 
+              type="checkbox" 
+              id="consent" 
+              required
+              class="mt-1 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+            >
+            <span class="text-xs text-slate-600 leading-normal">
+              Je confirme que je suis bien le titulaire du compte susmentionné et j'exige formellement la suppression définitive de toutes mes données, scores et historiques d'évaluation de l'application de formation.
+            </span>
+          </label>
+
+          <!-- Error message placeholder -->
+          <div id="error-message" class="hidden text-rose-650 bg-rose-50 text-xs border border-rose-100 p-3.5 rounded-xl font-medium"></div>
+
+          <!-- Submit buttons -->
+          <button 
+            type="submit" 
+            id="submit-btn"
+            class="w-full h-14 bg-rose-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-rose-700 active:scale-[0.99] transition-all shadow-lg shadow-rose-600/10"
+          >
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            Soumettre la demande de suppression
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("deletion-form");
+      const submitBtn = document.getElementById("submit-btn");
+      const errorMessage = document.getElementById("error-message");
+      const mainContentBlock = document.getElementById("main-content-block");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        // Form compilation
+        const fullName = document.getElementById("fullName").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const reason = document.getElementById("reason").value.trim();
+        const consent = document.getElementById("consent").checked;
+
+        if (!consent) {
+          errorMessage.textContent = "Veuillez cocher la case d'autorisation.";
+          errorMessage.classList.remove("hidden");
+          return;
+        }
+
+        errorMessage.classList.add("hidden");
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = \`<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Transmission en cours...\`;
+
+        try {
+          const response = await fetch("/api/public/request-data-deletion", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fullName, phone, email, reason })
+          });
+          const result = await response.json();
+
+          if (result.success) {
+            // Render beautiful success box in place of form
+            mainContentBlock.innerHTML = \`
+              <div class="py-6 text-center space-y-4 animate-fadeIn">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+                  ✓
+                </div>
+                <h2 class="text-xl font-extrabold text-slate-900">Demande Enregistrée !</h2>
+                <div class="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs p-5 rounded-2xl max-w-md mx-auto leading-relaxed">
+                  <p class="font-bold">Votre demande a été prise en compte avec succès.</p>
+                  <p class="mt-2 text-slate-650">L'administrateur de l'ONG Health Access Initiative (HAI) va traiter la suppression complète de votre compte et de toutes vos progressions (modules, quiz, audio, rapports) dans un délai maximum de 48 heures conformément aux politiques de protection.</p>
+                  <p class="mt-2 text-xs text-emerald-600 font-semibold">Identifiant de suivi de la suppression : \${result.requestId}</p>
+                </div>
+                <div class="pt-2 text-xs text-slate-400">
+                  Besoin d'aide supplémentaire ? Contactez-nous à <a href="mailto:info@healthaccess-initiative.org" class="text-emerald-500 underline font-medium">info@healthaccess-initiative.org</a>
+                </div>
+              </div>
+            \`;
+          } else {
+            throw new Error(result.error || "Erreur de transmission");
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = \`<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Soumettre la demande de suppression\`;
+          errorMessage.textContent = err.message || "Une erreur est survenue lors de l'envoi. Veuillez réessayer ou contacter le support de l'ONG.";
+          errorMessage.classList.remove("hidden");
+        }
+      });
+    </script>
+  </div>
+</body>
+</html>
+    `);
+  });
+
+  // 3. API endpoint: POST deletion request from public form
+  app.post("/api/public/request-data-deletion", (req, res) => {
+    try {
+      const { fullName, phone, email, reason } = req.body;
+      if (!fullName || !phone) {
+        return res.status(400).json({ error: "Le nom complet et le numéro de téléphone sont obligatoires." });
+      }
+
+      const requestId = "dr-" + Math.round(Math.random() * 1e5) + "-" + Date.now().toString().slice(-4);
+      const createdAt = new Date().toISOString();
+
+      const insert = db.prepare("INSERT INTO deletion_requests (id, fullName, phone, email, reason, status, createdAt) VALUES (?, ?, ?, ?, ?, 'pending', ?)");
+      insert.run(requestId, fullName, phone, email || "", reason || "", createdAt);
+
+      console.log("[Data Deletion Request] Nouvelle demande soumise: " + requestId + " pour le téléphone: " + phone);
+      res.json({ success: true, requestId });
+    } catch (error: any) {
+      console.error("Error inserting deletion request:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 4. API endpoint: GET deletion requests for admin view
+  app.get("/api/admin/deletion-requests", (req, res) => {
+    try {
+      const list = db.prepare("SELECT * FROM deletion_requests ORDER BY createdAt DESC").all();
+      res.json(list);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 5. API endpoint: DELETE or Resolve a deletion request
+  app.delete("/api/admin/deletion-requests/:id", (req, res) => {
+    try {
+      const { id } = req.params;
+      db.prepare("DELETE FROM deletion_requests WHERE id = ?").run(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

@@ -10,6 +10,28 @@
     <title>Paralegal APP</title>
     <!-- Code développé par Léonard KABO -->
     
+    <!-- Pre-emptive protection for window.fetch override in sandboxed environments -->
+    <script>
+      (function() {
+        try {
+          var originalFetch = window.fetch;
+          var fetchValue = originalFetch;
+          Object.defineProperty(window, 'fetch', {
+            configurable: true,
+            enumerable: true,
+            get: function() {
+              return fetchValue;
+            },
+            set: function(val) {
+              fetchValue = val;
+            }
+          });
+        } catch (e) {
+          console.warn('[Fetch Protection] Unable to define wrapper on window.fetch:', e);
+        }
+      })();
+    </script>
+    
     <!-- Service Worker PWA Registration -->
     <script>
       if ('serviceWorker' in navigator) {

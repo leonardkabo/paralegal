@@ -814,6 +814,171 @@ const PrivacyScreen = ({ onBack, organizationName }: { onBack: () => void, organ
   );
 };
 
+const PublicSuppressionScreen = ({ onBack, organizationName }: { onBack: () => void, organizationName: string }) => {
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [reason, setReason] = useState('');
+  const [consent, setConsent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [requestId, setRequestId] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!consent) {
+      setError("Veuillez cocher la case d'autorisation.");
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/public/request-data-deletion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, phone, email, reason })
+      });
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setSuccess(true);
+        setRequestId(result.requestId);
+      } else {
+        throw new Error(result.error || "Erreur de transmission");
+      }
+    } catch (err: any) {
+      setError(err.message || "Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="h-full bg-slate-50 flex flex-col overflow-hidden text-left bg-white">
+      <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-white shrink-0 z-10">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft size={20} />
+        </Button>
+        <h2 className="font-bold">Suppression de Compte</h2>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-24 text-slate-700 leading-relaxed text-sm">
+        <div className="bg-slate-900 p-6 rounded-3xl text-white relative overflow-hidden shadow-xl">
+          <div className="absolute top-4 right-4 bg-rose-500/20 text-rose-300 text-[9px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full border border-rose-500/30">
+            Play Store Compliance
+          </div>
+          <h1 className="text-xl font-extrabold tracking-tight">Supprimer vos Données</h1>
+          <p className="text-slate-400 text-xs mt-2 max-w-lg leading-relaxed">
+            Saisissez vos informations pour formuler votre demande de suppression définitive de votre compte et de toutes vos données d'apprentissage.
+          </p>
+        </div>
+
+        {success ? (
+          <div className="py-6 text-center space-y-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
+              ✓
+            </div>
+            <h2 className="text-xl font-extrabold text-slate-900">Demande Enregistrée !</h2>
+            <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs p-5 rounded-2xl max-w-md mx-auto leading-relaxed">
+              <p className="font-bold">Votre demande a été prise en compte.</p>
+              <p className="mt-2 text-slate-650">L'administrateur de l'organisation <strong>{organizationName}</strong> va traiter la suppression complète de votre compte et de toutes vos progressions (modules, quiz, audio, rapports) dans un délai maximum de 48 heures.</p>
+              {requestId && <p className="mt-2 text-xs font-mono font-semibold text-emerald-600">ID de suivi : {requestId}</p>}
+            </div>
+            <Button onClick={onBack} className="mt-4 shrink-0 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700">
+              Retourner à l'accueil
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-5">
+            <div className="bg-rose-50 border border-rose-100 text-rose-850 p-4 rounded-2xl flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <div className="text-xs text-rose-800 space-y-1">
+                <p className="font-bold">Attention - Action Irréversible :</p>
+                <p className="leading-normal text-rose-700">
+                  Cette action supprimera définitivement votre profil, votre mot de passe, votre accès général, vos quiz validés, vos écoutes de cours audio et vos certificats déjà accumulés.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Nom Complet</label>
+              <input 
+                type="text" 
+                required
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                placeholder="Ex. Koffi Mensah"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Numéro de Téléphone</label>
+                <input 
+                  type="tel" 
+                  required
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="Ex. +229 01..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">E-mail (facultatif)</label>
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="Ex. monadresse@gmail.com"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Pourquoi souhaitez-vous supprimer vos données ?</label>
+              <textarea 
+                rows={3}
+                value={reason}
+                onChange={e => setReason(e.target.value)}
+                placeholder="Indiquez brièvement le motif si vous le souhaitez..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm resize-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+              />
+            </div>
+
+            <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 cursor-pointer hover:bg-slate-100/50 transition-colors">
+              <input 
+                type="checkbox" 
+                checked={consent}
+                onChange={e => setConsent(e.target.checked)}
+                className="mt-1 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span className="text-xs text-slate-600 leading-normal">
+                Je confirme être le propriétaire de ce compte et je demande la purge définitive de son contenu de la base de données.
+              </span>
+            </label>
+
+            {error && <div className="text-rose-600 bg-rose-50 text-xs border border-rose-100 p-3.5 rounded-xl font-medium">{error}</div>}
+
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full h-14 bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50 font-bold text-sm rounded-xl"
+            >
+              {loading ? "Transmission..." : "Soumettre la demande de suppression"}
+            </Button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const GlossaryScreen = ({ onBack, glossary }: { onBack: () => void, glossary: GlossaryTerm[] }) => {
   const [search, setSearch] = useState('');
   const [selectedTerm, setSelectedTerm] = useState<GlossaryTerm | null>(null);
@@ -3242,6 +3407,60 @@ const AdminDashboard = ({
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [editorTab, setEditorTab] = useState<'edit' | 'preview'>('edit');
 
+  const [deletionRequests, setDeletionRequests] = useState<any[]>([]);
+
+  const fetchDeletionRequests = async () => {
+    try {
+      const response = await fetch("/api/admin/deletion-requests");
+      const list = await response.json();
+      setDeletionRequests(list);
+    } catch (e) {
+      console.error("Error fetching deletion requests:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (view === 'users') {
+      fetchDeletionRequests();
+    }
+  }, [view]);
+
+  const handleDeleteDeletionRequest = async (id: string) => {
+    if (confirm("Supprimer cette demande de la liste ?")) {
+      try {
+        const response = await fetch(`/api/admin/deletion-requests/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (result.success) {
+          setDeletionRequests(deletionRequests.filter(dr => dr.id !== id));
+        }
+      } catch (err) {
+        console.error("Error deleting deletion request:", err);
+      }
+    }
+  };
+
+  const handleApproveDeletion = async (request: any) => {
+    const userToDelete = allUsers.find(u => u.phone === request.phone || u.email === request.email);
+    const identifier = userToDelete ? (userToDelete.fullName + " (" + request.phone + ")") : request.phone;
+    
+    if (confirm(`IMPORTANT: Voulez-vous approuver cette demande et SUPPRIMER DÉFINITIVEMENT l'utilisateur ${identifier} ainsi que toutes ses données (progressions, rapports, mot de passe) ?`)) {
+      const phoneId = userToDelete?.phone || request.phone;
+      const ok = await onDeleteUser(phoneId);
+      
+      if (ok) {
+        try {
+          await fetch(`/api/admin/deletion-requests/${request.id}`, { method: 'DELETE' });
+          setDeletionRequests(deletionRequests.filter(dr => dr.id !== request.id));
+          alert("Utilisateur supprimé définitivement avec succès !");
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        alert("Une erreur est survenue lors de la suppression de l'utilisateur.");
+      }
+    }
+  };
+
   const insertMarkdownAtCursor = (text: string) => {
     if (!editingModule) return;
     const textarea = contentRef.current;
@@ -3926,6 +4145,53 @@ const AdminDashboard = ({
                 <UserPlus size={18} /> Créer un utilisateur
               </Button>
             </div>
+
+            {deletionRequests.length > 0 && (
+              <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 space-y-3 mb-4">
+                <div className="flex items-center gap-2 text-rose-700">
+                  <AlertTriangle size={20} className="shrink-0" />
+                  <h4 className="font-bold text-sm">Demandes de suppression de compte ({deletionRequests.length})</h4>
+                </div>
+                <p className="text-xs text-rose-600 leading-normal">
+                  Ces utilisateurs demandent la suppression définitive de leur compte et de toutes leurs données (conforme Google Play).
+                </p>
+                <div className="space-y-2">
+                  {deletionRequests.map((req) => {
+                    const userExists = allUsers.some(u => u.phone === req.phone || u.email === req.email);
+                    return (
+                      <div key={req.id} className="bg-white border border-rose-100 rounded-xl p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div className="text-left">
+                          <p className="font-bold text-slate-800 text-xs">{req.fullName}</p>
+                          <p className="text-[10px] text-slate-500">{req.phone} {req.email ? `• ${req.email}` : ''}</p>
+                          {req.reason && <p className="text-[10px] text-slate-500 italic mt-0.5">Motif: "{req.reason}"</p>}
+                          <p className="text-[8px] text-slate-400 mt-1">Reçu le {new Date(req.createdAt).toLocaleString('fr-FR')}</p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          {userExists ? (
+                            <button 
+                              onClick={() => handleApproveDeletion(req)}
+                              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[10px] font-bold transition-all"
+                            >
+                              Approuver & Supprimer
+                            </button>
+                          ) : (
+                            <span className="px-2 py-1.5 bg-slate-100 border border-slate-200 text-slate-400 rounded-lg text-[9px] font-semibold">
+                              Déjà supprimé
+                            </span>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteDeletionRequest(req.id)}
+                            className="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-lg text-[10px] font-bold transition-all"
+                          >
+                            Masquer
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {showUserForm && (
               <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
@@ -5398,6 +5664,35 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'main' | 'module' | 'settings' | 'glossary' | 'documents' | 'reporting' | 'cases' | 'performance' | 'exam' | 'admin' | 'privacy'>('main');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
 
+  const [publicView, setPublicView] = useState<'none' | 'privacy' | 'suppression'>(() => {
+    const hash = window.location.hash;
+    const path = window.location.pathname;
+    if (hash === '#privacy' || path === '/privacy') return 'privacy';
+    if (hash === '#suppression' || path === '/suppression') return 'suppression';
+    return 'none';
+  });
+
+  useEffect(() => {
+    const handleHashAndPath = () => {
+      const hash = window.location.hash;
+      const path = window.location.pathname;
+      if (hash === '#privacy' || path === '/privacy') {
+        setPublicView('privacy');
+      } else if (hash === '#suppression' || path === '/suppression') {
+        setPublicView('suppression');
+      } else {
+        setPublicView('none');
+      }
+    };
+    window.addEventListener('hashchange', handleHashAndPath);
+    window.addEventListener('popstate', handleHashAndPath);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashAndPath);
+      window.removeEventListener('popstate', handleHashAndPath);
+    };
+  }, []);
+
   // Synchronisation de l'état avec l'historique du navigateur (pour le bouton Retour matériel d'Android & navigateur)
   const isPopStateRef = useRef(false);
 
@@ -5538,6 +5833,40 @@ export default function App() {
     updateLastActivity(`Lecture du module: ${m.title}`, m.id);
     setCurrentScreen('module');
   };
+
+  if (publicView === 'privacy') {
+    return (
+      <div className="max-w-2xl mx-auto bg-slate-50 min-h-screen shadow-2xl relative overflow-y-auto">
+        <PrivacyScreen 
+          onBack={() => {
+            window.location.hash = '';
+            if (window.location.pathname === '/privacy') {
+              window.history.pushState({}, '', '/');
+            }
+            setPublicView('none');
+          }} 
+          organizationName={settings.organizationName || 'Health Access Initiative (HAI)'} 
+        />
+      </div>
+    );
+  }
+
+  if (publicView === 'suppression') {
+    return (
+      <div className="max-w-2xl mx-auto bg-slate-50 min-h-screen shadow-2xl relative overflow-y-auto">
+        <PublicSuppressionScreen 
+          onBack={() => {
+            window.location.hash = '';
+            if (window.location.pathname === '/suppression') {
+              window.history.pushState({}, '', '/');
+            }
+            setPublicView('none');
+          }} 
+          organizationName={settings.organizationName || 'Health Access Initiative (HAI)'}
+        />
+      </div>
+    );
+  }
 
   if (!user) {
     return (
